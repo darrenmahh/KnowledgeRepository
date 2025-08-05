@@ -1,16 +1,20 @@
 {
   "recentFiles": [
     {
+      "basename": "消息队列",
+      "path": "000-八股/01-笔记/MQ/消息队列.md"
+    },
+    {
       "basename": "MQ",
       "path": "000-八股/02-资料/MQ.pdf"
     },
     {
-      "basename": "Redis",
-      "path": "000-八股/01-笔记/Redis/Redis.md"
+      "basename": "confirm机制",
+      "path": "confirm机制.md"
     },
     {
-      "basename": "消息队列",
-      "path": "000-八股/01-笔记/MQ/消息队列.md"
+      "basename": "Redis",
+      "path": "000-八股/01-笔记/Redis/Redis.md"
     },
     {
       "basename": "Spring全家桶",
@@ -195,10 +199,6 @@
     {
       "basename": "行测必背手册",
       "path": "05-GWY/04-晨读/行测必背手册.pdf"
-    },
-    {
-      "basename": "【言语】顾斐高频成语500词",
-      "path": "05-GWY/04-晨读/【言语】顾斐高频成语500词.pdf"
     }
   ],
   "omittedPaths": [],
