@@ -1,0 +1,254 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>交互式随机森林演示</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Noto+Sans+SC:wght@400;500;700&display=swap');
+        body {
+            font-family: 'Noto Sans SC', sans-serif;
+        }
+        .fruit {
+            transition: all 0.3s ease-in-out;
+            cursor: pointer;
+        }
+        .fruit-icon {
+            font-size: 3rem;
+            line-height: 1;
+        }
+        .tree-node {
+            transition: all 0.3s ease;
+            transform-origin: top center;
+        }
+        .tree-node.highlight {
+            transform: scale(1.1);
+            box-shadow: 0 0 15px rgba(250, 204, 21, 0.8);
+        }
+    </style>
+</head>
+<body class="bg-gray-100 text-gray-800">
+
+    <div class="container mx-auto p-4 md:p-8">
+        <header class="text-center mb-8">
+            <h1 class="text-4xl font-bold text-gray-900">交互式随机森林演示</h1>
+            <p class="text-xl text-gray-600 mt-2">亲手操作，理解“森林”如何做出比“单棵树”更聪明的决策。</p>
+        </header>
+
+        <main class="grid grid-cols-1 lg:grid-cols-3 gap-8">
+            <!-- 左侧：手动决策区 -->
+            <div class="lg:col-span-1 bg-white p-6 rounded-2xl shadow-lg">
+                <h2 class="text-2xl font-bold mb-4 border-b pb-2">步骤 1: 手动决策</h2>
+                <p class="mb-4 text-gray-600">假设我们要根据两个特征（颜色和大小）来判断一个水果是苹果🍎还是柠檬🍋。</p>
+                
+                <div class="mb-6 text-center">
+                    <div id="fruit-display" class="fruit-icon">❓</div>
+                    <p id="fruit-label" class="font-semibold mt-2">未知水果</p>
+                </div>
+
+                <div class="space-y-4">
+                    <div>
+                        <label for="color-slider" class="block font-medium mb-1">颜色 (0:黄 ... 10:红)</label>
+                        <input id="color-slider" type="range" min="0" max="10" value="5" class="w-full h-2 bg-gradient-to-r from-yellow-400 to-red-600 rounded-lg appearance-none cursor-pointer">
+                        <div class="text-center font-bold text-lg mt-1" id="color-value">5</div>
+                    </div>
+                    <div>
+                        <label for="size-slider" class="block font-medium mb-1">大小 (0:小 ... 10:大)</label>
+                        <input id="size-slider" type="range" min="0" max="10" value="5" class="w-full h-2 bg-gray-200 rounded-lg appearance-none cursor-pointer">
+                         <div class="text-center font-bold text-lg mt-1" id="size-value">5</div>
+                    </div>
+                </div>
+
+                <div id="manual-tree" class="mt-8 p-4 bg-gray-50 rounded-lg border">
+                    <h3 class="text-lg font-semibold text-center mb-4">一棵“专家”决策树</h3>
+                    <div id="node1" class="tree-node bg-sky-100 p-3 rounded-md text-center shadow">颜色 > 6 ?</div>
+                    <div class="text-center my-2">↙️ 是&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;↘️ 否</div>
+                    <div class="flex justify-around">
+                        <div id="node1-yes" class="tree-node bg-red-100 p-3 rounded-md shadow">🍎 苹果</div>
+                        <div id="node1-no" class="tree-node bg-sky-100 p-3 rounded-md shadow">大小 > 4 ?</div>
+                    </div>
+                     <div class="text-right my-2" style="margin-right: 20px;">↙️ 是&nbsp;&nbsp;&nbsp;&nbsp;↘️ 否&nbsp;&nbsp;</div>
+                     <div class="flex justify-end" style="gap: 1rem; margin-right: 1rem;">
+                        <div id="node2-yes" class="tree-node bg-red-100 p-3 rounded-md shadow">🍎 苹果</div>
+                        <div id="node2-no" class="tree-node bg-yellow-100 p-3 rounded-md shadow">🍋 柠檬</div>
+                    </div>
+                </div>
+                 <div class="mt-4 p-4 text-center bg-blue-50 rounded-lg">
+                    <p class="font-semibold">单棵树的预测结果:</p>
+                    <p id="manual-prediction" class="text-4xl font-bold text-blue-600 mt-2">-</p>
+                </div>
+            </div>
+
+            <!-- 右侧：随机森林区 -->
+            <div class="lg:col-span-2 bg-white p-6 rounded-2xl shadow-lg">
+                <h2 class="text-2xl font-bold mb-4 border-b pb-2">步骤 2: 随机森林集体决策</h2>
+                <p class="mb-6 text-gray-600">现在，我们咨询一个由3位不同“专家”（3棵决策树）组成的“随机森林”。每棵树的判断标准都略有不同。</p>
+                
+                <div id="forest-container" class="grid grid-cols-1 md:grid-cols-3 gap-6">
+                    <!-- Tree 1 -->
+                    <div id="tree-1" class="bg-gray-50 rounded-lg border p-4">
+                        <h4 class="font-bold text-center mb-2">树 1 (更看重颜色)</h4>
+                        <div class="text-sm space-y-1">
+                            <p>1. 颜色 > 5 ?</p>
+                            <p class="ml-2">是: 🍎 苹果</p>
+                            <p class="ml-2">否: 🍋 柠檬</p>
+                        </div>
+                        <p class="text-center mt-4 font-bold text-2xl">预测: <span id="pred-1" class="text-gray-500">?</span></p>
+                    </div>
+                    <!-- Tree 2 -->
+                    <div id="tree-2" class="bg-gray-50 rounded-lg border p-4">
+                        <h4 class="font-bold text-center mb-2">树 2 (更看重大-小)</h4>
+                        <div class="text-sm space-y-1">
+                            <p>1. 大小 > 6 ?</p>
+                            <p class="ml-2">是: 🍎 苹果</p>
+                            <p class="ml-2">否: 颜色 > 3 ?</p>
+                             <p class="ml-4">是: 🍎 苹果</p>
+                             <p class="ml-4">否: 🍋 柠檬</p>
+                        </div>
+                        <p class="text-center mt-4 font-bold text-2xl">预测: <span id="pred-2" class="text-gray-500">?</span></p>
+                    </div>
+                    <!-- Tree 3 -->
+                    <div id="tree-3" class="bg-gray-50 rounded-lg border p-4">
+                       <h4 class="font-bold text-center mb-2">树 3 (标准不同)</h4>
+                        <div class="text-sm space-y-1">
+                            <p>1. 颜色 + 大小 > 11 ?</p>
+                            <p class="ml-2">是: 🍎 苹果</p>
+                            <p class="ml-2">否: 🍋 柠檬</p>
+                        </div>
+                        <p class="text-center mt-4 font-bold text-2xl">预测: <span id="pred-3" class="text-gray-500">?</span></p>
+                    </div>
+                </div>
+
+                <div class="mt-8 p-6 text-center bg-green-100 rounded-2xl border-2 border-green-300">
+                    <h3 class="text-xl font-semibold">最终投票结果:</h3>
+                    <div id="votes" class="flex justify-center items-center gap-4 text-5xl my-4">
+                        <!-- Votes will be populated here -->
+                    </div>
+                    <p class="font-semibold">随机森林的最终预测:</p>
+                    <p id="forest-prediction" class="text-5xl font-bold text-green-700 mt-2">-</p>
+                </div>
+            </div>
+        </main>
+
+    </div>
+
+    <script>
+        const colorSlider = document.getElementById('color-slider');
+        const sizeSlider = document.getElementById('size-slider');
+        const colorValue = document.getElementById('color-value');
+        const sizeValue = document.getElementById('size-value');
+        const fruitDisplay = document.getElementById('fruit-display');
+        const fruitLabel = document.getElementById('fruit-label');
+
+        const manualPrediction = document.getElementById('manual-prediction');
+        const nodes = {
+            node1: document.getElementById('node1'),
+            node1yes: document.getElementById('node1-yes'),
+            node1no: document.getElementById('node1-no'),
+            node2yes: document.getElementById('node2-yes'),
+            node2no: document.getElementById('node2-no')
+        };
+
+        const forestPreds = {
+            pred1: document.getElementById('pred-1'),
+            pred2: document.getElementById('pred-2'),
+            pred3: document.getElementById('pred-3')
+        };
+        const votesContainer = document.getElementById('votes');
+        const forestPrediction = document.getElementById('forest-prediction');
+
+        function updateFruitDisplay(color, size) {
+            const hue = 60 - (color * 6); // 0(red) -> 60(yellow)
+            fruitDisplay.style.color = `hsl(${hue}, 90%, 60%)`;
+            const scale = 0.8 + (size * 0.05);
+            fruitDisplay.style.transform = `scale(${scale})`;
+            fruitLabel.textContent = `颜色:${color}, 大小:${size}`;
+        }
+
+        function clearHighlights() {
+            Object.values(nodes).forEach(node => node.classList.remove('highlight'));
+        }
+
+        function runManualTree(color, size) {
+            clearHighlights();
+            nodes.node1.classList.add('highlight');
+            
+            setTimeout(() => {
+                if (color > 6) {
+                    nodes.node1yes.classList.add('highlight');
+                    manualPrediction.textContent = '🍎';
+                } else {
+                    nodes.node1no.classList.add('highlight');
+                    setTimeout(() => {
+                        if (size > 4) {
+                            nodes.node2yes.classList.add('highlight');
+                            manualPrediction.textContent = '🍎';
+                        } else {
+                            nodes.node2no.classList.add('highlight');
+                            manualPrediction.textContent = '🍋';
+                        }
+                    }, 500);
+                }
+            }, 500);
+        }
+
+        function runForest(color, size) {
+            // Tree 1 logic
+            const pred1 = color > 5 ? '🍎' : '🍋';
+            forestPreds.pred1.textContent = pred1;
+
+            // Tree 2 logic
+            let pred2;
+            if (size > 6) {
+                pred2 = '🍎';
+            } else {
+                pred2 = color > 3 ? '🍎' : '🍋';
+            }
+            forestPreds.pred2.textContent = pred2;
+
+            // Tree 3 logic
+            const pred3 = (color + size) > 11 ? '🍎' : '🍋';
+            forestPreds.pred3.textContent = pred3;
+
+            // Voting
+            const allVotes = [pred1, pred2, pred3];
+            votesContainer.innerHTML = '';
+            allVotes.forEach(vote => {
+                const voteEl = document.createElement('span');
+                voteEl.textContent = vote;
+                votesContainer.appendChild(voteEl);
+            });
+            
+            const appleVotes = allVotes.filter(v => v === '🍎').length;
+            const lemonVotes = allVotes.filter(v => v === '🍋').length;
+
+            if (appleVotes > lemonVotes) {
+                forestPrediction.textContent = '🍎';
+            } else if (lemonVotes > appleVotes) {
+                forestPrediction.textContent = '🍋';
+            } else {
+                forestPrediction.textContent = '平票🤔'; // Tie-breaking rule could be applied
+            }
+        }
+        
+        function updateAll() {
+            const color = parseInt(colorSlider.value);
+            const size = parseInt(sizeSlider.value);
+            
+            colorValue.textContent = color;
+            sizeValue.textContent = size;
+            
+            updateFruitDisplay(color, size);
+            runManualTree(color, size);
+            runForest(color, size);
+        }
+
+        colorSlider.addEventListener('input', updateAll);
+        sizeSlider.addEventListener('input', updateAll);
+
+        // Initial run
+        window.addEventListener('load', updateAll);
+    </script>
+</body>
+</html>

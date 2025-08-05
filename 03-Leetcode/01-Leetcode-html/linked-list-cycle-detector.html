@@ -1,0 +1,632 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>链表环检测算法 - Floyd判圈算法演示</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Microsoft YaHei', Arial, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            color: #333;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+
+        .header {
+            text-align: center;
+            margin-bottom: 30px;
+            color: white;
+        }
+
+        .header h1 {
+            font-size: 2.5em;
+            margin-bottom: 10px;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.3);
+        }
+
+        .header p {
+            font-size: 1.1em;
+            opacity: 0.9;
+        }
+
+        .control-panel {
+            background: rgba(255, 255, 255, 0.95);
+            border-radius: 15px;
+            padding: 20px;
+            margin-bottom: 20px;
+            box-shadow: 0 8px 32px rgba(0,0,0,0.1);
+            backdrop-filter: blur(10px);
+        }
+
+        .controls {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 15px;
+            align-items: center;
+            justify-content: center;
+            margin-bottom: 20px;
+        }
+
+        button {
+            background: linear-gradient(45deg, #4CAF50, #45a049);
+            color: white;
+            border: none;
+            padding: 12px 20px;
+            border-radius: 25px;
+            cursor: pointer;
+            font-size: 14px;
+            font-weight: bold;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.2);
+        }
+
+        button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(0,0,0,0.3);
+        }
+
+        button:disabled {
+            background: #ccc;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        .btn-danger {
+            background: linear-gradient(45deg, #f44336, #d32f2f);
+        }
+
+        .btn-warning {
+            background: linear-gradient(45deg, #ff9800, #f57c00);
+        }
+
+        .btn-info {
+            background: linear-gradient(45deg, #2196F3, #1976D2);
+        }
+
+        .visualization-area {
+            background: rgba(255, 255, 255, 0.95);
+            border-radius: 15px;
+            padding: 30px;
+            min-height: 400px;
+            box-shadow: 0 8px 32px rgba(0,0,0,0.1);
+            backdrop-filter: blur(10px);
+            margin-bottom: 20px;
+        }
+
+        .linked-list-container {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            min-height: 300px;
+            position: relative;
+            overflow-x: auto;
+            padding: 20px;
+        }
+
+        .node {
+            width: 60px;
+            height: 60px;
+            border: 3px solid #333;
+            border-radius: 50%;
+            background: linear-gradient(45deg, #e3f2fd, #bbdefb);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+            font-size: 14px;
+            margin: 0 10px;
+            position: relative;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+        }
+
+        .node.cycle-node {
+            background: linear-gradient(45deg, #fff3e0, #ffcc80);
+            border-color: #ff9800;
+        }
+
+        .node.slow-pointer {
+            border-color: #4CAF50;
+            border-width: 4px;
+            background: linear-gradient(45deg, #e8f5e8, #c8e6c9);
+            transform: scale(1.1);
+            box-shadow: 0 0 20px rgba(76, 175, 80, 0.5);
+        }
+
+        .node.fast-pointer {
+            border-color: #f44336;
+            border-width: 4px;
+            background: linear-gradient(45deg, #ffebee, #ffcdd2);
+            transform: scale(1.1);
+            box-shadow: 0 0 20px rgba(244, 67, 54, 0.5);
+        }
+
+        .node.meeting-point {
+            border-color: #9c27b0;
+            border-width: 5px;
+            background: linear-gradient(45deg, #f3e5f5, #e1bee7);
+            animation: pulse 1s infinite;
+        }
+
+        @keyframes pulse {
+            0% { transform: scale(1.1); }
+            50% { transform: scale(1.2); }
+            100% { transform: scale(1.1); }
+        }
+
+        .arrow {
+            position: absolute;
+            font-size: 24px;
+            color: #666;
+            top: 50%;
+            transform: translateY(-50%);
+            right: -20px;
+        }
+
+        .cycle-arrow {
+            position: absolute;
+            font-size: 20px;
+            color: #ff9800;
+            font-weight: bold;
+        }
+
+        .stats-panel {
+            background: rgba(255, 255, 255, 0.95);
+            border-radius: 15px;
+            padding: 20px;
+            box-shadow: 0 8px 32px rgba(0,0,0,0.1);
+            backdrop-filter: blur(10px);
+        }
+
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 20px;
+            margin-bottom: 20px;
+        }
+
+        .stat-item {
+            background: linear-gradient(45deg, #f5f5f5, #e0e0e0);
+            padding: 15px;
+            border-radius: 10px;
+            text-align: center;
+            border-left: 4px solid #2196F3;
+        }
+
+        .stat-value {
+            font-size: 2em;
+            font-weight: bold;
+            color: #2196F3;
+        }
+
+        .stat-label {
+            font-size: 0.9em;
+            color: #666;
+            margin-top: 5px;
+        }
+
+        .algorithm-explanation {
+            background: linear-gradient(45deg, #e8f5e8, #f1f8e9);
+            border-radius: 10px;
+            padding: 20px;
+            border-left: 4px solid #4CAF50;
+        }
+
+        .algorithm-explanation h3 {
+            color: #2e7d32;
+            margin-bottom: 10px;
+        }
+
+        
+
+        .preset-buttons {
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+        }
+
+        .status-indicator {
+            padding: 10px 20px;
+            border-radius: 20px;
+            font-weight: bold;
+            text-align: center;
+            margin: 10px 0;
+        }
+
+        .status-running {
+            background: linear-gradient(45deg, #fff3e0, #ffcc80);
+            color: #e65100;
+        }
+
+        .status-found {
+            background: linear-gradient(45deg, #ffebee, #ffcdd2);
+            color: #c62828;
+        }
+
+        .status-no-cycle {
+            background: linear-gradient(45deg, #e8f5e8, #c8e6c9);
+            color: #2e7d32;
+        }
+
+        @media (max-width: 768px) {
+            .container {
+                padding: 10px;
+            }
+            
+            .controls {
+                flex-direction: column;
+                align-items: stretch;
+            }
+            
+            button {
+                width: 100%;
+            }
+            
+            .stats-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>🔗 链表环检测算法演示</h1>
+            <p>Floyd判圈算法（龟兔赛跑算法）的可视化实现</p>
+        </div>
+
+        <div class="control-panel">
+            <div class="controls">
+                <div class="preset-buttons">
+                    <button onclick="createLinkedList(false)">生成无环链表</button>
+                    <button onclick="createLinkedList(true, 3)">生成小环链表</button>
+                    <button onclick="createLinkedList(true, 5)">生成中环链表</button>
+                    <button onclick="createLinkedList(true, 7)">生成大环链表</button>
+                </div>
+                
+                <button id="startBtn" onclick="startDetection()" class="btn-info">开始检测</button>
+                <button id="nextStepBtn" onclick="nextStep()" class="btn-warning" disabled>下一步</button>
+                <button id="resetBtn" onclick="resetDetection()" class="btn-danger">重置</button>
+            </div>
+            
+            <div id="statusIndicator" class="status-indicator" style="display: none;"></div>
+        </div>
+
+        <div class="visualization-area">
+            <div id="linkedListContainer" class="linked-list-container">
+                <!-- 链表节点将在这里动态生成 -->
+            </div>
+        </div>
+
+        <div class="stats-panel">
+            <div class="stats-grid">
+                <div class="stat-item">
+                    <div class="stat-value" id="slowSteps">0</div>
+                    <div class="stat-label">慢指针步数</div>
+                </div>
+                <div class="stat-item">
+                    <div class="stat-value" id="fastSteps">0</div>
+                    <div class="stat-label">快指针步数</div>
+                </div>
+                <div class="stat-item">
+                    <div class="stat-value" id="cycleRounds">0</div>
+                    <div class="stat-label">快指针环内轮数</div>
+                </div>
+                <div class="stat-item">
+                    <div class="stat-value" id="totalSteps">0</div>
+                    <div class="stat-label">总检测步数</div>
+                </div>
+            </div>
+
+            <div class="algorithm-explanation">
+                <h3>🎯 Floyd判圈算法原理</h3>
+                <p><strong>核心思想：</strong>使用两个指针，一个每次移动一步（慢指针），一个每次移动两步（快指针）。如果链表有环，快指针最终会追上慢指针。</p>
+                <br>
+                <p><strong>重要观察：</strong>当快慢指针相遇时，快指针可能已经在环内跑了多圈！这是因为快指针移动速度是慢指针的两倍，在慢指针进入环之前，快指针可能已经在环内转了好几圈了。</p>
+                <br>
+                <p><strong>时间复杂度：</strong>O(n)，<strong>空间复杂度：</strong>O(1)</p>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        class LinkedListNode {
+            constructor(value) {
+                this.value = value;
+                this.next = null;
+                this.element = null;
+                this.inCycle = false;
+            }
+        }
+
+                 class CycleDetector {
+             constructor() {
+                 this.head = null;
+                 this.nodes = [];
+                 this.slowPointer = null;
+                 this.fastPointer = null;
+                 this.isRunning = false;
+                 this.isDetectionStarted = false;
+                 this.slowSteps = 0;
+                 this.fastSteps = 0;
+                 this.totalSteps = 0;
+                 this.cycleRounds = 0;
+                 this.cycleStartNode = null;
+                 this.fastPointerCycleEntry = null;
+                 this.detectionComplete = false;
+             }
+
+            createLinkedList(hasCycle = false, cycleLength = 0) {
+                this.resetDetection();
+                
+                const container = document.getElementById('linkedListContainer');
+                container.innerHTML = '';
+                
+                this.nodes = [];
+                let listLength = hasCycle ? Math.max(8, cycleLength + 3) : 8;
+                
+                // 创建节点
+                for (let i = 0; i < listLength; i++) {
+                    const node = new LinkedListNode(i + 1);
+                    this.nodes.push(node);
+                    
+                    if (i > 0) {
+                        this.nodes[i - 1].next = node;
+                    }
+                }
+                
+                this.head = this.nodes[0];
+                
+                // 创建环
+                if (hasCycle && cycleLength > 0) {
+                    const cycleStart = Math.max(0, listLength - cycleLength);
+                    this.nodes[listLength - 1].next = this.nodes[cycleStart];
+                    this.cycleStartNode = this.nodes[cycleStart];
+                    
+                    // 标记环内节点
+                    for (let i = cycleStart; i < listLength; i++) {
+                        this.nodes[i].inCycle = true;
+                    }
+                }
+                
+                this.renderLinkedList();
+                this.updateStatus(`已生成${hasCycle ? '有环' : '无环'}链表 (长度: ${listLength}${hasCycle ? `, 环长: ${cycleLength}` : ''})`);
+            }
+
+            renderLinkedList() {
+                const container = document.getElementById('linkedListContainer');
+                container.innerHTML = '';
+                
+                this.nodes.forEach((node, index) => {
+                    const nodeElement = document.createElement('div');
+                    nodeElement.className = `node ${node.inCycle ? 'cycle-node' : ''}`;
+                    nodeElement.textContent = node.value;
+                    nodeElement.id = `node-${index}`;
+                    
+                    if (index < this.nodes.length - 1 || (node.next && node.next !== this.nodes[index + 1])) {
+                        const arrow = document.createElement('div');
+                        arrow.className = 'arrow';
+                        arrow.textContent = '→';
+                        nodeElement.appendChild(arrow);
+                    }
+                    
+                    node.element = nodeElement;
+                    container.appendChild(nodeElement);
+                });
+                
+                // 添加环的箭头
+                if (this.cycleStartNode) {
+                    const lastNode = this.nodes[this.nodes.length - 1];
+                    const cycleArrow = document.createElement('div');
+                    cycleArrow.className = 'cycle-arrow';
+                    cycleArrow.textContent = '↗';
+                    cycleArrow.style.position = 'absolute';
+                    cycleArrow.style.top = '-10px';
+                    cycleArrow.style.right = '-30px';
+                    lastNode.element.appendChild(cycleArrow);
+                }
+            }
+
+                         startDetection() {
+                 if (!this.head) {
+                     alert('请先生成链表！');
+                     return;
+                 }
+                 
+                 this.isDetectionStarted = true;
+                 this.detectionComplete = false;
+                 this.slowPointer = this.head;
+                 this.fastPointer = this.head;
+                 this.slowSteps = 0;
+                 this.fastSteps = 0;
+                 this.totalSteps = 0;
+                 this.cycleRounds = 0;
+                 this.fastPointerCycleEntry = null;
+                 
+                 this.updateButtons();
+                 this.updateStats();
+                 this.updatePointerPositions();
+                 this.updateStatus('🏃‍♂️ 检测已开始，点击"下一步"逐步执行算法');
+             }
+
+             nextStep() {
+                 if (!this.isDetectionStarted || this.detectionComplete) {
+                     return;
+                 }
+
+                 // 清除之前的指针标记
+                 this.clearPointerMarkers();
+                 
+                 // 移动慢指针
+                 if (this.slowPointer.next) {
+                     this.slowPointer = this.slowPointer.next;
+                     this.slowSteps++;
+                     this.totalSteps++;
+                 } else {
+                     // 到达链表末尾，无环
+                     this.detectionComplete = true;
+                     this.updateStatus('✅ 检测完成：链表无环', 'no-cycle');
+                     this.updateButtons();
+                     return;
+                 }
+                 
+                 // 移动快指针（两步）
+                 for (let i = 0; i < 2; i++) {
+                     if (this.fastPointer.next) {
+                         this.fastPointer = this.fastPointer.next;
+                         this.fastSteps++;
+                         
+                         // 检查快指针是否进入环
+                         if (this.fastPointer.inCycle && !this.fastPointerCycleEntry) {
+                             this.fastPointerCycleEntry = this.fastPointer;
+                         }
+                         
+                         // 计算快指针在环内的轮数
+                         if (this.fastPointerCycleEntry && this.fastPointer === this.fastPointerCycleEntry && this.fastSteps > 2) {
+                             this.cycleRounds++;
+                         }
+                     } else {
+                         // 到达链表末尾，无环
+                         this.detectionComplete = true;
+                         this.updateStatus('✅ 检测完成：链表无环', 'no-cycle');
+                         this.updateButtons();
+                         return;
+                     }
+                 }
+                 
+                 // 更新可视化
+                 this.updatePointerPositions();
+                 this.updateStats();
+                 
+                 // 检查是否相遇
+                 if (this.slowPointer === this.fastPointer) {
+                     this.detectionComplete = true;
+                     this.markMeetingPoint();
+                     this.updateStatus(`🎯 检测完成：发现环！快指针在环内跑了 ${this.cycleRounds} 轮`, 'found');
+                     this.updateButtons();
+                     return;
+                 }
+                 
+                 this.updateStatus(`👆 慢指针在节点 ${this.slowPointer.value}，快指针在节点 ${this.fastPointer.value}，点击"下一步"继续`, 'running');
+             }
+
+            clearPointerMarkers() {
+                this.nodes.forEach(node => {
+                    if (node.element) {
+                        node.element.classList.remove('slow-pointer', 'fast-pointer', 'meeting-point');
+                    }
+                });
+            }
+
+            updatePointerPositions() {
+                this.clearPointerMarkers();
+                
+                if (this.slowPointer && this.slowPointer.element) {
+                    this.slowPointer.element.classList.add('slow-pointer');
+                }
+                
+                if (this.fastPointer && this.fastPointer.element) {
+                    this.fastPointer.element.classList.add('fast-pointer');
+                }
+            }
+
+            markMeetingPoint() {
+                if (this.slowPointer && this.slowPointer.element) {
+                    this.slowPointer.element.classList.add('meeting-point');
+                }
+            }
+
+                         resetDetection() {
+                 this.isDetectionStarted = false;
+                 this.detectionComplete = false;
+                 this.slowPointer = null;
+                 this.fastPointer = null;
+                 this.slowSteps = 0;
+                 this.fastSteps = 0;
+                 this.totalSteps = 0;
+                 this.cycleRounds = 0;
+                 this.fastPointerCycleEntry = null;
+                 
+                 this.clearPointerMarkers();
+                 this.updateStats();
+                 this.updateButtons();
+                 this.updateStatus('🔄 已重置，点击"开始检测"开始新的检测');
+             }
+
+            updateStats() {
+                document.getElementById('slowSteps').textContent = this.slowSteps;
+                document.getElementById('fastSteps').textContent = this.fastSteps;
+                document.getElementById('cycleRounds').textContent = this.cycleRounds;
+                document.getElementById('totalSteps').textContent = this.totalSteps;
+            }
+
+                         updateButtons() {
+                 const startBtn = document.getElementById('startBtn');
+                 const nextStepBtn = document.getElementById('nextStepBtn');
+                 const resetBtn = document.getElementById('resetBtn');
+                 
+                 if (!this.isDetectionStarted) {
+                     startBtn.disabled = false;
+                     startBtn.textContent = '开始检测';
+                     nextStepBtn.disabled = true;
+                     resetBtn.disabled = false;
+                 } else if (this.detectionComplete) {
+                     startBtn.disabled = true;
+                     nextStepBtn.disabled = true;
+                     resetBtn.disabled = false;
+                 } else {
+                     startBtn.disabled = true;
+                     nextStepBtn.disabled = false;
+                     resetBtn.disabled = false;
+                 }
+             }
+
+            updateStatus(message, type = 'running') {
+                const indicator = document.getElementById('statusIndicator');
+                indicator.textContent = message;
+                indicator.className = `status-indicator status-${type}`;
+                indicator.style.display = 'block';
+            }
+
+            
+        }
+
+        // 全局实例
+        const detector = new CycleDetector();
+
+        // 全局函数
+        function createLinkedList(hasCycle, cycleLength) {
+            detector.createLinkedList(hasCycle, cycleLength);
+        }
+
+                 function startDetection() {
+             detector.startDetection();
+         }
+
+         function nextStep() {
+             detector.nextStep();
+         }
+
+         function resetDetection() {
+             detector.resetDetection();
+         }
+
+        // 初始化
+        window.addEventListener('load', () => {
+            detector.createLinkedList(true, 5);
+        });
+    </script>
+</body>
+</html>

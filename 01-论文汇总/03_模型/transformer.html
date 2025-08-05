@@ -1,0 +1,1761 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Transformer模型交互式学习网站</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            color: #333;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+
+        .header {
+            text-align: center;
+            color: white;
+            margin-bottom: 30px;
+        }
+
+        .header h1 {
+            font-size: 2.5em;
+            margin-bottom: 10px;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.3);
+        }
+
+        .header p {
+            font-size: 1.2em;
+            opacity: 0.9;
+        }
+
+        .main-content {
+            background: white;
+            border-radius: 15px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+            overflow: hidden;
+        }
+
+        .navigation {
+            background: #2c3e50;
+            padding: 15px 0;
+            text-align: center;
+        }
+
+        .nav-btn {
+            background: #3498db;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            margin: 0 5px;
+            border-radius: 25px;
+            cursor: pointer;
+            font-size: 14px;
+            transition: all 0.3s ease;
+        }
+
+        .nav-btn:hover {
+            background: #2980b9;
+            transform: translateY(-2px);
+        }
+
+        .nav-btn.active {
+            background: #e74c3c;
+        }
+
+        .content-area {
+            padding: 30px;
+            min-height: 600px;
+        }
+
+        .step {
+            display: none;
+            animation: fadeIn 0.5s ease-in;
+        }
+
+        .step.active {
+            display: block;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .step-title {
+            color: #2c3e50;
+            font-size: 2em;
+            margin-bottom: 20px;
+            text-align: center;
+        }
+
+        .step-content {
+            line-height: 1.6;
+            font-size: 16px;
+        }
+
+        .transformer-diagram {
+            background: #f8f9fa;
+            border: 2px solid #e9ecef;
+            border-radius: 10px;
+            padding: 20px;
+            margin: 20px 0;
+            text-align: center;
+        }
+
+        .component {
+            background: #3498db;
+            color: white;
+            padding: 10px 15px;
+            margin: 5px;
+            border-radius: 8px;
+            display: inline-block;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .component:hover {
+            background: #2980b9;
+            transform: scale(1.05);
+        }
+
+        .component.highlighted {
+            background: #e74c3c;
+            animation: pulse 1s infinite;
+        }
+
+        @keyframes pulse {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.1); }
+            100% { transform: scale(1); }
+        }
+
+        .next-btn {
+            background: #27ae60;
+            color: white;
+            border: none;
+            padding: 15px 30px;
+            border-radius: 25px;
+            cursor: pointer;
+            font-size: 16px;
+            margin-top: 20px;
+            transition: all 0.3s ease;
+        }
+
+        .next-btn:hover {
+            background: #229954;
+            transform: translateY(-2px);
+        }
+
+        .matrix-visual {
+            display: grid;
+            gap: 2px;
+            margin: 20px 0;
+            justify-content: center;
+        }
+
+        .matrix-cell {
+            width: 30px;
+            height: 30px;
+            background: #ecf0f1;
+            border: 1px solid #bdc3c7;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 12px;
+            transition: background-color 0.3s ease;
+        }
+
+        .matrix-cell.active {
+            background: #3498db;
+            color: white;
+        }
+
+        .explanation-box {
+            background: #fff3cd;
+            border: 1px solid #ffeaa7;
+            border-radius: 8px;
+            padding: 15px;
+            margin: 15px 0;
+        }
+
+        .formula {
+            background: #f8f9fa;
+            border-left: 4px solid #3498db;
+            padding: 15px;
+            margin: 15px 0;
+            font-family: 'Courier New', monospace;
+            font-size: 14px;
+        }
+
+        .demo-step {
+            display: inline-block;
+            padding: 8px 15px;
+            margin: 0 5px;
+            background: #ecf0f1;
+            color: #7f8c8d;
+            border-radius: 20px;
+            font-size: 14px;
+            font-weight: bold;
+            transition: all 0.3s ease;
+            cursor: pointer;
+        }
+
+        .demo-step.active {
+            background: #3498db;
+            color: white;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 8px rgba(52, 152, 219, 0.3);
+        }
+
+        .generation-step {
+            opacity: 0.7;
+            transition: all 0.3s ease;
+        }
+
+        .generation-step:hover {
+            opacity: 1;
+            transform: translateX(5px);
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>🤖 Transformer模型交互式学习</h1>
+            <p>通过逐步点击深入理解Transformer的工作原理</p>
+        </div>
+
+        <div class="main-content">
+            <div class="navigation">
+                <button class="nav-btn active" onclick="showStep(0)">概述</button>
+                <button class="nav-btn" onclick="showStep(1)">输入处理</button>
+                <button class="nav-btn" onclick="showStep(2)">位置编码</button>
+                <button class="nav-btn" onclick="showStep(3)">自注意力</button>
+                <button class="nav-btn" onclick="showStep(4)">多头注意力</button>
+                <button class="nav-btn" onclick="showStep(5)">前馈网络</button>
+                <button class="nav-btn" onclick="showStep(6)">解码器</button>
+                <button class="nav-btn" onclick="showStep(7)">完整流程</button>
+            </div>
+
+            <div class="content-area">
+                <!-- 步骤0: 概述 -->
+                <div class="step active" id="step-0">
+                    <h2 class="step-title">Transformer模型概述</h2>
+                    <div class="step-content">
+                        <p>Transformer是一个革命性的深度学习架构，由Vaswani等人在2017年的论文"Attention Is All You Need"中提出。</p>
+                        
+                        <div class="transformer-diagram">
+                            <h3>Transformer整体架构</h3>
+                            <div style="display: flex; justify-content: space-around; margin-top: 20px;">
+                                <div style="text-align: center;">
+                                    <h4>编码器 (Encoder)</h4>
+                                    <div class="component" onclick="highlightComponent(this)">输入嵌入</div><br>
+                                    <div class="component" onclick="highlightComponent(this)">位置编码</div><br>
+                                    <div class="component" onclick="highlightComponent(this)">多头自注意力</div><br>
+                                    <div class="component" onclick="highlightComponent(this)">前馈网络</div><br>
+                                    <div style="font-size: 12px; margin-top: 10px;">× 6 层</div>
+                                </div>
+                                <div style="text-align: center;">
+                                    <h4>解码器 (Decoder)</h4>
+                                    <div class="component" onclick="highlightComponent(this)">输出嵌入</div><br>
+                                    <div class="component" onclick="highlightComponent(this)">位置编码</div><br>
+                                    <div class="component" onclick="highlightComponent(this)">掩码自注意力</div><br>
+                                    <div class="component" onclick="highlightComponent(this)">编码器-解码器注意力</div><br>
+                                    <div class="component" onclick="highlightComponent(this)">前馈网络</div><br>
+                                    <div style="font-size: 12px; margin-top: 10px;">× 6 层</div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="explanation-box">
+                            <h4>🔑 核心创新点：</h4>
+                            <ul>
+                                <li><strong>自注意力机制</strong>：允许模型同时关注序列中的所有位置</li>
+                                <li><strong>并行计算</strong>：不像RNN需要顺序处理，可以并行计算</li>
+                                <li><strong>位置编码</strong>：通过数学函数为每个位置添加唯一标识</li>
+                                <li><strong>多头注意力</strong>：从多个角度同时关注不同的信息</li>
+                            </ul>
+                        </div>
+
+                        <button class="next-btn" onclick="showStep(1)">开始学习 →</button>
+                    </div>
+                </div>
+
+                <!-- 步骤1: 输入处理 -->
+                <div class="step" id="step-1">
+                    <h2 class="step-title">步骤1: 输入处理与词嵌入</h2>
+                    <div class="step-content">
+                        <p>首先，我们需要将输入的文本转换为模型可以理解的数字表示。</p>
+                        
+                        <div class="transformer-diagram">
+                            <h3>🔄 点击下方按钮查看输入处理过程</h3>
+                            <div id="input-demo">
+                                <div style="margin: 20px 0;">
+                                    <button class="component" onclick="showTokenization()">1. 分词 (Tokenization)</button>
+                                    <button class="component" onclick="showEmbedding()">2. 词嵌入 (Embedding)</button>
+                                    <button class="component" onclick="showInputComplete()">3. 完整流程</button>
+                                </div>
+                                
+                                <div id="demo-area" style="min-height: 200px; background: #f8f9fa; padding: 20px; border-radius: 8px;">
+                                    <p>点击上方按钮开始演示...</p>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="explanation-box">
+                            <h4>📝 输入处理的重要性：</h4>
+                            <ul>
+                                <li><strong>分词</strong>：将句子分解为更小的单元（词或子词）</li>
+                                <li><strong>词汇表</strong>：建立词汇到索引的映射</li>
+                                <li><strong>词嵌入</strong>：将离散的词汇索引转换为连续的向量表示</li>
+                                <li><strong>维度</strong>：通常使用512维的向量表示每个词</li>
+                            </ul>
+                        </div>
+
+                        <div class="formula">
+                            <strong>数学表示：</strong><br>
+                            输入序列: ["我", "爱", "机器", "学习"] <br>
+                            词汇索引: [123, 456, 789, 012] <br>
+                            嵌入矩阵: E ∈ ℝ^(V×d_model) <br>
+                            输出: X = E[tokens] ∈ ℝ^(seq_len×d_model)
+                        </div>
+
+                        <button class="next-btn" onclick="showStep(2)">下一步: 位置编码 →</button>
+                    </div>
+                </div>
+
+                <!-- 步骤2: 位置编码 -->
+                <div class="step" id="step-2">
+                    <h2 class="step-title">步骤2: 位置编码 (Positional Encoding)</h2>
+                    <div class="step-content">
+                        <p>由于Transformer没有循环结构，我们需要显式地告诉模型词语在序列中的位置信息。</p>
+                        
+                        <div class="transformer-diagram">
+                            <h3>🎯 点击体验位置编码</h3>
+                            <div style="margin: 20px 0;">
+                                <button class="component" onclick="showPositionDemo()">查看位置编码可视化</button>
+                                <button class="component" onclick="showPositionFormula()">位置编码公式</button>
+                                <button class="component" onclick="showPositionAddition()">与词嵌入相加</button>
+                            </div>
+                            
+                            <div id="position-demo" style="min-height: 250px; background: #f8f9fa; padding: 20px; border-radius: 8px;">
+                                <p>点击上方按钮查看位置编码演示...</p>
+                            </div>
+                        </div>
+
+                        <div class="explanation-box">
+                            <h4>🎪 位置编码的设计原理：</h4>
+                            <ul>
+                                <li><strong>正弦和余弦函数</strong>：使用不同频率的三角函数</li>
+                                <li><strong>唯一性</strong>：每个位置都有唯一的编码</li>
+                                <li><strong>相对位置</strong>：模型可以学习相对位置关系</li>
+                                <li><strong>外推性</strong>：可以处理比训练时更长的序列</li>
+                            </ul>
+                        </div>
+
+                        <div class="formula">
+                            <strong>位置编码公式：</strong><br>
+                            PE(pos, 2i) = sin(pos / 10000^(2i/d_model))<br>
+                            PE(pos, 2i+1) = cos(pos / 10000^(2i/d_model))<br><br>
+                            最终输入: Input = Embedding + Positional_Encoding
+                        </div>
+
+                        <button class="next-btn" onclick="showStep(3)">下一步: 自注意力机制 →</button>
+                    </div>
+                </div>
+
+                <!-- 步骤3: 自注意力 -->
+                <div class="step" id="step-3">
+                    <h2 class="step-title">步骤3: 自注意力机制 (Self-Attention)</h2>
+                    <div class="step-content">
+                        <p>自注意力是Transformer的核心，它允许模型关注序列中的任何位置来编码当前位置的表示。</p>
+                        
+                        <div class="transformer-diagram">
+                            <h3>🧠 交互式自注意力演示</h3>
+                            <div style="margin: 20px 0;">
+                                <button class="component" onclick="showQKV()">1. 生成Q、K、V</button>
+                                <button class="component" onclick="showAttentionScore()">2. 计算注意力分数</button>
+                                <button class="component" onclick="showSoftmax()">3. Softmax归一化</button>
+                                <button class="component" onclick="showWeightedSum()">4. 加权求和</button>
+                            </div>
+                            
+                            <div id="attention-demo" style="min-height: 300px; background: #f8f9fa; padding: 20px; border-radius: 8px;">
+                                <p>点击上方按钮逐步了解自注意力计算过程...</p>
+                            </div>
+                        </div>
+
+                        <div class="explanation-box">
+                            <h4>🎭 自注意力的工作原理：</h4>
+                            <ul>
+                                <li><strong>Query (Q)</strong>：查询向量，表示"我想要什么信息"</li>
+                                <li><strong>Key (K)</strong>：键向量，表示"我有什么信息"</li>
+                                <li><strong>Value (V)</strong>：值向量，表示"我实际的信息内容"</li>
+                                <li><strong>注意力权重</strong>：决定每个位置对当前位置的重要程度</li>
+                            </ul>
+                        </div>
+
+                        <div class="formula">
+                            <strong>自注意力公式：</strong><br>
+                            Q = XW_Q, K = XW_K, V = XW_V<br>
+                            Attention(Q,K,V) = softmax(QK^T/√d_k)V<br><br>
+                            其中 d_k = d_model / num_heads
+                        </div>
+
+                        <button class="next-btn" onclick="showStep(4)">下一步: 多头注意力 →</button>
+                    </div>
+                </div>
+
+                <!-- 步骤4: 多头注意力 -->
+                <div class="step" id="step-4">
+                    <h2 class="step-title">步骤4: 多头注意力 (Multi-Head Attention)</h2>
+                    <div class="step-content">
+                        <p>多头注意力允许模型从多个角度同时关注不同的信息子空间。</p>
+                        
+                        <div class="transformer-diagram">
+                            <h3>👥 多头注意力可视化</h3>
+                            <div style="margin: 20px 0;">
+                                <button class="component" onclick="showMultiHead()">查看多头结构</button>
+                                <button class="component" onclick="showHeadComparison()">对比不同注意力头</button>
+                                <button class="component" onclick="showConcatenation()">拼接与线性变换</button>
+                            </div>
+                            
+                            <div id="multihead-demo" style="min-height: 300px; background: #f8f9fa; padding: 20px; border-radius: 8px;">
+                                <p>点击上方按钮探索多头注意力...</p>
+                            </div>
+                        </div>
+
+                        <div class="explanation-box">
+                            <h4>🔄 多头注意力的优势：</h4>
+                            <ul>
+                                <li><strong>多角度学习</strong>：每个头可以学习不同类型的关系</li>
+                                <li><strong>信息整合</strong>：组合来自多个头的信息</li>
+                                <li><strong>参数效率</strong>：每个头使用较小的维度</li>
+                                <li><strong>并行计算</strong>：所有头可以并行计算</li>
+                            </ul>
+                        </div>
+
+                        <div class="formula">
+                            <strong>多头注意力公式：</strong><br>
+                            MultiHead(Q,K,V) = Concat(head_1, ..., head_h)W^O<br>
+                            其中 head_i = Attention(QW_i^Q, KW_i^K, VW_i^V)<br>
+                            通常使用 h = 8 个注意力头
+                        </div>
+
+                        <button class="next-btn" onclick="showStep(5)">下一步: 前馈网络 →</button>
+                    </div>
+                </div>
+
+                <!-- 步骤5: 前馈网络 -->
+                <div class="step" id="step-5">
+                    <h2 class="step-title">步骤5: 前馈网络 (Feed Forward Network)</h2>
+                    <div class="step-content">
+                        <p>每个Transformer层还包含一个位置级别的前馈网络，用于进一步处理注意力机制的输出。</p>
+                        
+                        <div class="transformer-diagram">
+                            <h3>⚡ 前馈网络结构</h3>
+                            <div style="margin: 20px 0;">
+                                <button class="component" onclick="showFFNStructure()">网络结构</button>
+                                <button class="component" onclick="showReLUActivation()">ReLU激活函数</button>
+                                <button class="component" onclick="showResidualConnection()">残差连接</button>
+                                <button class="component" onclick="showLayerNorm()">层归一化</button>
+                            </div>
+                            
+                            <div id="ffn-demo" style="min-height: 300px; background: #f8f9fa; padding: 20px; border-radius: 8px;">
+                                <p>点击上方按钮了解前馈网络...</p>
+                            </div>
+                        </div>
+
+                        <div class="explanation-box">
+                            <h4>🏗️ 前馈网络的组成：</h4>
+                            <ul>
+                                <li><strong>两层全连接</strong>：先扩展到4倍维度，再压缩回原维度</li>
+                                <li><strong>ReLU激活</strong>：增加非线性能力</li>
+                                <li><strong>残差连接</strong>：帮助梯度传播，避免梯度消失</li>
+                                <li><strong>层归一化</strong>：稳定训练过程</li>
+                            </ul>
+                        </div>
+
+                        <div class="formula">
+                            <strong>前馈网络公式：</strong><br>
+                            FFN(x) = max(0, xW_1 + b_1)W_2 + b_2<br>
+                            LayerNorm(x + Sublayer(x))<br>
+                            其中 Sublayer(x) 是多头注意力或FFN
+                        </div>
+
+                        <button class="next-btn" onclick="showStep(6)">下一步: 解码器 →</button>
+                    </div>
+                </div>
+
+                <!-- 步骤6: 解码器 -->
+                <div class="step" id="step-6">
+                    <h2 class="step-title">步骤6: 解码器 (Decoder)</h2>
+                    <div class="step-content">
+                        <p>解码器用于生成输出序列，它比编码器多了一个掩码自注意力层和编码器-解码器注意力层。</p>
+                        
+                        <div class="transformer-diagram">
+                            <h3>🎯 解码器工作流程</h3>
+                            <div style="margin: 20px 0;">
+                                <button class="component" onclick="showMaskedAttention()">掩码自注意力</button>
+                                <button class="component" onclick="showCrossAttention()">交叉注意力</button>
+                                <button class="component" onclick="showAutoregressive()">自回归生成</button>
+                                <button class="component" onclick="showOutputProjection()">输出投影</button>
+                            </div>
+                            
+                            <div id="decoder-demo" style="min-height: 300px; background: #f8f9fa; padding: 20px; border-radius: 8px;">
+                                <p>点击上方按钮了解解码器工作原理...</p>
+                            </div>
+                        </div>
+
+                        <div class="explanation-box">
+                            <h4>🎪 解码器的特殊设计：</h4>
+                            <ul>
+                                <li><strong>掩码机制</strong>：防止模型看到未来的信息</li>
+                                <li><strong>交叉注意力</strong>：让解码器关注编码器的输出</li>
+                                <li><strong>自回归生成</strong>：逐个生成输出token</li>
+                                <li><strong>教师强制</strong>：训练时使用真实目标序列</li>
+                            </ul>
+                        </div>
+
+                        <div class="formula">
+                            <strong>解码器关键公式：</strong><br>
+                            掩码注意力: Attention(Q,K,V) with future masking<br>
+                            交叉注意力: Attention(Q_dec, K_enc, V_enc)<br>
+                            输出概率: P(y_t) = softmax(W_o · h_t + b_o)
+                        </div>
+
+                        <button class="next-btn" onclick="showStep(7)">下一步: 完整流程 →</button>
+                    </div>
+                </div>
+
+                <!-- 步骤7: 完整流程 -->
+                <div class="step" id="step-7">
+                    <h2 class="step-title">步骤7: Transformer完整工作流程</h2>
+                    <div class="step-content">
+                        <p>现在让我们通过一个完整的例子来理解Transformer如何将输入序列转换为输出序列。</p>
+                        
+                        <div class="transformer-diagram">
+                            <h3>🔄 完整流程演示</h3>
+                            <div style="margin: 20px 0;">
+                                <button class="component" onclick="startFullDemo()">开始完整演示</button>
+                                <button class="component" onclick="resetDemo()">重置演示</button>
+                            </div>
+                            
+                            <div id="full-demo" style="min-height: 400px; background: #f8f9fa; padding: 20px; border-radius: 8px;">
+                                <div id="demo-step-indicator" style="text-align: center; margin-bottom: 20px;">
+                                    <span class="demo-step active" id="demo-step-0">输入处理</span>
+                                    <span class="demo-step" id="demo-step-1">编码器</span>
+                                    <span class="demo-step" id="demo-step-2">解码器</span>
+                                    <span class="demo-step" id="demo-step-3">输出生成</span>
+                                </div>
+                                <div id="demo-content">
+                                    <p>点击"开始完整演示"查看Transformer处理过程...</p>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="explanation-box">
+                            <h4>🎓 学习总结：</h4>
+                            <ul>
+                                <li><strong>并行性</strong>：编码器可以并行处理整个序列</li>
+                                <li><strong>长距离依赖</strong>：注意力机制直接连接任意位置</li>
+                                <li><strong>可解释性</strong>：注意力权重提供了模型关注点的直观理解</li>
+                                <li><strong>灵活性</strong>：可以适应各种序列到序列的任务</li>
+                            </ul>
+                        </div>
+
+                        <div style="text-align: center; margin-top: 30px;">
+                            <h3>🎉 恭喜！您已经完成了Transformer模型的学习之旅！</h3>
+                            <button class="next-btn" onclick="showStep(0)" style="background: #8e44ad;">返回概述</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        let currentStep = 0;
+        const totalSteps = 8;
+
+        function showStep(stepIndex) {
+            // 隐藏所有步骤
+            for (let i = 0; i < totalSteps; i++) {
+                document.getElementById(`step-${i}`).classList.remove('active');
+            }
+            
+            // 显示指定步骤
+            document.getElementById(`step-${stepIndex}`).classList.add('active');
+            
+            // 更新导航按钮状态
+            document.querySelectorAll('.nav-btn').forEach((btn, index) => {
+                btn.classList.toggle('active', index === stepIndex);
+            });
+            
+            currentStep = stepIndex;
+        }
+
+        function highlightComponent(element) {
+            // 移除其他高亮
+            document.querySelectorAll('.component').forEach(comp => {
+                comp.classList.remove('highlighted');
+            });
+            
+            // 添加高亮到点击的组件
+            element.classList.add('highlighted');
+            
+            // 3秒后移除高亮
+            setTimeout(() => {
+                element.classList.remove('highlighted');
+            }, 3000);
+        }
+
+        function nextStep() {
+            if (currentStep < totalSteps - 1) {
+                showStep(currentStep + 1);
+            }
+        }
+
+        function prevStep() {
+            if (currentStep > 0) {
+                showStep(currentStep - 1);
+            }
+        }
+
+        // 步骤1: 输入处理演示函数
+        function showTokenization() {
+            const demoArea = document.getElementById('demo-area');
+            demoArea.innerHTML = `
+                <h4>🔤 分词演示</h4>
+                <div style="background: white; padding: 15px; border-radius: 5px; margin: 10px 0;">
+                    <strong>原始句子:</strong> "我爱机器学习"<br><br>
+                    <strong>分词结果:</strong>
+                    <div style="display: flex; gap: 10px; margin-top: 10px;">
+                        <span style="background: #3498db; color: white; padding: 5px 10px; border-radius: 5px;">我</span>
+                        <span style="background: #3498db; color: white; padding: 5px 10px; border-radius: 5px;">爱</span>
+                        <span style="background: #3498db; color: white; padding: 5px 10px; border-radius: 5px;">机器</span>
+                        <span style="background: #3498db; color: white; padding: 5px 10px; border-radius: 5px;">学习</span>
+                    </div>
+                </div>
+                <p><strong>说明:</strong> 将连续的文本分解为独立的词汇单元，每个单元都会获得一个唯一的ID。</p>
+            `;
+        }
+
+        function showEmbedding() {
+            const demoArea = document.getElementById('demo-area');
+            demoArea.innerHTML = `
+                <h4>🔢 词嵌入演示</h4>
+                <div style="background: white; padding: 15px; border-radius: 5px; margin: 10px 0;">
+                    <strong>词汇ID映射:</strong><br>
+                    我 → 123 → [0.2, -0.1, 0.8, 0.3, ...]<br>
+                    爱 → 456 → [0.5, 0.7, -0.2, 0.9, ...]<br>
+                    机器 → 789 → [-0.3, 0.4, 0.6, -0.1, ...]<br>
+                    学习 → 012 → [0.8, -0.5, 0.1, 0.7, ...]<br><br>
+                    <div class="matrix-visual" style="grid-template-columns: repeat(8, 1fr); width: 240px;">
+                        ${Array(32).fill(0).map((_, i) => 
+                            `<div class="matrix-cell ${i % 4 === 0 ? 'active' : ''}">${(Math.random() - 0.5).toFixed(1)}</div>`
+                        ).join('')}
+                    </div>
+                </div>
+                <p><strong>说明:</strong> 每个词被转换为高维向量（通常512维），包含语义信息。</p>
+            `;
+        }
+
+        function showInputComplete() {
+            const demoArea = document.getElementById('demo-area');
+            demoArea.innerHTML = `
+                <h4>✅ 完整输入处理流程</h4>
+                <div style="background: white; padding: 15px; border-radius: 5px; margin: 10px 0;">
+                    <div style="text-align: center;">
+                        <div style="margin: 10px 0;">📝 原始文本: "我爱机器学习"</div>
+                        <div style="margin: 10px 0;">⬇️</div>
+                        <div style="margin: 10px 0;">🔤 分词: ["我", "爱", "机器", "学习"]</div>
+                        <div style="margin: 10px 0;">⬇️</div>
+                        <div style="margin: 10px 0;">🔢 ID化: [123, 456, 789, 012]</div>
+                        <div style="margin: 10px 0;">⬇️</div>
+                        <div style="margin: 10px 0;">📊 嵌入: 4×512 维矩阵</div>
+                    </div>
+                </div>
+                <p><strong>结果:</strong> 文本被转换为模型可以处理的数值张量，准备进入下一阶段。</p>
+            `;
+        }
+
+        // 步骤2: 位置编码演示函数
+        function showPositionDemo() {
+            const positionDemo = document.getElementById('position-demo');
+            positionDemo.innerHTML = `
+                <h4>🎯 位置编码可视化</h4>
+                <div style="background: white; padding: 15px; border-radius: 5px; margin: 10px 0;">
+                    <div style="display: grid; grid-template-columns: repeat(8, 1fr); gap: 2px; margin: 20px 0;">
+                        ${Array(32).fill(0).map((_, i) => {
+                            const pos = Math.floor(i / 8);
+                            const dim = i % 8;
+                            const value = dim % 2 === 0 ? 
+                                Math.sin(pos / Math.pow(10000, dim/8)) : 
+                                Math.cos(pos / Math.pow(10000, (dim-1)/8));
+                            const intensity = Math.abs(value);
+                            return `<div class="matrix-cell" style="background: hsl(${240 + intensity*120}, 70%, ${50 + intensity*30}%); color: white;">${value.toFixed(2)}</div>`;
+                        }).join('')}
+                    </div>
+                    <div style="text-align: center; font-size: 12px;">
+                        每行代表一个位置，每列代表一个维度
+                    </div>
+                </div>
+                <p><strong>说明:</strong> 不同位置产生不同的编码模式，帮助模型理解词语的顺序。</p>
+            `;
+        }
+
+        function showPositionFormula() {
+            const positionDemo = document.getElementById('position-demo');
+            positionDemo.innerHTML = `
+                <h4>📐 位置编码公式详解</h4>
+                <div style="background: white; padding: 15px; border-radius: 5px; margin: 10px 0;">
+                    <div style="font-family: 'Courier New', monospace; font-size: 14px;">
+                        PE(pos, 2i) = sin(pos / 10000^(2i/d_model))<br>
+                        PE(pos, 2i+1) = cos(pos / 10000^(2i/d_model))<br><br>
+                        
+                        其中：<br>
+                        • pos: 位置索引 (0, 1, 2, ...)<br>
+                        • i: 维度索引 (0, 1, 2, ..., d_model/2)<br>
+                        • d_model: 模型维度 (通常为512)<br><br>
+                        
+                        示例计算 (pos=1, i=0):<br>
+                        PE(1, 0) = sin(1 / 10000^(0/512)) = sin(1) ≈ 0.841<br>
+                        PE(1, 1) = cos(1 / 10000^(0/512)) = cos(1) ≈ 0.540
+                    </div>
+                </div>
+                <p><strong>特点:</strong> 使用三角函数确保每个位置都有唯一的编码模式。</p>
+            `;
+        }
+
+        function showPositionAddition() {
+            const positionDemo = document.getElementById('position-demo');
+            positionDemo.innerHTML = `
+                <h4>➕ 位置编码与词嵌入相加</h4>
+                <div style="background: white; padding: 15px; border-radius: 5px; margin: 10px 0;">
+                    <div style="display: flex; justify-content: space-around; align-items: center;">
+                        <div style="text-align: center;">
+                            <div style="font-weight: bold;">词嵌入</div>
+                            <div class="matrix-visual" style="grid-template-columns: repeat(4, 1fr); margin: 10px 0;">
+                                ${[0.2, -0.1, 0.8, 0.3, 0.5, 0.7, -0.2, 0.9].map(v => 
+                                    `<div class="matrix-cell">${v}</div>`
+                                ).join('')}
+                            </div>
+                            <div style="font-size: 12px;">语义信息</div>
+                        </div>
+                        
+                        <div style="font-size: 24px;">+</div>
+                        
+                        <div style="text-align: center;">
+                            <div style="font-weight: bold;">位置编码</div>
+                            <div class="matrix-visual" style="grid-template-columns: repeat(4, 1fr); margin: 10px 0;">
+                                ${[0.0, 1.0, 0.1, 0.9, 0.2, 0.8, 0.3, 0.7].map(v => 
+                                    `<div class="matrix-cell" style="background: #e74c3c; color: white;">${v}</div>`
+                                ).join('')}
+                            </div>
+                            <div style="font-size: 12px;">位置信息</div>
+                        </div>
+                        
+                        <div style="font-size: 24px;">=</div>
+                        
+                        <div style="text-align: center;">
+                            <div style="font-weight: bold;">最终输入</div>
+                            <div class="matrix-visual" style="grid-template-columns: repeat(4, 1fr); margin: 10px 0;">
+                                ${[0.2, 0.9, 0.9, 1.2, 0.7, 1.5, 0.1, 1.6].map(v => 
+                                    `<div class="matrix-cell" style="background: #27ae60; color: white;">${v}</div>`
+                                ).join('')}
+                            </div>
+                            <div style="font-size: 12px;">语义+位置</div>
+                        </div>
+                    </div>
+                </div>
+                <p><strong>结果:</strong> 融合了语义和位置信息的完整表示，准备进入注意力层。</p>
+            `;
+        }
+
+        // 步骤3: 自注意力演示函数
+        function showQKV() {
+            const attentionDemo = document.getElementById('attention-demo');
+            attentionDemo.innerHTML = `
+                <h4>🔑 生成Query、Key、Value矩阵</h4>
+                <div style="background: white; padding: 15px; border-radius: 5px; margin: 10px 0;">
+                    <div style="display: flex; justify-content: space-around;">
+                        <div style="text-align: center;">
+                            <div style="font-weight: bold; color: #e74c3c;">Query (Q)</div>
+                            <div style="font-size: 12px;">我想要什么信息?</div>
+                            <div class="matrix-visual" style="grid-template-columns: repeat(3, 1fr); margin: 10px 0;">
+                                ${[0.2, 0.8, -0.1, 0.5, -0.3, 0.9, 0.7, 0.1, -0.5].map(v => 
+                                    `<div class="matrix-cell" style="background: #e74c3c; color: white;">${v}</div>`
+                                ).join('')}
+                            </div>
+                        </div>
+                        
+                        <div style="text-align: center;">
+                            <div style="font-weight: bold; color: #3498db;">Key (K)</div>
+                            <div style="font-size: 12px;">我有什么信息?</div>
+                            <div class="matrix-visual" style="grid-template-columns: repeat(3, 1fr); margin: 10px 0;">
+                                ${[0.1, -0.2, 0.6, 0.8, 0.3, -0.1, -0.4, 0.7, 0.2].map(v => 
+                                    `<div class="matrix-cell" style="background: #3498db; color: white;">${v}</div>`
+                                ).join('')}
+                            </div>
+                        </div>
+                        
+                        <div style="text-align: center;">
+                            <div style="font-weight: bold; color: #27ae60;">Value (V)</div>
+                            <div style="font-size: 12px;">我的实际内容是什么?</div>
+                            <div class="matrix-visual" style="grid-template-columns: repeat(3, 1fr); margin: 10px 0;">
+                                ${[0.9, 0.2, -0.3, 0.1, 0.8, 0.5, 0.6, -0.2, 0.4].map(v => 
+                                    `<div class="matrix-cell" style="background: #27ae60; color: white;">${v}</div>`
+                                ).join('')}
+                            </div>
+                        </div>
+                    </div>
+                    <div style="text-align: center; margin-top: 15px; font-size: 14px;">
+                        通过学习到的权重矩阵W_Q, W_K, W_V 将输入X转换为Q, K, V
+                    </div>
+                </div>
+                <p><strong>说明:</strong> 每个词都会生成自己的Query、Key、Value向量，用于计算注意力。</p>
+            `;
+        }
+
+        function showAttentionScore() {
+            const attentionDemo = document.getElementById('attention-demo');
+            attentionDemo.innerHTML = `
+                <h4>📊 计算注意力分数</h4>
+                <div style="background: white; padding: 15px; border-radius: 5px; margin: 10px 0;">
+                    <div style="text-align: center; margin-bottom: 20px;">
+                        <strong>计算公式: Score = Q · K^T / √d_k</strong>
+                    </div>
+                    
+                    <div style="display: flex; justify-content: center; align-items: center; gap: 20px;">
+                        <div>
+                            <div style="font-weight: bold;">注意力分数矩阵</div>
+                            <table style="border-collapse: collapse; margin: 10px 0;">
+                                <tr>
+                                    <td style="border: 1px solid #ddd; padding: 8px; background: #f8f9fa;"></td>
+                                    <td style="border: 1px solid #ddd; padding: 8px; background: #f8f9fa;">我</td>
+                                    <td style="border: 1px solid #ddd; padding: 8px; background: #f8f9fa;">爱</td>
+                                    <td style="border: 1px solid #ddd; padding: 8px; background: #f8f9fa;">机器</td>
+                                    <td style="border: 1px solid #ddd; padding: 8px; background: #f8f9fa;">学习</td>
+                                </tr>
+                                <tr>
+                                    <td style="border: 1px solid #ddd; padding: 8px; background: #f8f9fa;">我</td>
+                                    <td style="border: 1px solid #ddd; padding: 8px; background: #e74c3c; color: white;">0.8</td>
+                                    <td style="border: 1px solid #ddd; padding: 8px;">0.3</td>
+                                    <td style="border: 1px solid #ddd; padding: 8px;">0.1</td>
+                                    <td style="border: 1px solid #ddd; padding: 8px;">0.2</td>
+                                </tr>
+                                <tr>
+                                    <td style="border: 1px solid #ddd; padding: 8px; background: #f8f9fa;">爱</td>
+                                    <td style="border: 1px solid #ddd; padding: 8px;">0.2</td>
+                                    <td style="border: 1px solid #ddd; padding: 8px; background: #e74c3c; color: white;">0.9</td>
+                                    <td style="border: 1px solid #ddd; padding: 8px;">0.6</td>
+                                    <td style="border: 1px solid #ddd; padding: 8px;">0.7</td>
+                                </tr>
+                                <tr>
+                                    <td style="border: 1px solid #ddd; padding: 8px; background: #f8f9fa;">机器</td>
+                                    <td style="border: 1px solid #ddd; padding: 8px;">0.1</td>
+                                    <td style="border: 1px solid #ddd; padding: 8px;">0.4</td>
+                                    <td style="border: 1px solid #ddd; padding: 8px; background: #e74c3c; color: white;">0.8</td>
+                                    <td style="border: 1px solid #ddd; padding: 8px;">0.9</td>
+                                </tr>
+                                <tr>
+                                    <td style="border: 1px solid #ddd; padding: 8px; background: #f8f9fa;">学习</td>
+                                    <td style="border: 1px solid #ddd; padding: 8px;">0.3</td>
+                                    <td style="border: 1px solid #ddd; padding: 8px;">0.5</td>
+                                    <td style="border: 1px solid #ddd; padding: 8px;">0.8</td>
+                                    <td style="border: 1px solid #ddd; padding: 8px; background: #e74c3c; color: white;">0.7</td>
+                                </tr>
+                            </table>
+                        </div>
+                    </div>
+                    <div style="text-align: center; font-size: 12px; margin-top: 10px;">
+                        对角线值较高，表明词语更关注自己
+                    </div>
+                </div>
+                <p><strong>说明:</strong> 分数越高，表示当前词对目标词的关注度越大。</p>
+            `;
+        }
+
+        function showSoftmax() {
+            const attentionDemo = document.getElementById('attention-demo');
+            attentionDemo.innerHTML = `
+                <h4>🎯 Softmax归一化</h4>
+                <div style="background: white; padding: 15px; border-radius: 5px; margin: 10px 0;">
+                    <div style="display: flex; justify-content: space-around; align-items: center;">
+                        <div style="text-align: center;">
+                            <div style="font-weight: bold;">原始分数</div>
+                            <div style="margin: 10px 0;">
+                                [0.8, 0.3, 0.1, 0.2]
+                            </div>
+                        </div>
+                        
+                        <div style="font-size: 20px;">→ Softmax →</div>
+                        
+                        <div style="text-align: center;">
+                            <div style="font-weight: bold;">注意力权重</div>
+                            <div style="margin: 10px 0;">
+                                [0.45, 0.27, 0.22, 0.25]
+                            </div>
+                            <div style="font-size: 12px;">总和 = 1.0</div>
+                        </div>
+                    </div>
+                    
+                    <div style="margin: 20px 0;">
+                        <div style="font-weight: bold; text-align: center;">可视化权重分布</div>
+                        <div style="display: flex; gap: 10px; justify-content: center; margin: 15px 0;">
+                            <div style="text-align: center;">
+                                <div style="background: #e74c3c; height: 45px; width: 30px; margin: 0 auto;"></div>
+                                <div style="font-size: 12px;">我<br>45%</div>
+                            </div>
+                            <div style="text-align: center;">
+                                <div style="background: #3498db; height: 27px; width: 30px; margin: 0 auto;"></div>
+                                <div style="font-size: 12px;">爱<br>27%</div>
+                            </div>
+                            <div style="text-align: center;">
+                                <div style="background: #27ae60; height: 22px; width: 30px; margin: 0 auto;"></div>
+                                <div style="font-size: 12px;">机器<br>22%</div>
+                            </div>
+                            <div style="text-align: center;">
+                                <div style="background: #f39c12; height: 25px; width: 30px; margin: 0 auto;"></div>
+                                <div style="font-size: 12px;">学习<br>25%</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <p><strong>说明:</strong> Softmax确保所有权重和为1，形成概率分布。</p>
+            `;
+        }
+
+        function showWeightedSum() {
+            const attentionDemo = document.getElementById('attention-demo');
+            attentionDemo.innerHTML = `
+                <h4>🎯 加权求和得到输出</h4>
+                <div style="background: white; padding: 15px; border-radius: 5px; margin: 10px 0;">
+                    <div style="text-align: center; margin-bottom: 20px;">
+                        <strong>输出 = Σ(权重 × Value向量)</strong>
+                    </div>
+                    
+                    <div style="display: flex; justify-content: space-around; align-items: center; font-size: 14px;">
+                        <div style="text-align: center;">
+                            <div style="color: #e74c3c; font-weight: bold;">0.45 × V_我</div>
+                            <div>[0.4, 0.1, -0.1]</div>
+                        </div>
+                        <div>+</div>
+                        <div style="text-align: center;">
+                            <div style="color: #3498db; font-weight: bold;">0.27 × V_爱</div>
+                            <div>[0.1, 0.2, 0.1]</div>
+                        </div>
+                        <div>+</div>
+                        <div style="text-align: center;">
+                            <div style="color: #27ae60; font-weight: bold;">0.22 × V_机器</div>
+                            <div>[0.1, 0.2, 0.1]</div>
+                        </div>
+                        <div>+</div>
+                        <div style="text-align: center;">
+                            <div style="color: #f39c12; font-weight: bold;">0.25 × V_学习</div>
+                            <div>[0.2, -0.1, 0.3]</div>
+                        </div>
+                    </div>
+                    
+                    <div style="text-align: center; margin: 20px 0;">
+                        <div style="font-size: 20px;">⬇️</div>
+                        <div style="font-weight: bold; background: #8e44ad; color: white; padding: 10px; border-radius: 5px; display: inline-block;">
+                            最终输出: [0.8, 0.4, 0.4]
+                        </div>
+                    </div>
+                    
+                    <div style="background: #fff3cd; padding: 10px; border-radius: 5px; border-left: 4px solid #ffc107;">
+                        <strong>重要:</strong> 这个输出融合了序列中所有位置的信息，权重决定了每个位置的贡献程度。
+                    </div>
+                </div>
+                <p><strong>结果:</strong> 得到融合了全局信息的新表示，这就是自注意力的输出！</p>
+            `;
+        }
+
+        // 步骤4: 多头注意力演示函数
+        function showMultiHead() {
+            const multiheadDemo = document.getElementById('multihead-demo');
+            multiheadDemo.innerHTML = `
+                <h4>👥 多头注意力结构</h4>
+                <div style="background: white; padding: 15px; border-radius: 5px; margin: 10px 0;">
+                    <div style="text-align: center; margin-bottom: 20px;">
+                        <strong>8个并行的注意力头</strong>
+                    </div>
+                    <div style="display: grid; grid-template-columns: repeat(4, 1fr); gap: 10px;">
+                        ${Array(8).fill(0).map((_, i) => `
+                            <div style="border: 2px solid #3498db; padding: 10px; text-align: center; border-radius: 8px;">
+                                <div style="font-weight: bold; color: #3498db;">头 ${i+1}</div>
+                                <div style="font-size: 12px; margin: 5px 0;">维度: 64</div>
+                                <div style="background: #3498db; color: white; padding: 5px; border-radius: 4px; font-size: 11px;">
+                                    Q${i+1} × K${i+1}
+                                </div>
+                            </div>
+                        `).join('')}
+                    </div>
+                    <div style="text-align: center; margin-top: 20px;">
+                        <div style="font-size: 18px;">⬇️ 拼接 ⬇️</div>
+                        <div style="background: #27ae60; color: white; padding: 10px; border-radius: 8px; display: inline-block; margin-top: 10px;">
+                            输出维度: 8 × 64 = 512
+                        </div>
+                    </div>
+                </div>
+                <p><strong>说明:</strong> 每个头关注不同的特征子空间，总维度保持512不变。</p>
+            `;
+        }
+
+        function showHeadComparison() {
+            const multiheadDemo = document.getElementById('multihead-demo');
+            multiheadDemo.innerHTML = `
+                <h4>🔍 不同注意力头的关注点</h4>
+                <div style="background: white; padding: 15px; border-radius: 5px; margin: 10px 0;">
+                    <div style="text-align: center; margin-bottom: 20px;">
+                        <strong>句子: "The cat sat on the mat"</strong>
+                    </div>
+                    <div style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 20px;">
+                        <div style="border: 2px solid #e74c3c; padding: 15px; border-radius: 8px;">
+                            <div style="font-weight: bold; color: #e74c3c; margin-bottom: 10px;">注意力头 1 - 语法关系</div>
+                            <div style="font-size: 14px;">
+                                <span style="background: #e74c3c; color: white; padding: 2px 5px; border-radius: 3px;">The</span>
+                                <span style="background: #ffebee; padding: 2px 5px; border-radius: 3px;">cat</span>
+                                <span>sat on</span>
+                                <span style="background: #e74c3c; color: white; padding: 2px 5px; border-radius: 3px;">the</span>
+                                <span style="background: #ffebee; padding: 2px 5px; border-radius: 3px;">mat</span>
+                            </div>
+                            <div style="font-size: 12px; margin-top: 5px;">关注: 冠词与名词</div>
+                        </div>
+                        
+                        <div style="border: 2px solid #3498db; padding: 15px; border-radius: 8px;">
+                            <div style="font-weight: bold; color: #3498db; margin-bottom: 10px;">注意力头 2 - 动作关系</div>
+                            <div style="font-size: 14px;">
+                                <span>The</span>
+                                <span style="background: #3498db; color: white; padding: 2px 5px; border-radius: 3px;">cat</span>
+                                <span style="background: #e3f2fd; padding: 2px 5px; border-radius: 3px;">sat</span>
+                                <span>on the</span>
+                                <span style="background: #3498db; color: white; padding: 2px 5px; border-radius: 3px;">mat</span>
+                            </div>
+                            <div style="font-size: 12px; margin-top: 5px;">关注: 主语与谓语</div>
+                        </div>
+                        
+                        <div style="border: 2px solid #27ae60; padding: 15px; border-radius: 8px;">
+                            <div style="font-weight: bold; color: #27ae60; margin-bottom: 10px;">注意力头 3 - 位置关系</div>
+                            <div style="font-size: 14px;">
+                                <span>The cat</span>
+                                <span style="background: #27ae60; color: white; padding: 2px 5px; border-radius: 3px;">sat</span>
+                                <span style="background: #e8f5e8; padding: 2px 5px; border-radius: 3px;">on</span>
+                                <span>the</span>
+                                <span style="background: #27ae60; color: white; padding: 2px 5px; border-radius: 3px;">mat</span>
+                            </div>
+                            <div style="font-size: 12px; margin-top: 5px;">关注: 介词关系</div>
+                        </div>
+                        
+                        <div style="border: 2px solid #f39c12; padding: 15px; border-radius: 8px;">
+                            <div style="font-weight: bold; color: #f39c12; margin-bottom: 10px;">注意力头 4 - 语义关系</div>
+                            <div style="font-size: 14px;">
+                                <span>The</span>
+                                <span style="background: #f39c12; color: white; padding: 2px 5px; border-radius: 3px;">cat</span>
+                                <span>sat on the</span>
+                                <span style="background: #fef9e7; padding: 2px 5px; border-radius: 3px;">mat</span>
+                            </div>
+                            <div style="font-size: 12px; margin-top: 5px;">关注: 实体关系</div>
+                        </div>
+                    </div>
+                </div>
+                <p><strong>说明:</strong> 不同的头学会关注不同类型的语言模式和关系。</p>
+            `;
+        }
+
+        function showConcatenation() {
+            const multiheadDemo = document.getElementById('multihead-demo');
+            multiheadDemo.innerHTML = `
+                <h4>🔗 拼接与线性变换</h4>
+                <div style="background: white; padding: 15px; border-radius: 5px; margin: 10px 0;">
+                    <div style="text-align: center;">
+                        <div style="display: flex; justify-content: space-around; align-items: center; margin: 20px 0;">
+                            <div style="text-align: center;">
+                                <div style="font-weight: bold;">头1输出</div>
+                                <div style="background: #e74c3c; color: white; padding: 8px; border-radius: 5px; margin: 5px;">64维</div>
+                            </div>
+                            <div style="text-align: center;">
+                                <div style="font-weight: bold;">头2输出</div>
+                                <div style="background: #3498db; color: white; padding: 8px; border-radius: 5px; margin: 5px;">64维</div>
+                            </div>
+                            <div style="text-align: center;">
+                                <div style="font-weight: bold;">...</div>
+                                <div style="background: #95a5a6; color: white; padding: 8px; border-radius: 5px; margin: 5px;">...</div>
+                            </div>
+                            <div style="text-align: center;">
+                                <div style="font-weight: bold;">头8输出</div>
+                                <div style="background: #f39c12; color: white; padding: 8px; border-radius: 5px; margin: 5px;">64维</div>
+                            </div>
+                        </div>
+                        
+                        <div style="font-size: 24px; margin: 20px 0;">⬇️ 拼接 (Concatenate) ⬇️</div>
+                        
+                        <div style="background: #8e44ad; color: white; padding: 15px; border-radius: 8px; margin: 20px 0;">
+                            拼接结果: 8 × 64 = 512维
+                        </div>
+                        
+                        <div style="font-size: 24px; margin: 20px 0;">⬇️ 线性变换 W^O ⬇️</div>
+                        
+                        <div style="background: #27ae60; color: white; padding: 15px; border-radius: 8px;">
+                            最终输出: 512维
+                        </div>
+                    </div>
+                    
+                    <div style="background: #fff3cd; padding: 10px; border-radius: 5px; border-left: 4px solid #ffc107; margin-top: 20px;">
+                        <strong>公式:</strong> MultiHead(Q,K,V) = Concat(head₁, head₂, ..., head₈)W^O
+                    </div>
+                </div>
+                <p><strong>说明:</strong> 拼接所有头的输出，然后通过线性变换整合信息。</p>
+            `;
+        }
+
+        // 步骤5: 前馈网络演示函数
+        function showFFNStructure() {
+            const ffnDemo = document.getElementById('ffn-demo');
+            ffnDemo.innerHTML = `
+                <h4>🏗️ 前馈网络结构</h4>
+                <div style="background: white; padding: 15px; border-radius: 5px; margin: 10px 0;">
+                    <div style="text-align: center;">
+                        <div style="display: flex; justify-content: center; align-items: center; gap: 30px; margin: 20px 0;">
+                            <div style="text-align: center;">
+                                <div style="background: #3498db; color: white; padding: 15px; border-radius: 8px;">
+                                    输入<br>512维
+                                </div>
+                            </div>
+                            
+                            <div style="font-size: 24px;">→</div>
+                            
+                            <div style="text-align: center;">
+                                <div style="background: #e74c3c; color: white; padding: 15px; border-radius: 8px;">
+                                    第一层<br>2048维<br><small>(扩展4倍)</small>
+                                </div>
+                                <div style="margin-top: 5px; font-size: 12px;">W₁x + b₁</div>
+                            </div>
+                            
+                            <div style="font-size: 24px;">→</div>
+                            
+                            <div style="text-align: center;">
+                                <div style="background: #f39c12; color: white; padding: 15px; border-radius: 8px;">
+                                    ReLU<br>激活
+                                </div>
+                                <div style="margin-top: 5px; font-size: 12px;">max(0, x)</div>
+                            </div>
+                            
+                            <div style="font-size: 24px;">→</div>
+                            
+                            <div style="text-align: center;">
+                                <div style="background: #27ae60; color: white; padding: 15px; border-radius: 8px;">
+                                    第二层<br>512维<br><small>(压缩回原维度)</small>
+                                </div>
+                                <div style="margin-top: 5px; font-size: 12px;">W₂x + b₂</div>
+                            </div>
+                        </div>
+                        
+                        <div style="background: #f8f9fa; padding: 15px; border-radius: 8px; margin-top: 20px;">
+                            <strong>完整公式:</strong> FFN(x) = max(0, xW₁ + b₁)W₂ + b₂
+                        </div>
+                    </div>
+                </div>
+                <p><strong>说明:</strong> 每个位置独立应用相同的前馈网络，增加模型的非线性表达能力。</p>
+            `;
+        }
+
+        function showReLUActivation() {
+            const ffnDemo = document.getElementById('ffn-demo');
+            ffnDemo.innerHTML = `
+                <h4>⚡ ReLU激活函数</h4>
+                <div style="background: white; padding: 15px; border-radius: 5px; margin: 10px 0;">
+                    <div style="display: flex; justify-content: space-around; align-items: center;">
+                        <div style="text-align: center;">
+                            <div style="font-weight: bold;">输入示例</div>
+                            <div style="margin: 10px 0; font-family: monospace;">
+                                [-0.5, 2.1, -1.2, 0.8, -0.1, 1.5]
+                            </div>
+                        </div>
+                        
+                        <div style="font-size: 24px;">ReLU(x) = max(0, x)</div>
+                        
+                        <div style="text-align: center;">
+                            <div style="font-weight: bold;">输出结果</div>
+                            <div style="margin: 10px 0; font-family: monospace;">
+                                [0.0, 2.1, 0.0, 0.8, 0.0, 1.5]
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div style="margin: 20px 0;">
+                        <div style="text-align: center; font-weight: bold; margin-bottom: 10px;">ReLU函数图示</div>
+                        <div style="display: flex; justify-content: center;">
+                            <svg width="300" height="150" style="border: 1px solid #ddd;">
+                                <line x1="50" y1="100" x2="250" y2="100" stroke="#333" stroke-width="2"/>
+                                <line x1="150" y1="20" x2="150" y2="130" stroke="#333" stroke-width="2"/>
+                                <path d="M 50 100 L 150 100 L 250 20" stroke="#e74c3c" stroke-width="3" fill="none"/>
+                                <text x="250" y="115" font-size="12">x</text>
+                                <text x="155" y="15" font-size="12">y</text>
+                                <text x="120" y="115" font-size="10">0</text>
+                                <text x="260" y="50" font-size="12" fill="#e74c3c">y = max(0, x)</text>
+                            </svg>
+                        </div>
+                    </div>
+                    
+                    <div style="background: #e8f5e8; padding: 10px; border-radius: 5px; border-left: 4px solid #27ae60;">
+                        <strong>作用:</strong> 引入非线性，只保留正值，过滤负值，增强模型表达能力
+                    </div>
+                </div>
+                <p><strong>说明:</strong> ReLU简单高效，避免梯度消失问题，是深度学习中常用的激活函数。</p>
+            `;
+        }
+
+        function showResidualConnection() {
+            const ffnDemo = document.getElementById('ffn-demo');
+            ffnDemo.innerHTML = `
+                <h4>🔄 残差连接</h4>
+                <div style="background: white; padding: 15px; border-radius: 5px; margin: 10px 0;">
+                    <div style="text-align: center; margin-bottom: 20px;">
+                        <strong>残差连接让信息可以"跳过"某些层直接传递</strong>
+                    </div>
+                    
+                    <div style="position: relative; height: 200px; margin: 20px 0;">
+                        <div style="position: absolute; left: 50px; top: 50px; background: #3498db; color: white; padding: 10px; border-radius: 8px;">
+                            输入 X
+                        </div>
+                        
+                        <div style="position: absolute; left: 200px; top: 50px; background: #e74c3c; color: white; padding: 10px; border-radius: 8px;">
+                            前馈网络<br>FFN(X)
+                        </div>
+                        
+                        <div style="position: absolute; left: 350px; top: 50px; background: #27ae60; color: white; padding: 10px; border-radius: 8px;">
+                            输出<br>X + FFN(X)
+                        </div>
+                        
+                        <!-- 主路径箭头 -->
+                        <div style="position: absolute; left: 150px; top: 65px; width: 40px; height: 0; border-top: 3px solid #333;"></div>
+                        <div style="position: absolute; left: 190px; top: 60px; width: 0; height: 0; border-left: 10px solid #333; border-top: 5px solid transparent; border-bottom: 5px solid transparent;"></div>
+                        
+                        <div style="position: absolute; left: 300px; top: 65px; width: 40px; height: 0; border-top: 3px solid #333;"></div>
+                        <div style="position: absolute; left: 340px; top: 60px; width: 0; height: 0; border-left: 10px solid #333; border-top: 5px solid transparent; border-bottom: 5px solid transparent;"></div>
+                        
+                        <!-- 跳跃连接箭头 -->
+                        <div style="position: absolute; left: 100px; top: 120px; width: 200px; height: 0; border-top: 3px solid #f39c12; border-style: dashed;"></div>
+                        <div style="position: absolute; left: 300px; top: 115px; width: 0; height: 0; border-left: 10px solid #f39c12; border-top: 5px solid transparent; border-bottom: 5px solid transparent;"></div>
+                        
+                        <div style="position: absolute; left: 150px; top: 140px; color: #f39c12; font-weight: bold; font-size: 14px;">
+                            残差连接 (跳跃连接)
+                        </div>
+                        
+                        <!-- 加号 -->
+                        <div style="position: absolute; left: 315px; top: 85px; font-size: 24px; font-weight: bold;">+</div>
+                    </div>
+                    
+                    <div style="background: #fff3cd; padding: 10px; border-radius: 5px; border-left: 4px solid #ffc107; margin-top: 20px;">
+                        <strong>优势:</strong><br>
+                        • 缓解梯度消失问题<br>
+                        • 让网络更容易训练<br>
+                        • 保留原始信息，防止信息丢失
+                    </div>
+                </div>
+                <p><strong>说明:</strong> 残差连接是深度学习的重要技术，使得训练非常深的网络成为可能。</p>
+            `;
+        }
+
+        function showLayerNorm() {
+            const ffnDemo = document.getElementById('ffn-demo');
+            ffnDemo.innerHTML = `
+                <h4>📊 层归一化 (Layer Normalization)</h4>
+                <div style="background: white; padding: 15px; border-radius: 5px; margin: 10px 0;">
+                    <div style="text-align: center; margin-bottom: 20px;">
+                        <strong>标准化每一层的输入，稳定训练过程</strong>
+                    </div>
+                    
+                    <div style="display: flex; justify-content: space-around; align-items: center; margin: 20px 0;">
+                        <div style="text-align: center;">
+                            <div style="font-weight: bold;">归一化前</div>
+                            <div style="margin: 10px 0; font-family: monospace; font-size: 14px;">
+                                [1.2, -0.5, 2.1, 0.8, -1.1]<br>
+                                均值: 0.5<br>
+                                标准差: 1.2
+                            </div>
+                            <div style="font-size: 12px; color: #666;">分布不稳定</div>
+                        </div>
+                        
+                        <div style="font-size: 24px;">→ LayerNorm →</div>
+                        
+                        <div style="text-align: center;">
+                            <div style="font-weight: bold;">归一化后</div>
+                            <div style="margin: 10px 0; font-family: monospace; font-size: 14px;">
+                                [0.6, -0.8, 1.3, 0.2, -1.3]<br>
+                                均值: 0.0<br>
+                                标准差: 1.0
+                            </div>
+                            <div style="font-size: 12px; color: #27ae60;">分布稳定</div>
+                        </div>
+                    </div>
+                    
+                    <div style="background: #f8f9fa; padding: 15px; border-radius: 8px; margin: 20px 0;">
+                        <div style="font-weight: bold; text-align: center; margin-bottom: 10px;">层归一化公式</div>
+                        <div style="text-align: center; font-family: monospace;">
+                            LayerNorm(x) = γ × (x - μ) / σ + β<br><br>
+                            其中：<br>
+                            μ = 层内均值<br>
+                            σ = 层内标准差<br>
+                            γ, β = 可学习参数
+                        </div>
+                    </div>
+                    
+                    <div style="background: #e8f5e8; padding: 10px; border-radius: 5px; border-left: 4px solid #27ae60;">
+                        <strong>完整结构:</strong> LayerNorm(x + Sublayer(x))<br>
+                        先应用残差连接，再进行层归一化
+                    </div>
+                </div>
+                <p><strong>说明:</strong> 层归一化确保每层的输入分布稳定，加速训练收敛。</p>
+            `;
+        }
+
+        // 步骤6: 解码器演示函数
+        function showMaskedAttention() {
+            const decoderDemo = document.getElementById('decoder-demo');
+            decoderDemo.innerHTML = `
+                <h4>🎭 掩码自注意力</h4>
+                <div style="background: white; padding: 15px; border-radius: 5px; margin: 10px 0;">
+                    <div style="text-align: center; margin-bottom: 20px;">
+                        <strong>防止模型看到未来信息</strong>
+                    </div>
+                    
+                    <div style="display: flex; justify-content: space-around; margin: 20px 0;">
+                        <div style="text-align: center;">
+                            <div style="font-weight: bold; margin-bottom: 10px;">未掩码的注意力矩阵</div>
+                            <table style="border-collapse: collapse; margin: 10px 0;">
+                                <tr><td></td><td style="background: #f8f9fa; padding: 8px; border: 1px solid #ddd;">我</td><td style="background: #f8f9fa; padding: 8px; border: 1px solid #ddd;">爱</td><td style="background: #f8f9fa; padding: 8px; border: 1px solid #ddd;">学习</td></tr>
+                                <tr><td style="background: #f8f9fa; padding: 8px; border: 1px solid #ddd;">我</td><td style="padding: 8px; border: 1px solid #ddd; background: #3498db; color: white;">0.8</td><td style="padding: 8px; border: 1px solid #ddd; background: #e74c3c; color: white;">0.3</td><td style="padding: 8px; border: 1px solid #ddd; background: #e74c3c; color: white;">0.2</td></tr>
+                                <tr><td style="background: #f8f9fa; padding: 8px; border: 1px solid #ddd;">爱</td><td style="padding: 8px; border: 1px solid #ddd;">0.2</td><td style="padding: 8px; border: 1px solid #ddd; background: #3498db; color: white;">0.9</td><td style="padding: 8px; border: 1px solid #ddd; background: #e74c3c; color: white;">0.7</td></tr>
+                                <tr><td style="background: #f8f9fa; padding: 8px; border: 1px solid #ddd;">学习</td><td style="padding: 8px; border: 1px solid #ddd;">0.3</td><td style="padding: 8px; border: 1px solid #ddd;">0.5</td><td style="padding: 8px; border: 1px solid #ddd; background: #3498db; color: white;">0.7</td></tr>
+                            </table>
+                            <div style="font-size: 12px; color: #e74c3c;">❌ 可以看到未来信息</div>
+                        </div>
+                        
+                        <div style="text-align: center;">
+                            <div style="font-weight: bold; margin-bottom: 10px;">掩码后的注意力矩阵</div>
+                            <table style="border-collapse: collapse; margin: 10px 0;">
+                                <tr><td></td><td style="background: #f8f9fa; padding: 8px; border: 1px solid #ddd;">我</td><td style="background: #f8f9fa; padding: 8px; border: 1px solid #ddd;">爱</td><td style="background: #f8f9fa; padding: 8px; border: 1px solid #ddd;">学习</td></tr>
+                                <tr><td style="background: #f8f9fa; padding: 8px; border: 1px solid #ddd;">我</td><td style="padding: 8px; border: 1px solid #ddd; background: #3498db; color: white;">0.8</td><td style="padding: 8px; border: 1px solid #ddd; background: #95a5a6; color: white;">-∞</td><td style="padding: 8px; border: 1px solid #ddd; background: #95a5a6; color: white;">-∞</td></tr>
+                                <tr><td style="background: #f8f9fa; padding: 8px; border: 1px solid #ddd;">爱</td><td style="padding: 8px; border: 1px solid #ddd;">0.2</td><td style="padding: 8px; border: 1px solid #ddd; background: #3498db; color: white;">0.9</td><td style="padding: 8px; border: 1px solid #ddd; background: #95a5a6; color: white;">-∞</td></tr>
+                                <tr><td style="background: #f8f9fa; padding: 8px; border: 1px solid #ddd;">学习</td><td style="padding: 8px; border: 1px solid #ddd;">0.3</td><td style="padding: 8px; border: 1px solid #ddd;">0.5</td><td style="padding: 8px; border: 1px solid #ddd; background: #3498db; color: white;">0.7</td></tr>
+                            </table>
+                            <div style="font-size: 12px; color: #27ae60;">✅ 无法看到未来信息</div>
+                        </div>
+                    </div>
+                    
+                    <div style="background: #fff3cd; padding: 10px; border-radius: 5px; border-left: 4px solid #ffc107;">
+                        <strong>掩码原理:</strong> 将未来位置的注意力分数设为-∞，经过softmax后变为0
+                    </div>
+                </div>
+                <p><strong>说明:</strong> 掩码确保自回归生成时，模型只能基于已生成的内容预测下一个词。</p>
+            `;
+        }
+
+        function showCrossAttention() {
+            const decoderDemo = document.getElementById('decoder-demo');
+            decoderDemo.innerHTML = `
+                <h4>🔄 编码器-解码器交叉注意力</h4>
+                <div style="background: white; padding: 15px; border-radius: 5px; margin: 10px 0;">
+                    <div style="text-align: center; margin-bottom: 20px;">
+                        <strong>解码器关注编码器的输出</strong>
+                    </div>
+                    
+                    <div style="display: flex; justify-content: space-around; align-items: center; margin: 20px 0;">
+                        <div style="text-align: center; border: 2px solid #3498db; padding: 15px; border-radius: 8px;">
+                            <div style="font-weight: bold; color: #3498db;">编码器输出</div>
+                            <div style="margin: 10px 0; font-size: 14px;">
+                                "I love machine learning"<br>
+                                [h_1, h_2, h_3, h_4]
+                            </div>
+                            <div style="font-size: 12px; color: #666;">提供 Key 和 Value</div>
+                        </div>
+                        
+                        <div style="text-align: center;">
+                            <div style="font-size: 24px;">↔️</div>
+                            <div style="font-size: 14px; margin-top: 5px;">交叉注意力</div>
+                        </div>
+                        
+                        <div style="text-align: center; border: 2px solid #e74c3c; padding: 15px; border-radius: 8px;">
+                            <div style="font-weight: bold; color: #e74c3c;">解码器状态</div>
+                            <div style="margin: 10px 0; font-size: 14px;">
+                                "我爱"<br>
+                                [d_1, d_2]
+                            </div>
+                            <div style="font-size: 12px; color: #666;">提供 Query</div>
+                        </div>
+                    </div>
+                    
+                    <div style="background: #f8f9fa; padding: 15px; border-radius: 8px; margin: 20px 0;">
+                        <div style="text-align: center; font-weight: bold; margin-bottom: 10px;">交叉注意力计算</div>
+                        <div style="font-family: monospace; text-align: center;">
+                            Q = 解码器状态 × W_Q<br>
+                            K = 编码器输出 × W_K<br>
+                            V = 编码器输出 × W_V<br><br>
+                            Attention(Q, K, V) = softmax(QK^T)V
+                        </div>
+                    </div>
+                    
+                    <div style="margin: 20px 0;">
+                        <div style="font-weight: bold; text-align: center; margin-bottom: 10px;">注意力权重示例</div>
+                        <div style="display: flex; justify-content: center;">
+                            <table style="border-collapse: collapse;">
+                                <tr>
+                                    <td style="border: 1px solid #ddd; padding: 8px; background: #f8f9fa;"></td>
+                                    <td style="border: 1px solid #ddd; padding: 8px; background: #f8f9fa;">I</td>
+                                    <td style="border: 1px solid #ddd; padding: 8px; background: #f8f9fa;">love</td>
+                                    <td style="border: 1px solid #ddd; padding: 8px; background: #f8f9fa;">machine</td>
+                                    <td style="border: 1px solid #ddd; padding: 8px; background: #f8f9fa;">learning</td>
+                                </tr>
+                                <tr>
+                                    <td style="border: 1px solid #ddd; padding: 8px; background: #f8f9fa;">我</td>
+                                    <td style="border: 1px solid #ddd; padding: 8px; background: #e74c3c; color: white;">0.9</td>
+                                    <td style="border: 1px solid #ddd; padding: 8px;">0.1</td>
+                                    <td style="border: 1px solid #ddd; padding: 8px;">0.0</td>
+                                    <td style="border: 1px solid #ddd; padding: 8px;">0.0</td>
+                                </tr>
+                                <tr>
+                                    <td style="border: 1px solid #ddd; padding: 8px; background: #f8f9fa;">爱</td>
+                                    <td style="border: 1px solid #ddd; padding: 8px;">0.1</td>
+                                    <td style="border: 1px solid #ddd; padding: 8px; background: #e74c3c; color: white;">0.8</td>
+                                    <td style="border: 1px solid #ddd; padding: 8px;">0.1</td>
+                                    <td style="border: 1px solid #ddd; padding: 8px;">0.0</td>
+                                </tr>
+                            </table>
+                        </div>
+                        <div style="text-align: center; font-size: 12px; margin-top: 10px;">
+                            "我"主要关注"I"，"爱"主要关注"love"
+                        </div>
+                    </div>
+                </div>
+                <p><strong>说明:</strong> 交叉注意力实现了源语言和目标语言之间的对齐，是机器翻译的关键。</p>
+            `;
+        }
+
+        function showAutoregressive() {
+            const decoderDemo = document.getElementById('decoder-demo');
+            decoderDemo.innerHTML = `
+                <h4>🔄 自回归生成过程</h4>
+                <div style="background: white; padding: 15px; border-radius: 5px; margin: 10px 0;">
+                    <div style="text-align: center; margin-bottom: 20px;">
+                        <strong>逐步生成目标序列</strong>
+                    </div>
+                    
+                    <div id="autoregressive-steps" style="margin: 20px 0;">
+                        <div class="generation-step" style="margin: 15px 0; padding: 15px; border: 2px solid #3498db; border-radius: 8px;">
+                            <div style="font-weight: bold; color: #3498db;">步骤 1</div>
+                            <div style="margin: 10px 0;">
+                                输入: [START] → 预测: "我" (概率: 0.85)
+                            </div>
+                            <div style="background: #e3f2fd; padding: 8px; border-radius: 4px;">
+                                当前序列: [START, 我]
+                            </div>
+                        </div>
+                        
+                        <div class="generation-step" style="margin: 15px 0; padding: 15px; border: 2px solid #27ae60; border-radius: 8px;">
+                            <div style="font-weight: bold; color: #27ae60;">步骤 2</div>
+                            <div style="margin: 10px 0;">
+                                输入: [START, 我] → 预测: "爱" (概率: 0.78)
+                            </div>
+                            <div style="background: #e8f5e8; padding: 8px; border-radius: 4px;">
+                                当前序列: [START, 我, 爱]
+                            </div>
+                        </div>
+                        
+                        <div class="generation-step" style="margin: 15px 0; padding: 15px; border: 2px solid #f39c12; border-radius: 8px;">
+                            <div style="font-weight: bold; color: #f39c12;">步骤 3</div>
+                            <div style="margin: 10px 0;">
+                                输入: [START, 我, 爱] → 预测: "机器" (概率: 0.92)
+                            </div>
+                            <div style="background: #fef9e7; padding: 8px; border-radius: 4px;">
+                                当前序列: [START, 我, 爱, 机器]
+                            </div>
+                        </div>
+                        
+                        <div class="generation-step" style="margin: 15px 0; padding: 15px; border: 2px solid #e74c3c; border-radius: 8px;">
+                            <div style="font-weight: bold; color: #e74c3c;">步骤 4</div>
+                            <div style="margin: 10px 0;">
+                                输入: [START, 我, 爱, 机器] → 预测: "学习" (概率: 0.89)
+                            </div>
+                            <div style="background: #ffebee; padding: 8px; border-radius: 4px;">
+                                当前序列: [START, 我, 爱, 机器, 学习]
+                            </div>
+                        </div>
+                        
+                        <div class="generation-step" style="margin: 15px 0; padding: 15px; border: 2px solid #8e44ad; border-radius: 8px;">
+                            <div style="font-weight: bold; color: #8e44ad;">步骤 5</div>
+                            <div style="margin: 10px 0;">
+                                输入: [START, 我, 爱, 机器, 学习] → 预测: [END] (概率: 0.95)
+                            </div>
+                            <div style="background: #f3e5f5; padding: 8px; border-radius: 4px;">
+                                <strong>生成完成!</strong> 最终结果: "我爱机器学习"
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div style="background: #fff3cd; padding: 10px; border-radius: 5px; border-left: 4px solid #ffc107;">
+                        <strong>关键特点:</strong><br>
+                        • 每次只生成一个词<br>
+                        • 基于之前生成的所有词预测下一个词<br>
+                        • 掩码确保不会看到未来信息
+                    </div>
+                </div>
+                <p><strong>说明:</strong> 自回归生成使模型能够生成任意长度的序列，适用于文本生成任务。</p>
+            `;
+        }
+
+        function showOutputProjection() {
+            const decoderDemo = document.getElementById('decoder-demo');
+            decoderDemo.innerHTML = `
+                <h4>📊 输出投影与概率计算</h4>
+                <div style="background: white; padding: 15px; border-radius: 5px; margin: 10px 0;">
+                    <div style="text-align: center; margin-bottom: 20px;">
+                        <strong>将隐藏状态转换为词汇概率</strong>
+                    </div>
+                    
+                    <div style="display: flex; justify-content: center; align-items: center; gap: 30px; margin: 20px 0;">
+                        <div style="text-align: center;">
+                            <div style="background: #3498db; color: white; padding: 15px; border-radius: 8px;">
+                                解码器输出<br>512维隐藏状态<br>[h₁, h₂, ..., h₅₁₂]
+                            </div>
+                        </div>
+                        
+                        <div style="font-size: 24px;">→</div>
+                        
+                        <div style="text-align: center;">
+                            <div style="background: #e74c3c; color: white; padding: 15px; border-radius: 8px;">
+                                线性投影<br>W_output × h + b<br>词汇表大小维度
+                            </div>
+                        </div>
+                        
+                        <div style="font-size: 24px;">→</div>
+                        
+                        <div style="text-align: center;">
+                            <div style="background: #27ae60; color: white; padding: 15px; border-radius: 8px;">
+                                Softmax<br>概率分布<br>Σ = 1.0
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div style="margin: 20px 0;">
+                        <div style="font-weight: bold; text-align: center; margin-bottom: 15px;">词汇概率示例 (预测"机器")</div>
+                        <div style="display: flex; justify-content: center;">
+                            <div style="background: #f8f9fa; padding: 15px; border-radius: 8px; font-family: monospace;">
+                                我:     0.01 (1%)<br>
+                                爱:     0.02 (2%)<br>
+                                <strong style="color: #e74c3c;">机器:   0.89 (89%)</strong><br>
+                                学习:   0.03 (3%)<br>
+                                是:     0.02 (2%)<br>
+                                的:     0.01 (1%)<br>
+                                ...     0.02 (2%)<br>
+                                ─────────────────<br>
+                                总计:   1.00 (100%)
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div style="display: flex; justify-content: space-around; margin: 20px 0;">
+                        <div style="text-align: center; border: 2px solid #3498db; padding: 15px; border-radius: 8px;">
+                            <div style="font-weight: bold; color: #3498db;">训练时</div>
+                            <div style="font-size: 14px; margin: 10px 0;">
+                                使用交叉熵损失<br>
+                                与真实标签比较
+                            </div>
+                            <div style="background: #e3f2fd; padding: 8px; border-radius: 4px; font-size: 12px;">
+                                Loss = -log(P(正确词))
+                            </div>
+                        </div>
+                        
+                        <div style="text-align: center; border: 2px solid #27ae60; padding: 15px; border-radius: 8px;">
+                            <div style="font-weight: bold; color: #27ae60;">推理时</div>
+                            <div style="font-size: 14px; margin: 10px 0;">
+                                选择概率最高的词<br>
+                                或使用采样策略
+                            </div>
+                            <div style="background: #e8f5e8; padding: 8px; border-radius: 4px; font-size: 12px;">
+                                选择: argmax(P(词))
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div style="background: #f8f9fa; padding: 15px; border-radius: 8px; border-left: 4px solid #3498db;">
+                        <strong>完整公式:</strong> P(y_t | y_{&lt;t}, x) = softmax(W_o × h_t + b_o)
+                    </div>
+                </div>
+                <p><strong>说明:</strong> 输出投影层将抽象的隐藏表示转换为具体的词汇选择概率。</p>
+            `;
+        }
+
+        // 步骤7: 完整流程演示函数
+        let demoTimer;
+        let currentDemoStep = 0;
+
+        function startFullDemo() {
+            currentDemoStep = 0;
+            clearInterval(demoTimer);
+            showDemoStep(0);
+            
+            demoTimer = setInterval(() => {
+                currentDemoStep++;
+                if (currentDemoStep <= 3) {
+                    showDemoStep(currentDemoStep);
+                } else {
+                    clearInterval(demoTimer);
+                }
+            }, 3000);
+        }
+
+        function resetDemo() {
+            clearInterval(demoTimer);
+            currentDemoStep = 0;
+            const demoContent = document.getElementById('demo-content');
+            demoContent.innerHTML = '<p>点击"开始完整演示"查看Transformer处理过程...</p>';
+            
+            // 重置步骤指示器
+            document.querySelectorAll('.demo-step').forEach((step, index) => {
+                step.classList.toggle('active', index === 0);
+            });
+        }
+
+        function showDemoStep(step) {
+            // 更新步骤指示器
+            document.querySelectorAll('.demo-step').forEach((stepEl, index) => {
+                stepEl.classList.toggle('active', index === step);
+            });
+            
+            const demoContent = document.getElementById('demo-content');
+            
+            switch(step) {
+                case 0:
+                    demoContent.innerHTML = `
+                        <h4>🔄 步骤1: 输入处理</h4>
+                        <div style="background: white; padding: 15px; border-radius: 5px;">
+                            <div style="text-align: center; margin-bottom: 15px;">
+                                <strong>输入: "I love machine learning"</strong>
+                            </div>
+                            <div style="display: flex; justify-content: space-around; align-items: center;">
+                                <div style="text-align: center;">
+                                    <div style="background: #3498db; color: white; padding: 10px; border-radius: 5px;">分词</div>
+                                    <div style="font-size: 12px; margin-top: 5px;">["I", "love", "machine", "learning"]</div>
+                                </div>
+                                <div>→</div>
+                                <div style="text-align: center;">
+                                    <div style="background: #e74c3c; color: white; padding: 10px; border-radius: 5px;">嵌入</div>
+                                    <div style="font-size: 12px; margin-top: 5px;">4×512 矩阵</div>
+                                </div>
+                                <div>→</div>
+                                <div style="text-align: center;">
+                                    <div style="background: #27ae60; color: white; padding: 10px; border-radius: 5px;">位置编码</div>
+                                    <div style="font-size: 12px; margin-top: 5px;">添加位置信息</div>
+                                </div>
+                            </div>
+                        </div>
+                    `;
+                    break;
+                case 1:
+                    demoContent.innerHTML = `
+                        <h4>🧠 步骤2: 编码器处理</h4>
+                        <div style="background: white; padding: 15px; border-radius: 5px;">
+                            <div style="text-align: center; margin-bottom: 15px;">
+                                <strong>6层编码器处理输入</strong>
+                            </div>
+                            <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 15px;">
+                                <div style="text-align: center; border: 2px solid #3498db; padding: 10px; border-radius: 8px;">
+                                    <div style="font-weight: bold; color: #3498db;">多头自注意力</div>
+                                    <div style="font-size: 12px;">理解词间关系</div>
+                                </div>
+                                <div style="text-align: center; border: 2px solid #e74c3c; padding: 10px; border-radius: 8px;">
+                                    <div style="font-weight: bold; color: #e74c3c;">前馈网络</div>
+                                    <div style="font-size: 12px;">增强表达能力</div>
+                                </div>
+                                <div style="text-align: center; border: 2px solid #27ae60; padding: 10px; border-radius: 8px;">
+                                    <div style="font-weight: bold; color: #27ae60;">残差+归一化</div>
+                                    <div style="font-size: 12px;">稳定训练</div>
+                                </div>
+                            </div>
+                            <div style="text-align: center; margin-top: 15px; background: #f8f9fa; padding: 10px; border-radius: 5px;">
+                                输出: 丰富的上下文表示 (4×512)
+                            </div>
+                        </div>
+                    `;
+                    break;
+                case 2:
+                    demoContent.innerHTML = `
+                        <h4>🎯 步骤3: 解码器生成</h4>
+                        <div style="background: white; padding: 15px; border-radius: 5px;">
+                            <div style="text-align: center; margin-bottom: 15px;">
+                                <strong>自回归生成目标序列</strong>
+                            </div>
+                            <div style="display: flex; justify-content: space-around; margin-bottom: 15px;">
+                                <div style="text-align: center; background: #e74c3c; color: white; padding: 10px; border-radius: 8px;">
+                                    <div>掩码自注意力</div>
+                                    <div style="font-size: 12px;">防止看到未来</div>
+                                </div>
+                                <div style="text-align: center; background: #3498db; color: white; padding: 10px; border-radius: 8px;">
+                                    <div>交叉注意力</div>
+                                    <div style="font-size: 12px;">关注源语言</div>
+                                </div>
+                                <div style="text-align: center; background: #27ae60; color: white; padding: 10px; border-radius: 8px;">
+                                    <div>前馈网络</div>
+                                    <div style="font-size: 12px;">最终处理</div>
+                                </div>
+                            </div>
+                            <div style="background: #fff3cd; padding: 10px; border-radius: 5px; text-align: center;">
+                                逐步生成: "我" → "我爱" → "我爱机器" → "我爱机器学习"
+                            </div>
+                        </div>
+                    `;
+                    break;
+                case 3:
+                    demoContent.innerHTML = `
+                        <h4>📊 步骤4: 输出生成</h4>
+                        <div style="background: white; padding: 15px; border-radius: 5px;">
+                            <div style="text-align: center; margin-bottom: 15px;">
+                                <strong>最终输出概率分布</strong>
+                            </div>
+                            <div style="display: flex; justify-content: center; align-items: center; gap: 20px;">
+                                <div style="text-align: center;">
+                                    <div style="background: #8e44ad; color: white; padding: 15px; border-radius: 8px;">
+                                        解码器隐藏状态<br>512维
+                                    </div>
+                                </div>
+                                <div>→</div>
+                                <div style="text-align: center;">
+                                    <div style="background: #f39c12; color: white; padding: 15px; border-radius: 8px;">
+                                        线性投影<br>词汇表大小
+                                    </div>
+                                </div>
+                                <div>→</div>
+                                <div style="text-align: center;">
+                                    <div style="background: #27ae60; color: white; padding: 15px; border-radius: 8px;">
+                                        Softmax<br>概率分布
+                                    </div>
+                                </div>
+                            </div>
+                            <div style="background: #e8f5e8; padding: 15px; border-radius: 5px; margin-top: 15px; text-align: center;">
+                                <strong>✅ 翻译完成!</strong><br>
+                                "I love machine learning" → "我爱机器学习"
+                            </div>
+                        </div>
+                    `;
+                    break;
+            }
+        }
+    </script>
+</body>
+</html>

@@ -1,0 +1,270 @@
+{
+  "main": {
+    "id": "af878cae545276cb",
+    "type": "split",
+    "children": [
+      {
+        "id": "1db4eb6cd42dabe6",
+        "type": "tabs",
+        "children": [
+          {
+            "id": "2306d2550f047de3",
+            "type": "leaf",
+            "state": {
+              "type": "markdown",
+              "state": {
+                "file": "000-八股/01-笔记/Redis/Redis.md",
+                "mode": "source",
+                "source": false
+              },
+              "icon": "lucide-file",
+              "title": "Redis"
+            }
+          },
+          {
+            "id": "618ac54481d390a8",
+            "type": "leaf",
+            "state": {
+              "type": "markdown",
+              "state": {
+                "file": "13-java八股/Prompt/通用2.0.md",
+                "mode": "source",
+                "source": false
+              },
+              "icon": "lucide-file",
+              "title": "通用2.0"
+            }
+          }
+        ]
+      }
+    ],
+    "direction": "vertical"
+  },
+  "left": {
+    "id": "c739be8c010755de",
+    "type": "split",
+    "children": [
+      {
+        "id": "f20dd02cc4000dcb",
+        "type": "tabs",
+        "children": [
+          {
+            "id": "e945d6d16a11f41b",
+            "type": "leaf",
+            "state": {
+              "type": "file-explorer",
+              "state": {
+                "sortOrder": "alphabetical",
+                "autoReveal": false
+              },
+              "icon": "lucide-folder-closed",
+              "title": "文件列表"
+            }
+          },
+          {
+            "id": "a65e45fd94522bb4",
+            "type": "leaf",
+            "state": {
+              "type": "bookmarks",
+              "state": {},
+              "icon": "lucide-bookmark",
+              "title": "书签"
+            }
+          },
+          {
+            "id": "108b8224c0e85444",
+            "type": "leaf",
+            "state": {
+              "type": "recent-files",
+              "state": {},
+              "icon": "clock",
+              "title": "Recent Files"
+            }
+          },
+          {
+            "id": "94807afb999f2c98",
+            "type": "leaf",
+            "state": {
+              "type": "search",
+              "state": {
+                "query": "",
+                "matchingCase": false,
+                "explainSearch": false,
+                "collapseAll": false,
+                "extraContext": false,
+                "sortOrder": "alphabetical"
+              },
+              "icon": "lucide-search",
+              "title": "搜索"
+            }
+          }
+        ]
+      }
+    ],
+    "direction": "horizontal",
+    "width": 265.5
+  },
+  "right": {
+    "id": "2dcd0acacef7ce46",
+    "type": "split",
+    "children": [
+      {
+        "id": "69d59b2bd0190498",
+        "type": "tabs",
+        "children": [
+          {
+            "id": "9b4ce79679870764",
+            "type": "leaf",
+            "state": {
+              "type": "backlink",
+              "state": {
+                "file": "11-牛客刷题/操作系统/操作系统错题记录.md",
+                "collapseAll": false,
+                "extraContext": false,
+                "sortOrder": "alphabetical",
+                "showSearch": false,
+                "searchQuery": "",
+                "backlinkCollapsed": false,
+                "unlinkedCollapsed": true
+              },
+              "icon": "links-coming-in",
+              "title": "操作系统错题记录 的反向链接列表"
+            }
+          },
+          {
+            "id": "bac7c5742cd27fc9",
+            "type": "leaf",
+            "state": {
+              "type": "outgoing-link",
+              "state": {
+                "file": "11-牛客刷题/操作系统/操作系统错题记录.md",
+                "linksCollapsed": false,
+                "unlinkedCollapsed": true
+              },
+              "icon": "links-going-out",
+              "title": "操作系统错题记录 的出链列表"
+            }
+          },
+          {
+            "id": "bfc3eff9ae4c93d2",
+            "type": "leaf",
+            "state": {
+              "type": "tag",
+              "state": {
+                "sortOrder": "frequency",
+                "useHierarchy": true,
+                "showSearch": false,
+                "searchQuery": ""
+              },
+              "icon": "lucide-tags",
+              "title": "标签"
+            }
+          },
+          {
+            "id": "cf995728c8845860",
+            "type": "leaf",
+            "state": {
+              "type": "outline",
+              "state": {
+                "file": "000-八股/01-笔记/Redis/Redis.md",
+                "followCursor": false,
+                "showSearch": false,
+                "searchQuery": ""
+              },
+              "icon": "lucide-list",
+              "title": "Redis 的大纲"
+            }
+          },
+          {
+            "id": "b5c566cd9eb2ffa5",
+            "type": "leaf",
+            "state": {
+              "type": "quiet-outline",
+              "state": {},
+              "icon": "lines-of-text",
+              "title": "Quiet Outline"
+            }
+          },
+          {
+            "id": "fbc7c44c54022f03",
+            "type": "leaf",
+            "state": {
+              "type": "mermaid-toolbar-view",
+              "state": {},
+              "icon": "trident-custom",
+              "title": "Mermaid Toolbar"
+            }
+          }
+        ],
+        "currentTab": 3
+      }
+    ],
+    "direction": "horizontal",
+    "width": 200,
+    "collapsed": true
+  },
+  "left-ribbon": {
+    "hiddenItems": {
+      "switcher:打开快速切换": false,
+      "graph:查看关系图谱": false,
+      "canvas:新建白板": false,
+      "daily-notes:打开/创建今天的日记": false,
+      "templates:插入模板": false,
+      "command-palette:打开命令面板": false,
+      "obsidian-importer:Open Importer": false,
+      "templater-obsidian:Templater": false,
+      "pdf-plus:PDF++: Toggle auto-copy": false,
+      "pdf-plus:PDF++: Toggle auto-focus": false,
+      "pdf-plus:PDF++: Toggle auto-paste": false,
+      "mermaid-tools:Open Mermaid Toolbar": false,
+      "periodic-notes:Open today": false
+    }
+  },
+  "active": "2306d2550f047de3",
+  "lastOpenFiles": [
+    "000-八股/01-笔记/MQ/消息队列.md",
+    "000-八股/02-资料/MQ.pdf",
+    "000-八股/02-资料/Redis.pdf",
+    "13-java八股/Prompt/通用2.0.md",
+    "000-八股/01-笔记/SQL",
+    "000-八股/01-笔记/Java",
+    "000-八股/01-笔记/MQ",
+    "000-八股/01-笔记/Redis/Redis.md",
+    "000-八股/01-笔记/Redis/Redis阶段一.md",
+    "13-java八股/Prompt/通用.md",
+    "000-八股/01-笔记/Redis",
+    "05-GWY/02-申论/白鹭申论进度.md",
+    "05-GWY/02-申论/b19e14bf29d74d869e7848395a94d723/de25dd8d27f44ef088be97bed7515262.pdf",
+    "05-GWY/02-申论/b19e14bf29d74d869e7848395a94d723",
+    "05-GWY/02-申论/申论纸.pdf",
+    "05-GWY/02-申论/申论纸-adb7ec35747c.pdf.qkdownloading",
+    "00_系统配置/HTML模板.md",
+    "000-八股/01-笔记/SQL/SQL笔记.md",
+    "05-GWY/01-行测/02-逻辑判断/0102-花生十三逻辑判断/判断推理知识点梳理.md",
+    "05-GWY/01-行测/02-逻辑判断/0102-花生十三逻辑判断/命题否定整理.md",
+    "00_系统配置/待办.md",
+    "00_系统配置/电影.md",
+    "000-八股/03-测试/SQL前29答题.md",
+    "000-八股/03-测试/SQL前29.md",
+    "01-论文汇总/00-改进实验/步骤.md",
+    "05-GWY/00-笔记/言语理解.md",
+    "01-论文汇总/05-实验流程/01-LAI/LAI处理流程.md",
+    "01-论文汇总/02-数据/论文复现/基于机器学习的青藏高原总初级生产力估算研究 - 复现步骤详解.md",
+    "01-论文汇总/02-数据/03-参数数据信息.md",
+    "01-论文汇总/02-数据/02-参数处理步骤.md",
+    "01-论文汇总/02-数据/00-论文思路.md",
+    "01-论文汇总/03_模型/01_结果/模型结果记录.md",
+    "000-八股/01-笔记/Java/Java基础笔记.md",
+    "05-GWY/01-行测/02-逻辑判断/0102-花生十三逻辑判断/花生十三逻辑600题.md",
+    "00_系统配置/热力图.md",
+    "05-GWY/Pasted image 20250623095226.png",
+    "assets/img/7/2/0/720d7e4ab8b18d26c3e6c7ed8f7179be9764cfdc08282dbc0e0673816acca11f.png",
+    "05-GWY/01-行测/02-逻辑判断/0102-花生十三逻辑判断/-1--images/Pasted image 20250630192724.png",
+    "assets/img/0/2/8/02824b0fdfe82029ba4a3242b7686524bd34fc06c3538a21ae2c68a31be95c58.png",
+    "Pasted image 20250623095226.png",
+    "10-JavaGuide-main/docs/cs-basics/network/images/arp/2008410143049281.png",
+    "10-JavaGuide-main/docs/system-design/framework/spring/images/spring-transaction/roollbackFor.png",
+    "10-JavaGuide-main/docs/system-design/framework/spring/images/spring-transaction/PlatformTransactionManager.png",
+    "10-JavaGuide-main/docs/system-design/framework/spring/images/spring-annotations/@RequestBody.png"
+  ]
+}

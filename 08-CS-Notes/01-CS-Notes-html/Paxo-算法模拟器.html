@@ -1,0 +1,386 @@
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Paxos 算法交互式模拟器</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Chosen Palette: Slate and Amber (石板色与琥珀色) -->
+    <!-- Application Structure Plan: 本应用设计为一个单页教育工具，分为四个核心部分：1. 简介与角色定义，为用户建立基本概念；2. 核心的交互式模拟器，将抽象的算法流程转化为用户可以控制的视觉动画；3. 动态文本解释区，与模拟器同步，实时解释每一步的操作和原因；4. 核心规则总结。这种结构旨在通过“视觉学习+同步阅读+动手操作”相结合的方式，将复杂的Paxos算法分解为易于理解的步骤，从而实现比静态文档更深刻的学习体验。 -->
+    <!-- Visualization & Content Choices: 1. **角色**: 使用卡片式布局（HTML/Tailwind）代表Proposer和Acceptor，每个Acceptor卡片内会动态展示其内部状态(max_N, accepted_N, accepted_Value)。[Goal: Inform, Method: Structured HTML]。2. **算法流程**: 放弃了源文档中的静态Mermaid流程图，转而使用JS动态创建和控制“消息”div在角色卡片之间移动，实现了可交互、可视化的动态流程图。[Goal: Change, Method: JS + HTML/CSS Animation]。3. **冲突场景**: 将源文档中的冲突实例转化为一个可交互的预设场景，用户通过点击“下一步”亲身体验并观察Paxos如何通过编号机制解决冲突，从而加深理解。[Goal: Compare/Relationships, Method: JS State + Interactive HTML]。4. **文本解释**: 右侧的解释面板会根据模拟的每一步动态更新，清晰说明当前操作的逻辑和依据。[Goal: Inform, Method: JS-driven text blocks]。 -->
+    <!-- CONFIRMATION: NO SVG graphics used. NO Mermaid JS used. -->
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Noto+Sans+SC:wght@400;500;700&display=swap');
+        body {
+            font-family: 'Noto Sans SC', sans-serif;
+            background-color: #f8fafc; /* slate-50 */
+        }
+        .node {
+            transition: all 0.3s ease-in-out;
+            box-shadow: 0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1);
+        }
+        .node-title {
+            border-bottom: 1px solid #e2e8f0; /* slate-200 */
+        }
+        .message {
+            position: absolute;
+            padding: 0.5rem 0.75rem;
+            border-radius: 0.5rem;
+            background-color: #f59e0b; /* amber-500 */
+            color: white;
+            z-index: 10;
+            transition: all 0.8s ease-in-out;
+            opacity: 0;
+            box-shadow: 0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1);
+            font-size: 0.875rem;
+        }
+        .controls button {
+            transition: all 0.2s ease-in-out;
+        }
+        .log-entry {
+            border-left: 3px solid #f59e0b; /* amber-500 */
+            transition: background-color 0.3s;
+        }
+        .log-entry:hover {
+             background-color: #fef3c7; /* amber-100 */
+        }
+        .status-badge {
+            font-size: 0.75rem;
+            padding: 0.1rem 0.5rem;
+            border-radius: 9999px;
+            font-weight: 500;
+        }
+        .status-approved {
+            background-color: #16a34a; /* green-600 */
+            color: white;
+        }
+        .status-rejected {
+            background-color: #dc2626; /* red-600 */
+            color: white;
+        }
+        .status-pending {
+            background-color: #64748b; /* slate-500 */
+            color: white;
+        }
+    </style>
+</head>
+<body class="text-slate-800">
+
+    <div id="app" class="container mx-auto p-4 md:p-8">
+
+        <header class="text-center mb-8">
+            <h1 class="text-4xl font-bold text-slate-900">Paxos 算法交互式模拟器</h1>
+            <p class="mt-2 text-lg text-slate-600">通过可视化模拟，理解分布式共识的奥秘</p>
+        </header>
+
+        <main class="bg-white p-4 sm:p-8 rounded-2xl shadow-lg">
+            
+            <!-- 简介 -->
+            <section id="introduction" class="mb-8">
+                <h2 class="text-2xl font-bold mb-3 border-b pb-2 text-slate-800">Paxos 是什么？—— 混乱中的秩序</h2>
+                <p class="text-slate-700 leading-relaxed">Paxos 是一种在多个节点组成的分布式系统中，针对某个提案（Proposal），如何安全、可靠地达成“共识 (Consensus)”的算法。它保证了尽管网络可能延迟、节点可能宕机，但最终所有存活的节点都会对同一个结果达成一致，且该结果一旦确定，就永远不会被更改。我们可以将它类比为一个由多位议员组成的古代议会，他们必须在信息传递不可靠的情况下，共同决定并通过一项唯一的法令。</p>
+            </section>
+
+            <!-- 模拟器 -->
+            <section id="simulator">
+                <div class="flex flex-col lg:flex-row gap-8">
+                    
+                    <!-- 左侧：可视化区域 -->
+                    <div id="visual-pane" class="lg:w-2/3 w-full relative min-h-[400px] md:min-h-[500px] bg-slate-50 rounded-xl p-4 border border-slate-200">
+                        <!-- 角色节点将由JS动态插入 -->
+                    </div>
+
+                    <!-- 右侧：控制与日志 -->
+                    <div class="lg:w-1/3 w-full">
+                        <div class="bg-slate-50 rounded-xl p-4 border border-slate-200">
+                            <h3 class="text-xl font-bold mb-4 text-slate-800">控制面板</h3>
+                            
+                            <div class="mb-4">
+                                <label for="scenario" class="block text-sm font-medium text-slate-700 mb-1">选择场景:</label>
+                                <select id="scenario" class="w-full p-2 border border-slate-300 rounded-md shadow-sm focus:ring-amber-500 focus:border-amber-500">
+                                    <option value="simple">基础成功流程</option>
+                                    <option value="conflict">竞争提议者冲突</option>
+                                </select>
+                            </div>
+
+                            <div class="controls grid grid-cols-2 gap-3 mb-6">
+                                <button id="reset-btn" class="w-full bg-slate-600 text-white py-2 px-4 rounded-md hover:bg-slate-700 font-semibold">重置模拟</button>
+                                <button id="next-step-btn" class="w-full bg-amber-500 text-white py-2 px-4 rounded-md hover:bg-amber-600 font-semibold">下一步</button>
+                            </div>
+
+                            <h3 class="text-xl font-bold mb-3 text-slate-800">日志与解释</h3>
+                            <div id="log-pane" class="h-80 overflow-y-auto bg-white p-3 rounded-md border border-slate-200 space-y-3">
+                                <!-- 日志条目将由JS动态插入 -->
+                            </div>
+                        </div>
+                    </div>
+
+                </div>
+            </section>
+             <!-- 核心规则 -->
+            <section id="rules" class="mt-10">
+                <h2 class="text-2xl font-bold mb-4 border-b pb-2 text-slate-800">核心规则</h2>
+                <div class="grid md:grid-cols-2 gap-6 text-slate-700">
+                    <div class="bg-slate-50 p-4 rounded-lg border border-slate-200">
+                        <h3 class="font-bold text-lg mb-2 text-slate-900">提案编号 (Proposal Number)</h3>
+                        <p>每个提案都必须有一个全局唯一且单调递增的编号 (N)。这是 Paxos 解决冲突、保证“喜新厌旧”的基础。</p>
+                    </div>
+                    <div class="bg-slate-50 p-4 rounded-lg border border-slate-200">
+                        <h3 class="font-bold text-lg mb-2 text-slate-900">多数派原则 (Majority Rule)</h3>
+                        <p>无论是 `Promise` 还是 `Accepted` 响应，提议者 (Proposer) 都必须获得超过半数 (N/2 + 1) 的接受者 (Acceptor) 的支持，才能进入下一阶段或达成共识。</p>
+                    </div>
+                    <div class="bg-slate-50 p-4 rounded-lg border border-slate-200 md:col-span-2">
+                        <h3 class="font-bold text-lg mb-2 text-slate-900">值的选择与锁定 (Value Selection & Locking)</h3>
+                        <p>在准备阶段，如果 Proposer 发现有 Acceptor 已经接受过某个提案，它必须在接受阶段提出那个具有最大编号的提案的值。这个机制保证了**一旦一个决议被选定，它就不会被后续的提案推翻**，只会“被遵循”。</p>
+                    </div>
+                </div>
+            </section>
+
+        </main>
+    </div>
+
+<script>
+const visualPane = document.getElementById('visual-pane');
+const logPane = document.getElementById('log-pane');
+const nextStepBtn = document.getElementById('next-step-btn');
+const resetBtn = document.getElementById('reset-btn');
+const scenarioSelect = document.getElementById('scenario');
+
+let state = {};
+
+const scenarios = {
+    simple: {
+        proposers: [{ id: 'P1', value: '决议A' }],
+        acceptors: 3,
+        steps: [
+            { phase: 'Prepare', from: 'P1', to: ['A1', 'A2', 'A3'], type: 'prepare', n: 10, log: 'P1 发起 Prepare 请求，提案编号为 10。' },
+            { phase: 'Prepare', from: 'A1', to: 'P1', type: 'promise', n: 10, accepted: null, log: 'A1 收到 Prepare(10)，承诺不再接受小于10的提案，并回复 Promise。' },
+            { phase: 'Prepare', from: 'A2', to: 'P1', type: 'promise', n: 10, accepted: null, log: 'A2 收到 Prepare(10)，承诺不再接受小于10的提案，并回复 Promise。' },
+            { phase: 'Prepare', from: 'A3', to: 'P1', type: 'promise', n: 10, accepted: null, log: 'A3 收到 Prepare(10)，承诺不再接受小于10的提案，并回复 Promise。' },
+            { phase: 'Accept', from: 'P1', to: ['A1', 'A2', 'A3'], type: 'accept', n: 10, value: '决议A', log: 'P1 已获多数 Promise，发起 Accept 请求，提议值为 "决议A"。' },
+            { phase: 'Accept', from: 'A1', to: 'P1', type: 'accepted', n: 10, value: '决议A', log: 'A1 接受提案(10, "决议A")。' },
+            { phase: 'Accept', from: 'A2', to: 'P1', type: 'accepted', n: 10, value: '决议A', log: 'A2 接受提案(10, "决议A")。' },
+            { phase: 'Accept', from: 'A3', to: 'P1', type: 'accepted', n: 10, value: '决议A', log: 'A3 接受提案(10, "决议A")。' },
+            { phase: 'Done', log: '共识达成！最终决议为 "决议A"。' }
+        ]
+    },
+    conflict: {
+        proposers: [{ id: 'P1', value: '决议A' }, { id: 'P2', value: '决议B' }],
+        acceptors: 3,
+        steps: [
+            { phase: 'Prepare', from: 'P1', to: ['A1', 'A2', 'A3'], type: 'prepare', n: 10, log: 'P1 启动，发起 Prepare 请求，提案编号为 10。' },
+            { phase: 'Prepare', from: 'A1', to: 'P1', type: 'promise', n: 10, accepted: null, log: 'A1 响应 P1，承诺 N=10。' },
+            { phase: 'Prepare', from: 'A2', to: 'P1', type: 'promise', n: 10, accepted: null, log: 'A2 响应 P1，承诺 N=10。（网络延迟，A3尚未收到）' },
+            { phase: 'Prepare', from: 'P2', to: ['A1', 'A2', 'A3'], type: 'prepare', n: 11, log: 'P2 抢先启动，发起 Prepare 请求，提案编号为 11。' },
+            { phase: 'Prepare', from: 'A1', to: 'P2', type: 'promise', n: 11, accepted: null, log: 'A1 收到 Prepare(11)，由于 11 > 10，更新承诺并响应 P2。' },
+            { phase: 'Prepare', from: 'A2', to: 'P2', type: 'promise', n: 11, accepted: null, log: 'A2 收到 Prepare(11)，由于 11 > 10，更新承诺并响应 P2。' },
+            { phase: 'Prepare', from: 'A3', to: 'P2', type: 'promise', n: 11, accepted: null, log: 'A3 收到 Prepare(11)，承诺并响应 P2。' },
+            { phase: 'Accept', from: 'P1', to: ['A1', 'A2', 'A3'], type: 'accept', n: 10, value: '决议A', log: 'P1 已获多数 Promise (A1,A2)，发起 Accept 请求(10, "决议A")。' },
+            { phase: 'Accept', from: 'A1', to: 'P1', type: 'rejected', n: 10, log: 'A1 拒绝 P1 的 Accept 请求，因为它已承诺给编号11。' },
+            { phase: 'Accept', from: 'A2', to: 'P1', type: 'rejected', n: 10, log: 'A2 拒绝 P1 的 Accept 请求，因为它已承诺给编号11。P1提议失败。' },
+            { phase: 'Accept', from: 'P2', to: ['A1', 'A2', 'A3'], type: 'accept', n: 11, value: '决议B', log: 'P2 已获多数 Promise (A1,A2,A3)，发起 Accept 请求(11, "决议B")。' },
+            { phase: 'Accept', from: 'A1', to: 'P2', type: 'accepted', n: 11, value: '决议B', log: 'A1 接受提案(11, "决议B")。' },
+            { phase: 'Accept', from: 'A2', to: 'P2', type: 'accepted', n: 11, value: '决议B', log: 'A2 接受提案(11, "决议B")。' },
+            { phase: 'Accept', from: 'A3', to: 'P2', type: 'accepted', n: 11, value: '决议B', log: 'A3 接受提案(11, "决议B")。' },
+            { phase: 'Done', log: '共识达成！最终决议为 "决议B"。' }
+        ]
+    }
+};
+
+function init() {
+    const scenarioKey = scenarioSelect.value;
+    const scenario = scenarios[scenarioKey];
+    state = {
+        step: 0,
+        scenarioKey,
+        proposers: scenario.proposers.map(p => ({ ...p, promises: 0, accepted: 0 })),
+        acceptors: Array.from({ length: scenario.acceptors }, (_, i) => ({
+            id: `A${i + 1}`,
+            max_N: 0,
+            accepted_N: null,
+            accepted_Value: null,
+            finalValue: null
+        }))
+    };
+    render();
+}
+
+function render() {
+    visualPane.innerHTML = '';
+    logPane.innerHTML = '<div class="text-slate-500 text-sm p-4 text-center">点击“下一步”开始模拟</div>';
+
+    const proposerContainer = document.createElement('div');
+    proposerContainer.className = 'flex justify-center gap-4 mb-16';
+    state.proposers.forEach(p => {
+        const el = document.createElement('div');
+        el.id = p.id;
+        el.className = 'node bg-white rounded-lg p-4 w-48 text-center border-2 border-amber-400';
+        el.innerHTML = `
+            <div class="node-title pb-2 mb-2 font-bold text-lg">提议者 ${p.id}</div>
+            <div class="text-slate-600">提议值:</div>
+            <div class="font-mono text-xl font-semibold text-amber-600">${p.value}</div>
+        `;
+        proposerContainer.appendChild(el);
+    });
+
+    const acceptorContainer = document.createElement('div');
+    acceptorContainer.className = 'flex justify-around gap-4';
+    state.acceptors.forEach(a => {
+        const el = document.createElement('div');
+        el.id = a.id;
+        el.className = 'node bg-white rounded-lg p-4 w-48 text-center';
+        let statusBadge = `<div class="status-badge status-pending">等待中</div>`;
+        if (a.finalValue) {
+            statusBadge = `<div class="status-badge status-approved">已批准: ${a.finalValue}</div>`;
+        }
+        el.innerHTML = `
+            <div class="node-title pb-2 mb-2 font-bold text-lg">接受者 ${a.id}</div>
+            <div class="text-sm">
+                <p>max_N: <span class="font-mono font-semibold" id="${a.id}-max_N">${a.max_N}</span></p>
+                <p>accepted_N: <span class="font-mono font-semibold" id="${a.id}-accepted_N">${a.accepted_N || 'null'}</span></p>
+                <p>accepted_Value: <span class="font-mono font-semibold" id="${a.id}-accepted_Value">${a.accepted_Value || 'null'}</span></p>
+            </div>
+             <div class="mt-3">${statusBadge}</div>
+        `;
+        acceptorContainer.appendChild(el);
+    });
+
+    visualPane.appendChild(proposerContainer);
+    visualPane.appendChild(acceptorContainer);
+    nextStepBtn.disabled = false;
+}
+
+function nextStep() {
+    const scenario = scenarios[state.scenarioKey];
+    if (state.step >= scenario.steps.length) return;
+    
+    const step = scenario.steps[state.step];
+    
+    addLog(step.log);
+
+    if (step.from) {
+        animateMessage(step);
+    }
+
+    updateState(step);
+    updateUI();
+
+    state.step++;
+    if (state.step >= scenario.steps.length) {
+        nextStepBtn.disabled = true;
+    }
+}
+
+function updateState(step) {
+    switch (step.type) {
+        case 'promise':
+            const acceptorP = state.acceptors.find(a => a.id === step.from);
+            if (acceptorP) acceptorP.max_N = step.n;
+            break;
+        case 'accepted':
+             const acceptorA = state.acceptors.find(a => a.id === step.from);
+            if (acceptorA) {
+                acceptorA.accepted_N = step.n;
+                acceptorA.accepted_Value = step.value;
+                acceptorA.finalValue = step.value;
+            }
+            break;
+        case 'rejected':
+             // State changes already occurred in a previous promise to a higher N
+            break;
+    }
+}
+
+function updateUI() {
+    state.acceptors.forEach(a => {
+        const max_N_el = document.getElementById(`${a.id}-max_N`);
+        const accepted_N_el = document.getElementById(`${a.id}-accepted_N`);
+        const accepted_Value_el = document.getElementById(`${a.id}-accepted_Value`);
+        const node_el = document.getElementById(a.id);
+
+        if(max_N_el) max_N_el.textContent = a.max_N;
+        if(accepted_N_el) accepted_N_el.textContent = a.accepted_N || 'null';
+        if(accepted_Value_el) accepted_Value_el.textContent = a.accepted_Value || 'null';
+        
+        if (node_el) {
+            let statusBadge = `<div class="status-badge status-pending">等待中</div>`;
+            if (a.finalValue) {
+                statusBadge = `<div class="status-badge status-approved">已批准: ${a.finalValue}</div>`;
+            }
+            node_el.querySelector('.mt-3').innerHTML = statusBadge;
+        }
+    });
+}
+
+
+function addLog(message) {
+    if (logPane.firstElementChild && logPane.firstElementChild.textContent.includes('点击“下一步”开始模拟')) {
+        logPane.innerHTML = '';
+    }
+    const entry = document.createElement('div');
+    entry.className = 'log-entry p-2 text-sm text-slate-700';
+    entry.textContent = message;
+    logPane.prepend(entry);
+}
+
+function animateMessage(step) {
+    const fromEl = document.getElementById(step.from);
+    if (!fromEl) return;
+    
+    const fromRect = fromEl.getBoundingClientRect();
+    const visualRect = visualPane.getBoundingClientRect();
+
+    const targets = Array.isArray(step.to) ? step.to : [step.to];
+    
+    targets.forEach(targetId => {
+        const toEl = document.getElementById(targetId);
+        if (!toEl) return;
+
+        const toRect = toEl.getBoundingClientRect();
+        
+        const messageEl = document.createElement('div');
+        messageEl.className = 'message';
+        
+        let messageText = '';
+        if (step.type === 'prepare') messageText = `Prepare(${step.n})`;
+        if (step.type === 'promise') messageText = `Promise(${step.n})`;
+        if (step.type === 'accept') messageText = `Accept(${step.n}, "${step.value}")`;
+        if (step.type === 'accepted') messageText = `Accepted`;
+        if (step.type === 'rejected') messageText = `Rejected`;
+        messageEl.textContent = messageText;
+
+        const startX = fromRect.left + fromRect.width / 2 - visualRect.left;
+        const startY = fromRect.top + fromRect.height / 2 - visualRect.top;
+        const endX = toRect.left + toRect.width / 2 - visualRect.left;
+        const endY = toRect.top + toRect.height / 2 - visualRect.top;
+
+        messageEl.style.left = `${startX}px`;
+        messageEl.style.top = `${startY}px`;
+        messageEl.style.transform = 'translate(-50%, -50%) scale(0.5)';
+
+        visualPane.appendChild(messageEl);
+
+        requestAnimationFrame(() => {
+            messageEl.style.opacity = '1';
+            messageEl.style.transform = 'translate(-50%, -50%) scale(1)';
+            messageEl.style.left = `${endX}px`;
+            messageEl.style.top = `${endY}px`;
+        });
+        
+        setTimeout(() => {
+            messageEl.style.opacity = '0';
+            setTimeout(() => {
+                visualPane.removeChild(messageEl);
+            }, 300);
+        }, 800);
+    });
+}
+
+resetBtn.addEventListener('click', init);
+nextStepBtn.addEventListener('click', nextStep);
+scenarioSelect.addEventListener('change', init);
+
+window.onload = init;
+</script>
+
+</body>
+</html>

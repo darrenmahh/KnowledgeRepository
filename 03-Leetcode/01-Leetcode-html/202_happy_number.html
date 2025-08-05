@@ -1,0 +1,757 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>LeetCode 202 - 快乐数</title>
+    <style>
+        body {
+            font-family: 'Arial', sans-serif;
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+            background: linear-gradient(135deg, #ff9a9e 0%, #fecfef 50%, #fecfef 100%);
+            min-height: 100vh;
+            color: #333;
+            scroll-behavior: smooth;
+        }
+        
+        .container {
+            background: white;
+            border-radius: 15px;
+            padding: 30px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+        }
+        
+        h1 {
+            text-align: center;
+            color: #2c3e50;
+            margin-bottom: 10px;
+        }
+        
+        .problem-description {
+            background: #f8f9fa;
+            padding: 20px;
+            border-radius: 10px;
+            margin: 20px 0;
+            border-left: 4px solid #e91e63;
+        }
+        
+        .examples {
+            background: #fff3e0;
+            padding: 15px;
+            border-radius: 8px;
+            margin: 15px 0;
+        }
+        
+        .input-section {
+            margin: 20px 0;
+            padding: 20px;
+            background: #f3e5f5;
+            border-radius: 10px;
+        }
+        
+        .input-group {
+            margin: 10px 0;
+        }
+        
+        label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: bold;
+            color: #2c3e50;
+        }
+        
+        input[type="number"] {
+            width: 100%;
+            padding: 10px;
+            border: 2px solid #ddd;
+            border-radius: 5px;
+            font-size: 16px;
+            box-sizing: border-box;
+        }
+        
+        input[type="number"]:focus {
+            border-color: #e91e63;
+            outline: none;
+        }
+        
+        .buttons {
+            text-align: center;
+            margin: 20px 0;
+        }
+        
+        button {
+            background: linear-gradient(45deg, #e91e63, #ad1457);
+            color: white;
+            border: none;
+            padding: 12px 24px;
+            margin: 5px;
+            border-radius: 25px;
+            cursor: pointer;
+            font-size: 16px;
+            transition: all 0.3s ease;
+        }
+        
+        button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(0,0,0,0.2);
+        }
+        
+        button:disabled {
+            background: #bdc3c7;
+            cursor: not-allowed;
+            transform: none;
+            opacity: 0.6;
+        }
+        
+        .button-group {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 10px;
+            flex-wrap: wrap;
+        }
+        
+        .step-nav {
+            background: #fce4ec;
+            padding: 15px;
+            border-radius: 10px;
+            margin: 20px 0;
+            text-align: center;
+            border: 2px solid #e91e63;
+            position: sticky;
+            top: 20px;
+            z-index: 100;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+        }
+        
+        .step-info {
+            color: #2c3e50;
+            font-weight: bold;
+            margin-bottom: 10px;
+        }
+        
+        .step-container {
+            margin: 20px 0;
+            padding: 20px;
+            background: #fff5f5;
+            border-radius: 10px;
+            border: 2px solid #e91e63;
+            display: none;
+        }
+        
+        .step-container.active {
+            display: block;
+            animation: fadeIn 0.5s ease-in;
+        }
+        
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        
+        .step-title {
+            color: #e91e63;
+            font-size: 18px;
+            font-weight: bold;
+            margin-bottom: 15px;
+        }
+        
+        .calculation-box {
+            background: white;
+            border: 2px solid #e91e63;
+            border-radius: 8px;
+            padding: 20px;
+            margin: 15px 0;
+            transition: all 0.3s ease;
+        }
+        
+        .calculation-box:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+        }
+        
+        .calculation-step {
+            font-family: monospace;
+            font-size: 18px;
+            background: #f5f5f5;
+            padding: 10px;
+            border-radius: 5px;
+            margin: 10px 0;
+        }
+        
+        .current-number {
+            font-size: 24px;
+            font-weight: bold;
+            color: #e91e63;
+            text-align: center;
+            background: #fce4ec;
+            padding: 15px;
+            border-radius: 10px;
+            margin: 15px 0;
+        }
+        
+        .result-section {
+            background: #e8f5e8;
+            padding: 20px;
+            border-radius: 10px;
+            margin: 20px 0;
+            border: 2px solid #4caf50;
+            display: none;
+        }
+        
+        .result-section.active {
+            display: block;
+            animation: fadeIn 0.5s ease-in;
+        }
+        
+        .result-section.sad {
+            background: #ffebee;
+            border-color: #f44336;
+        }
+        
+        .result-happy {
+            color: #4caf50;
+            font-size: 24px;
+            font-weight: bold;
+            text-align: center;
+        }
+        
+        .result-sad {
+            color: #f44336;
+            font-size: 24px;
+            font-weight: bold;
+            text-align: center;
+        }
+        
+        .current-step {
+            background: #fff3cd;
+            border: 2px solid #ffc107;
+            padding: 15px;
+            border-radius: 8px;
+            margin: 10px 0;
+        }
+        
+        .algorithm-steps {
+            background: #e3f2fd;
+            padding: 15px;
+            border-radius: 8px;
+            margin: 15px 0;
+            border-left: 4px solid #2196f3;
+        }
+        
+        .algorithm-steps ol {
+            margin: 0;
+            padding-left: 20px;
+        }
+        
+        .algorithm-steps li {
+            margin: 5px 0;
+        }
+        
+        .history-section {
+            background: #f9f9f9;
+            padding: 15px;
+            border-radius: 8px;
+            margin: 15px 0;
+        }
+        
+        .history-numbers {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+            margin: 10px 0;
+        }
+        
+        .history-number {
+            background: #e91e63;
+            color: white;
+            padding: 8px 12px;
+            border-radius: 20px;
+            font-weight: bold;
+            font-size: 16px;
+        }
+        
+        .history-number.duplicate {
+            background: #f44336;
+            animation: pulse 1s infinite;
+        }
+        
+        @keyframes pulse {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.1); }
+            100% { transform: scale(1); }
+        }
+        
+        .digit-breakdown {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 10px;
+            margin: 15px 0;
+            font-size: 20px;
+            flex-wrap: wrap;
+        }
+        
+        .digit {
+            background: #2196f3;
+            color: white;
+            padding: 10px;
+            border-radius: 8px;
+            font-weight: bold;
+            min-width: 40px;
+            text-align: center;
+        }
+        
+        .operator {
+            font-size: 24px;
+            font-weight: bold;
+            color: #666;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>😊 LeetCode 202 - 快乐数</h1>
+        
+        <div class="problem-description">
+            <h3>题目描述：</h3>
+            <p>编写一个算法来判断一个数 <code>n</code> 是不是快乐数。</p>
+            <p><strong>「快乐数」定义为：</strong>对于一个正整数，每一次将该数替换为它每个位置上的数字的平方和，然后重复这个过程直到这个数变为 1，也可能是 <strong>无限循环</strong> 但始终变不到 1。如果 <strong>可以变为 1</strong>，那么这个数就是快乐数。</p>
+            
+            <div class="examples">
+                <h4>示例：</h4>
+                <p><strong>输入：</strong>19</p>
+                <p><strong>输出：</strong>true</p>
+                <p><strong>解释：</strong></p>
+                <p>1² + 9² = 1 + 81 = 82</p>
+                <p>8² + 2² = 64 + 4 = 68</p>
+                <p>6² + 8² = 36 + 64 = 100</p>
+                <p>1² + 0² + 0² = 1 + 0 + 0 = 1</p>
+            </div>
+            
+            <div class="algorithm-steps">
+                <h4>算法思路：</h4>
+                <ol>
+                    <li>提取数字的每一位</li>
+                    <li>计算每位数字的平方和</li>
+                    <li>检查是否得到1（快乐数）</li>
+                    <li>检查是否出现循环（不是快乐数）</li>
+                    <li>用集合记录已出现的数字来检测循环</li>
+                </ol>
+            </div>
+        </div>
+        
+        <div class="input-section">
+            <h3>🎮 交互演示</h3>
+            <div class="input-group">
+                <label for="numberInput">输入一个正整数：</label>
+                <input type="number" id="numberInput" placeholder="例如：19" value="19" min="1">
+            </div>
+            
+            <div class="buttons button-group">
+                <button onclick="startAnalysis()">开始分析</button>
+                <button onclick="loadExample()">加载示例：7</button>
+                <button onclick="reset()">重置</button>
+            </div>
+        </div>
+        
+        <div class="step-nav" id="stepNav" style="display: none;">
+            <div class="step-info" id="stepInfo">步骤导航</div>
+            <div class="button-group">
+                <button onclick="prevStep()" id="prevBtn" disabled>⬅️ 上一步</button>
+                <button onclick="nextStep()" id="nextBtn" disabled>下一步 ➡️</button>
+            </div>
+        </div>
+        
+        <div id="step0" class="step-container">
+            <div class="step-title">步骤 1: 初始化</div>
+            <div id="initDisplay"></div>
+        </div>
+        
+        <div id="step1" class="step-container">
+            <div class="step-title">步骤 2: 计算数字各位平方和</div>
+            <div id="calculationDisplay"></div>
+        </div>
+        
+        <div id="step2" class="step-container">
+            <div class="step-title">步骤 3: 检查结果</div>
+            <div id="checkDisplay"></div>
+        </div>
+        
+        <div id="result" class="result-section">
+            <h3 id="resultTitle">🎉 分析结果</h3>
+            <div id="finalResult"></div>
+        </div>
+    </div>
+
+    <script>
+        let currentStep = -1;
+        let inputNumber = 0;
+        let currentNumber = 0;
+        let history = [];
+        let steps = [];
+        let currentStepIndex = 0;
+        let isHappy = false;
+
+        function reset() {
+            currentStep = -1;
+            inputNumber = 0;
+            currentNumber = 0;
+            history = [];
+            steps = [];
+            currentStepIndex = 0;
+            isHappy = false;
+            
+            // 隐藏所有步骤
+            for (let i = 0; i <= 2; i++) {
+                document.getElementById(`step${i}`).classList.remove('active');
+            }
+            document.getElementById('result').classList.remove('active');
+            document.getElementById('result').classList.remove('sad');
+            updateButtonStates();
+        }
+
+        function loadExample() {
+            document.getElementById('numberInput').value = '7';
+        }
+
+        function updateButtonStates() {
+            const prevBtn = document.getElementById('prevBtn');
+            const nextBtn = document.getElementById('nextBtn');
+            const stepNav = document.getElementById('stepNav');
+            const stepInfo = document.getElementById('stepInfo');
+            
+            if (currentStep === -1) {
+                stepNav.style.display = 'none';
+            } else {
+                stepNav.style.display = 'block';
+                
+                if (currentStep <= 2) {
+                    stepInfo.textContent = `当前步骤: ${currentStep + 1}/3`;
+                } else {
+                    stepInfo.textContent = '查看最终结果';
+                }
+                
+                prevBtn.disabled = currentStep <= 0;
+                
+                if (currentStep >= 3) {
+                    nextBtn.disabled = true;
+                    nextBtn.textContent = '已完成 ✅';
+                } else if (currentStep === 2) {
+                    nextBtn.disabled = false;
+                    nextBtn.textContent = '查看结果 🎉';
+                } else {
+                    nextBtn.disabled = false;
+                    nextBtn.textContent = '下一步 ➡️';
+                }
+            }
+        }
+
+        function startAnalysis() {
+            reset();
+            const input = document.getElementById('numberInput').value;
+            
+            if (!input || input <= 0) {
+                alert('请输入一个正整数！');
+                return;
+            }
+            
+            inputNumber = parseInt(input);
+            currentNumber = inputNumber;
+            history = [];
+            steps = [];
+            
+            // 计算完整的快乐数序列
+            calculateHappySequence();
+            
+            currentStep = 0;
+            currentStepIndex = 0;
+            showCurrentStep();
+        }
+
+        function calculateHappySequence() {
+            const seen = new Set();
+            let num = inputNumber;
+            
+            while (num !== 1 && !seen.has(num)) {
+                seen.add(num);
+                history.push(num);
+                
+                const digits = num.toString().split('').map(Number);
+                const sum = digits.reduce((acc, digit) => acc + digit * digit, 0);
+                
+                steps.push({
+                    number: num,
+                    digits: digits,
+                    calculation: digits.map(d => `${d}²`).join(' + ') + ` = ${sum}`,
+                    sum: sum
+                });
+                
+                num = sum;
+            }
+            
+            if (num === 1) {
+                history.push(1);
+                isHappy = true;
+            } else {
+                history.push(num); // 添加循环的第一个重复数字
+                isHappy = false;
+            }
+        }
+
+        function prevStep() {
+            if (currentStep > 0) {
+                currentStep--;
+                if (currentStep <= 2) {
+                    showCurrentStep();
+                } else {
+                    showResult();
+                }
+            }
+        }
+
+        function nextStep() {
+            currentStep++;
+            if (currentStep <= 2) {
+                showCurrentStep();
+            } else {
+                showResult();
+            }
+        }
+
+        function showCurrentStep() {
+            for (let i = 0; i <= 2; i++) {
+                document.getElementById(`step${i}`).classList.remove('active');
+            }
+            document.getElementById('result').classList.remove('active');
+            
+            const currentStepElement = document.getElementById(`step${currentStep}`);
+            currentStepElement.classList.add('active');
+            
+            switch(currentStep) {
+                case 0:
+                    showStep0();
+                    break;
+                case 1:
+                    showStep1();
+                    break;
+                case 2:
+                    showStep2();
+                    break;
+            }
+            
+            updateButtonStates();
+            
+            setTimeout(() => {
+                const navHeight = document.getElementById('stepNav').offsetHeight;
+                const elementTop = currentStepElement.offsetTop - navHeight - 20;
+                window.scrollTo({
+                    top: elementTop,
+                    behavior: 'smooth'
+                });
+            }, 100);
+        }
+
+        function showStep0() {
+            const display = document.getElementById('initDisplay');
+            display.innerHTML = `
+                <div class="current-step">
+                    <p><strong>输入数字：</strong> ${inputNumber}</p>
+                    <p><strong>目标：</strong>判断这个数字是否为快乐数</p>
+                    <p><strong>方法：</strong>不断计算各位数字的平方和，直到得到1或进入循环</p>
+                </div>
+                
+                <div class="current-number">
+                    当前数字: ${inputNumber}
+                </div>
+                
+                <div class="history-section">
+                    <h4>已出现的数字：</h4>
+                    <div class="history-numbers">
+                        <span class="history-number">${inputNumber}</span>
+                    </div>
+                    <p><small>我们用集合来记录已经出现过的数字，以便检测循环</small></p>
+                </div>
+            `;
+        }
+
+        function showStep1() {
+            if (currentStepIndex >= steps.length) {
+                currentStepIndex = steps.length - 1;
+            }
+            
+            const step = steps[currentStepIndex];
+            const display = document.getElementById('calculationDisplay');
+            
+            let html = `
+                <div class="current-number">
+                    当前数字: ${step.number}
+                </div>
+                
+                <div class="calculation-box">
+                    <h4>分解数字并计算平方和：</h4>
+                    <div class="digit-breakdown">
+            `;
+            
+            step.digits.forEach((digit, index) => {
+                html += `<span class="digit">${digit}²</span>`;
+                if (index < step.digits.length - 1) {
+                    html += '<span class="operator">+</span>';
+                }
+            });
+            
+            html += `</div>
+                    <div class="calculation-step">
+                        ${step.calculation}
+                    </div>
+                </div>
+            `;
+            
+            html += `
+                <div class="history-section">
+                    <h4>计算历史：</h4>
+                    <div class="history-numbers">
+            `;
+            
+            for (let i = 0; i <= currentStepIndex; i++) {
+                html += `<span class="history-number">${history[i]}</span>`;
+                if (i < currentStepIndex) {
+                    html += ' → ';
+                }
+            }
+            html += `<span class="history-number" style="background: #4caf50;">${step.sum}</span>`;
+            
+            html += `</div></div>`;
+            
+            if (currentStepIndex < steps.length - 1) {
+                html += `
+                    <div class="current-step">
+                        <p>继续计算下一步...</p>
+                        <button onclick="nextCalculation()" style="background: #4caf50;">计算下一步</button>
+                    </div>
+                `;
+            }
+            
+            display.innerHTML = html;
+        }
+
+        function nextCalculation() {
+            if (currentStepIndex < steps.length - 1) {
+                currentStepIndex++;
+                showStep1();
+            }
+        }
+
+        function showStep2() {
+            const display = document.getElementById('checkDisplay');
+            const lastStep = steps[steps.length - 1];
+            
+            let html = `
+                <div class="current-step">
+                    <h4>检查结果：</h4>
+                    <p>经过 ${steps.length} 步计算，最终得到：<strong>${lastStep.sum}</strong></p>
+                </div>
+            `;
+            
+            html += `
+                <div class="history-section">
+                    <h4>完整计算序列：</h4>
+                    <div class="history-numbers">
+            `;
+            
+            history.forEach((num, index) => {
+                let className = 'history-number';
+                if (num === 1) {
+                    className += '" style="background: #4caf50;';
+                } else if (index > 0 && history.indexOf(num) < index) {
+                    className += ' duplicate';
+                }
+                html += `<span class="${className}">${num}</span>`;
+                if (index < history.length - 1) {
+                    html += ' → ';
+                }
+            });
+            
+            html += `</div></div>`;
+            
+            if (isHappy) {
+                html += `
+                    <div style="background: #e8f5e8; padding: 15px; border-radius: 10px; border: 2px solid #4caf50;">
+                        <h4 style="color: #4caf50;">✅ 这是一个快乐数！</h4>
+                        <p>因为最终得到了 1</p>
+                    </div>
+                `;
+            } else {
+                const duplicateNum = history[history.length - 1];
+                html += `
+                    <div style="background: #ffebee; padding: 15px; border-radius: 10px; border: 2px solid #f44336;">
+                        <h4 style="color: #f44336;">❌ 这不是快乐数！</h4>
+                        <p>因为出现了循环：数字 <strong>${duplicateNum}</strong> 重复出现</p>
+                    </div>
+                `;
+            }
+            
+            display.innerHTML = html;
+        }
+
+        function showResult() {
+            currentStep = 3;
+            
+            for (let i = 0; i <= 2; i++) {
+                document.getElementById(`step${i}`).classList.remove('active');
+            }
+            
+            const resultElement = document.getElementById('result');
+            const resultTitle = document.getElementById('resultTitle');
+            resultElement.classList.add('active');
+            
+            if (!isHappy) {
+                resultElement.classList.add('sad');
+            }
+            
+            updateButtonStates();
+            
+            setTimeout(() => {
+                const navHeight = document.getElementById('stepNav').offsetHeight;
+                const elementTop = resultElement.offsetTop - navHeight - 20;
+                window.scrollTo({
+                    top: elementTop,
+                    behavior: 'smooth'
+                });
+            }, 100);
+            
+            const display = document.getElementById('finalResult');
+            
+            if (isHappy) {
+                resultTitle.innerHTML = '🎉 快乐数分析结果';
+                display.innerHTML = `
+                    <div class="result-happy">
+                        ${inputNumber} 是快乐数！😊
+                    </div>
+                    <p><strong>计算过程：</strong></p>
+                    <p>${history.slice(0, -1).join(' → ')} → <strong style="color: #4caf50;">1</strong></p>
+                    <div class="current-step">
+                        <strong>判断依据：</strong>
+                        <p>通过不断计算各位数字的平方和，最终得到了 1，所以这是一个快乐数。</p>
+                    </div>
+                `;
+            } else {
+                resultTitle.innerHTML = '😢 快乐数分析结果';
+                display.innerHTML = `
+                    <div class="result-sad">
+                        ${inputNumber} 不是快乐数！😢
+                    </div>
+                    <p><strong>计算过程：</strong></p>
+                    <p>${history.join(' → ')}</p>
+                    <div class="current-step">
+                        <strong>判断依据：</strong>
+                        <p>计算过程中出现了循环，永远无法得到 1，所以这不是快乐数。</p>
+                    </div>
+                `;
+            }
+        }
+    </script>
+</body>
+</html> 

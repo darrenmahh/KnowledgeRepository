@@ -1,0 +1,11 @@
+{
+  "baseFontSizeAction": true,
+  "baseFontSize": 22,
+  "theme": "system",
+  "accentColor": "#2ee316",
+  "cssTheme": "Minimal",
+  "nativeMenus": false,
+  "enabledCssSnippets": [
+    "mermaid-styles"
+  ]
+}

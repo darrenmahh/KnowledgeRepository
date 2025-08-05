@@ -1,0 +1,187 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>模型性能对比图表</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #f8fafc; /* slate-50 */
+        }
+        .chart-container {
+            position: relative;
+            margin: auto;
+            padding: 24px;
+            height: 400px; /* 调整了高度以适应更窄的宽度 */
+            background-color: white;
+            border-radius: 12px;
+            box-shadow: 0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1);
+        }
+    </style>
+</head>
+<body class="p-4 md:p-8">
+
+    <div class="max-w-screen-2xl mx-auto">
+        <h1 class="text-3xl font-bold text-center text-slate-800 mb-8">模型性能对比分析</h1>
+
+        <!-- 更新：将网格布局更改为在桌面端显示4列 -->
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
+            <!-- R² Chart -->
+            <div class="chart-container">
+                <h2 class="text-xl font-semibold text-center text-slate-700 mb-4">R² (决定系数)</h2>
+                <canvas id="r2Chart"></canvas>
+            </div>
+
+            <!-- RMSE Chart -->
+            <div class="chart-container">
+                <h2 class="text-xl font-semibold text-center text-slate-700 mb-4">RMSE (均方根误差)</h2>
+                <canvas id="rmseChart"></canvas>
+            </div>
+
+            <!-- MAE Chart -->
+            <div class="chart-container">
+                <h2 class="text-xl font-semibold text-center text-slate-700 mb-4">MAE (平均绝对误差)</h2>
+                <canvas id="maeChart"></canvas>
+            </div>
+            
+            <!-- Slope Chart -->
+            <div class="chart-container">
+                <h2 class="text-xl font-semibold text-center text-slate-700 mb-4">斜率 (Slope)</h2>
+                <canvas id="slopeChart"></canvas>
+            </div>
+        </div>
+        
+        <!-- 偏差图表保持独立，并设置了最大宽度使其居中显示 -->
+        <div class="mt-8 chart-container max-w-4xl mx-auto">
+             <h2 class="text-xl font-semibold text-center text-slate-700 mb-4">偏差 (Bias) - 越接近0越好</h2>
+             <canvas id="biasChart"></canvas>
+        </div>
+    </div>
+
+    <script>
+        // --- 数据定义 ---
+        const labels = ['总体', '森林', '绿地', '湿地'];
+        const modelData = {
+            'DNN': {
+                r2: [0.8179, 0.8071, 0.8568, 0.7801],
+                rmse: [5.0243, 4.8981, 6.4060, 4.5215],
+                mae: [3.2608, 3.2178, 3.9748, 2.9402],
+                slope: [1.0459, 1.0551, 1.0354, 1.0188],
+                bias: [-0.1034, -0.1229, 0.1534, -0.1882],
+                color: 'rgba(255, 99, 132, 0.7)'
+            },
+            'CNN': {
+                r2: [0.8181, 0.8089, 0.8527, 0.7758],
+                rmse: [5.0220, 4.8753, 6.4983, 4.5657],
+                mae: [3.1845, 3.1465, 3.7919, 2.9229],
+                slope: [0.9827, 0.9866, 0.9919, 0.9559],
+                bias: [-0.2483, -0.3768, 0.5877, -0.0275],
+                color: 'rgba(54, 162, 235, 0.7)'
+            },
+            '随机森林': {
+                r2: [0.8271, 0.8162, 0.8704, 0.7794],
+                rmse: [4.8960, 4.7809, 6.0941, 4.5298],
+                mae: [3.1472, 3.1080, 3.6876, 2.9557],
+                slope: [1.0683, 1.0661, 1.0933, 1.0202],
+                bias: [-0.1745, -0.2006, -0.3476, 0.1815],
+                color: 'rgba(255, 206, 86, 0.7)'
+            },
+            'XGBoost': {
+                r2: [0.8638, 0.8489, 0.9091, 0.8597],
+                rmse: [4.3458, 4.3349, 5.1030, 3.6115],
+                mae: [2.8320, 2.8418, 2.9605, 2.6413],
+                slope: [1.0224, 1.0182, 1.0365, 1.0462],
+                bias: [-0.0830, -0.1018, 0.1536, -0.1550],
+                color: 'rgba(75, 192, 192, 0.7)'
+            }
+        };
+
+        // --- 通用图表创建函数 ---
+        function createBarChart(canvasId, metric) {
+            const ctx = document.getElementById(canvasId).getContext('2d');
+            const datasets = Object.keys(modelData).map(modelName => {
+                return {
+                    label: modelName,
+                    data: modelData[modelName][metric],
+                    backgroundColor: modelData[modelName].color,
+                    borderColor: modelData[modelName].color.replace('0.7', '1'),
+                    borderWidth: 1,
+                    borderRadius: 4,
+                }
+            });
+
+            new Chart(ctx, {
+                type: 'bar',
+                data: {
+                    labels: labels,
+                    datasets: datasets
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false, 
+                    plugins: {
+                        legend: {
+                            position: 'top',
+                            labels: {
+                                font: {
+                                    size: 12, // 减小字体以适应更小的空间
+                                    family: 'Inter'
+                                }
+                            }
+                        },
+                        tooltip: {
+                            callbacks: {
+                                label: function(context) {
+                                    let label = context.dataset.label || '';
+                                    if (label) {
+                                        label += ': ';
+                                    }
+                                    if (context.parsed.y !== null) {
+                                        label += context.parsed.y.toFixed(4);
+                                    }
+                                    return label;
+                                }
+                            }
+                        }
+                    },
+                    scales: {
+                        y: {
+                            beginAtZero: false, 
+                            grid: {
+                                color: '#e2e8f0'
+                            },
+                            ticks: {
+                                font: {
+                                    family: 'Inter'
+                                }
+                            }
+                        },
+                        x: {
+                            grid: {
+                                display: false
+                            },
+                            ticks: {
+                                font: {
+                                    family: 'Inter'
+                                }
+                            }
+                        }
+                    }
+                }
+            });
+        }
+
+        // --- 创建所有图表 ---
+        createBarChart('r2Chart', 'r2');
+        createBarChart('rmseChart', 'rmse');
+        createBarChart('maeChart', 'mae');
+        createBarChart('slopeChart', 'slope');
+        createBarChart('biasChart', 'bias');
+    </script>
+
+</body>
+</html>

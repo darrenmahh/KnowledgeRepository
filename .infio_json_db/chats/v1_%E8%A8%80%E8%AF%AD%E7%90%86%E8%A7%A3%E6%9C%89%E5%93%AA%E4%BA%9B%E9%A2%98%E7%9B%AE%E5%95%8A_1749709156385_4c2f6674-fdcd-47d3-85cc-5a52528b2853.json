@@ -1,0 +1,65 @@
+{
+  "id": "4c2f6674-fdcd-47d3-85cc-5a52528b2853",
+  "title": "言语理解有哪些题目啊",
+  "messages": [
+    {
+      "role": "user",
+      "applyStatus": 0,
+      "content": {
+        "root": {
+          "children": [
+            {
+              "children": [
+                {
+                  "detail": 0,
+                  "format": 0,
+                  "mode": "normal",
+                  "style": "",
+                  "text": "言语理解有哪些题目啊",
+                  "type": "text",
+                  "version": 1
+                }
+              ],
+              "direction": "ltr",
+              "format": "",
+              "indent": 0,
+              "type": "paragraph",
+              "version": 1,
+              "textFormat": 0,
+              "textStyle": ""
+            }
+          ],
+          "direction": "ltr",
+          "format": "",
+          "indent": 0,
+          "type": "root",
+          "version": 1
+        }
+      },
+      "promptContent": [
+        {
+          "type": "text",
+          "text": "<task>\n言语理解有哪些题目啊\n</task>\n\n<current_file_content path=\"05-GWY/01-行测/00-题集汇总.md\">\n 1 | | 类别   | 题目名称           | 说明              | 是否完成 |\n 2 | | ---- | -------------- | --------------- | ---- |\n 3 | | 言语理解 | 阿里木江刷题册        | 适合打基础           |      |\n 4 | | 言语理解 | 欣说言语题集         | 适合拔高            |      |\n 5 | | 言语理解 | [[郭照100题]]     | 精华题集，错题需回顾      | ing  |\n 6 | | 资料分析 | 理论实战班3+2       | 掌握3+2方法，打好基础    |      |\n 7 | | 资料分析 | [[高照夸夸刷]]      | 听课边刷题，效果好       | ing  |\n 8 | | 资料分析 | 高照超大杯          | 全是真题，很实用        |      |\n 9 | | 资料分析 | 花生十三1200题      | 配合大杯，技巧提升       |      |\n10 | | 资料分析 | 速算大练兵          | 高照/花生通用，考前狂刷    |      |\n11 | | 判断推理 | 图推1000题        | 图推+图推1000题，刷到考前 |      |\n12 | | 判断推理 | [[花生十三逻辑600题]] | 练技巧与速度          | ing  |\n13 | | 判断推理 | 晟佳刷题组          | 精选题型，必会         |      |\n14 | | 判断推理 | 阿里木江定义200题     | 比较简单            |      |\n15 | | 数量关系 | 高照超大杯          | 数量入门            |      |\n16 | | 数量关系 | 花生数量1200题      | 技巧提升            |      |\n17 | | 政治理论 | FB政治理论必刷题集     | 适合打基础           |      |\n18 | | 政治理论 | FB政治理论100题     | 巩固基础            |      |\n19 | | 政治理论 | CG政治理论考前200题   | 正确率不能低于80%      |      |\n20 | | 政治理论 | ZG小黑政治理论必刷50题  | 提升检测，每题都要会      |      |\n21 | \n</current_file_content>\n\n<environment_details>\n# Obsidian Current File\n05-GWY/01-行测/00-题集汇总.md\n\n# Obsidian Open Tabs\n05-GWY/01-行测/00-题集汇总.md\n\n# Current Time\n2025/6/12 下午2:19:15 (Asia/Shanghai, UTC+8:00)\n\n# Current Mode\n<slug>ask</slug>\n<name>Ask</name>\n</environment_details>"
+        }
+      ],
+      "id": "f90c2111-f0c9-49b9-8c33-21108535a529",
+      "mentionables": [
+        {
+          "type": "current-file",
+          "file": "05-GWY/01-行测/00-题集汇总.md"
+        }
+      ]
+    },
+    {
+      "role": "assistant",
+      "applyStatus": 0,
+      "content": "",
+      "reasoningContent": "",
+      "id": "b8722288-27c8-44e4-b90c-51fe2cb69a8b",
+      "metadata": {}
+    }
+  ],
+  "createdAt": 1749709156385,
+  "updatedAt": 1749709156385,
+  "schemaVersion": 1
+}

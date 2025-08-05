@@ -1,0 +1,1257 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>一致性哈希高级交互式演示</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+            overflow-x: hidden;
+        }
+        .hash-ring-container {
+            position: relative;
+            width: 100%;
+            padding-top: 100%;
+        }
+        #hashRingCanvas {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+        }
+        .log-entry {
+            transition: all 0.3s ease-in-out;
+            transform-origin: top;
+        }
+        .log-entry.new {
+            transform: scaleY(0);
+            opacity: 0;
+        }
+        .migration-animation {
+            animation: pulse 0.5s ease-in-out;
+        }
+        @keyframes pulse {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.5; }
+        }
+        .tab-content {
+            display: none;
+        }
+        .tab-content.active {
+            display: block;
+        }
+        .tab-button {
+            transition: all 0.3s ease;
+        }
+        .tab-button.active {
+            background-color: #3B82F6;
+            color: white;
+        }
+        .chart-container {
+            position: relative;
+            height: 320px;
+            width: 100%;
+        }
+        .chart-container canvas {
+            position: absolute !important;
+            height: 100% !important;
+            width: 100% !important;
+        }
+    </style>
+</head>
+<body class="bg-gray-50 text-gray-800">
+
+    <div class="container mx-auto p-4 md:p-8">
+        <header class="text-center mb-8">
+            <h1 class="text-3xl md:text-4xl font-bold text-gray-900">一致性哈希高级交互式演示</h1>
+            <p class="mt-2 text-lg text-gray-600">深度理解虚拟节点、负载均衡与数据迁移机制</p>
+        </header>
+
+        <!-- Tab Navigation -->
+        <div class="flex justify-center mb-8">
+            <div class="bg-white rounded-lg p-1 shadow-lg border border-gray-200">
+                <button id="basicTab" class="tab-button px-4 py-2 rounded-md font-medium active">基础操作</button>
+                <button id="advancedTab" class="tab-button px-4 py-2 rounded-md font-medium">高级功能</button>
+                <button id="statsTab" class="tab-button px-4 py-2 rounded-md font-medium">统计分析</button>
+                <button id="theoryTab" class="tab-button px-4 py-2 rounded-md font-medium">算法原理</button>
+            </div>
+        </div>
+
+        <!-- Basic Tab Content -->
+        <div id="basicContent" class="tab-content active">
+            <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
+                <!-- Controls Column -->
+                <div class="lg:col-span-1 bg-white p-6 rounded-2xl shadow-lg border border-gray-200">
+                    <h2 class="text-xl font-semibold mb-6 border-b pb-3">控制面板</h2>
+                    
+                    <!-- Add Server -->
+                    <div class="mb-6">
+                        <h3 class="font-semibold mb-2 text-gray-700">1. 添加服务器</h3>
+                        <div class="space-y-2">
+                            <input type="text" id="serverName" placeholder="服务器名称" class="w-full p-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition">
+                            <div class="flex items-center space-x-2">
+                                <label class="text-sm text-gray-600">虚拟节点数:</label>
+                                <input type="number" id="virtualNodes" value="3" min="1" max="10" class="w-20 p-1 border border-gray-300 rounded focus:ring-2 focus:ring-blue-500 focus:border-blue-500">
+                            </div>
+                            <button id="addServerBtn" class="w-full bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 font-semibold transition shadow-sm">添加服务器</button>
+                        </div>
+                    </div>
+
+                    <!-- Add Key -->
+                    <div class="mb-6">
+                        <h3 class="font-semibold mb-2 text-gray-700">2. 添加数据</h3>
+                        <div class="space-y-2">
+                            <input type="text" id="keyName" placeholder="数据键名称" class="w-full p-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition">
+                            <button id="addKeyBtn" class="w-full bg-green-600 text-white px-4 py-2 rounded-lg hover:bg-green-700 font-semibold transition shadow-sm">添加数据</button>
+                        </div>
+                    </div>
+                    
+                    <!-- Remove Element -->
+                    <div class="mb-6">
+                        <h3 class="font-semibold mb-2 text-gray-700">3. 移除元素</h3>
+                        <div class="space-y-2">
+                            <select id="removeSelect" class="w-full p-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition bg-white">
+                                <option value="">-- 选择要移除的元素 --</option>
+                            </select>
+                            <button id="removeBtn" class="w-full bg-red-600 text-white px-4 py-2 rounded-lg hover:bg-red-700 font-semibold transition shadow-sm">移除</button>
+                        </div>
+                    </div>
+
+                    <!-- Quick Actions -->
+                    <div class="mb-6">
+                        <h3 class="font-semibold mb-2 text-gray-700">4. 快速操作</h3>
+                        <div class="space-y-2">
+                            <button id="demoScenarioBtn" class="w-full bg-purple-600 text-white px-4 py-2 rounded-lg hover:bg-purple-700 font-semibold transition shadow-sm">加载演示场景</button>
+                            <button id="resetBtn" class="w-full bg-gray-700 text-white px-4 py-2 rounded-lg hover:bg-gray-800 font-semibold transition shadow-sm">重置所有</button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Visualization Column -->
+                <div class="lg:col-span-2">
+                    <div class="bg-white p-4 rounded-2xl shadow-lg border border-gray-200">
+                        <h2 class="text-xl font-semibold mb-4 text-center">哈希环可视化</h2>
+                        <div class="hash-ring-container">
+                            <canvas id="hashRingCanvas"></canvas>
+                        </div>
+                        
+                        <!-- Legend -->
+                        <div class="mt-4 flex flex-wrap justify-center gap-4 text-sm">
+                            <div class="flex items-center space-x-2">
+                                <div class="w-4 h-4 bg-blue-500 rounded-full"></div>
+                                <span>物理服务器</span>
+                            </div>
+                            <div class="flex items-center space-x-2">
+                                <div class="w-4 h-4 bg-blue-300 rounded"></div>
+                                <span>虚拟节点</span>
+                            </div>
+                            <div class="flex items-center space-x-2">
+                                <div class="w-4 h-4 bg-green-500 rounded-full"></div>
+                                <span>数据键</span>
+                            </div>
+                            <div class="flex items-center space-x-2">
+                                <div class="w-4 h-2 bg-gray-400"></div>
+                                <span>数据映射</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Advanced Tab Content -->
+        <div id="advancedContent" class="tab-content">
+            <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
+                <div class="bg-white p-6 rounded-2xl shadow-lg border border-gray-200">
+                    <h3 class="text-lg font-semibold mb-4">批量操作</h3>
+                    
+                    <div class="mb-4">
+                        <label class="block text-sm font-medium text-gray-700 mb-2">批量添加服务器</label>
+                        <div class="flex items-center space-x-2">
+                            <input type="number" id="batchServerCount" placeholder="数量" min="1" max="20" class="w-20 p-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500">
+                            <input type="text" id="batchServerPrefix" placeholder="前缀 (如: srv)" class="flex-1 p-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500">
+                            <button id="batchAddServersBtn" class="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 font-semibold transition">添加</button>
+                        </div>
+                    </div>
+
+                    <div class="mb-4">
+                        <label class="block text-sm font-medium text-gray-700 mb-2">批量添加数据</label>
+                        <div class="flex items-center space-x-2">
+                            <input type="number" id="batchKeyCount" placeholder="数量" min="1" max="100" class="w-20 p-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500">
+                            <input type="text" id="batchKeyPrefix" placeholder="前缀 (如: key)" class="flex-1 p-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500">
+                            <button id="batchAddKeysBtn" class="bg-green-600 text-white px-4 py-2 rounded-lg hover:bg-green-700 font-semibold transition">添加</button>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="bg-white p-6 rounded-2xl shadow-lg border border-gray-200">
+                    <h3 class="text-lg font-semibold mb-4">算法配置</h3>
+                    
+                    <div class="space-y-4">
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-2">哈希函数</label>
+                            <select id="hashFunction" class="w-full p-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 bg-white">
+                                <option value="simple">简单哈希</option>
+                                <option value="djb2">DJB2哈希</option>
+                                <option value="fnv">FNV哈希</option>
+                            </select>
+                        </div>
+                        
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-2">哈希环大小</label>
+                            <select id="hashRingSize" class="w-full p-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 bg-white">
+                                <option value="360">360 (度)</option>
+                                <option value="1024">1024</option>
+                                <option value="4096">4096</option>
+                                <option value="65536">65536</option>
+                            </select>
+                        </div>
+
+                        <div>
+                            <label class="flex items-center space-x-2">
+                                <input type="checkbox" id="showVirtualNodes" checked class="rounded">
+                                <span class="text-sm">显示虚拟节点</span>
+                            </label>
+                        </div>
+
+                        <div>
+                            <label class="flex items-center space-x-2">
+                                <input type="checkbox" id="animateMigration" checked class="rounded">
+                                <span class="text-sm">数据迁移动画</span>
+                            </label>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Virtual Nodes Info -->
+                <div class="bg-white p-6 rounded-2xl shadow-lg border border-gray-200 lg:col-span-2">
+                    <h3 class="text-lg font-semibold mb-4">虚拟节点详情</h3>
+                    <div id="virtualNodesInfo" class="text-sm">
+                        <!-- Virtual nodes info will be populated here -->
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Statistics Tab Content -->
+        <div id="statsContent" class="tab-content">
+            <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
+                <!-- Load Balance Stats -->
+                <div class="bg-white p-6 rounded-2xl shadow-lg border border-gray-200">
+                    <h3 class="text-lg font-semibold mb-4">负载均衡统计</h3>
+                    <div id="loadStats" class="space-y-3">
+                        <!-- Stats will be populated here -->
+                    </div>
+                </div>
+
+                <!-- Load Distribution Chart -->
+                <div class="bg-white p-6 rounded-2xl shadow-lg border border-gray-200">
+                    <h3 class="text-lg font-semibold mb-4">负载分布图</h3>
+                    <div class="chart-container">
+                        <canvas id="loadChart"></canvas>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Migration History -->
+            <div class="mt-8 bg-white p-6 rounded-2xl shadow-lg border border-gray-200">
+                <h3 class="text-lg font-semibold mb-4">数据迁移历史</h3>
+                <div id="migrationHistory" class="space-y-2 max-h-64 overflow-y-auto">
+                    <!-- Migration history will be populated here -->
+                </div>
+            </div>
+        </div>
+
+        <!-- Theory Tab Content -->
+        <div id="theoryContent" class="tab-content">
+            <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
+                <div class="bg-white p-6 rounded-2xl shadow-lg border border-gray-200">
+                    <h3 class="text-lg font-semibold mb-4">算法原理</h3>
+                    <div class="space-y-4 text-sm text-gray-700">
+                        <div>
+                            <h4 class="font-semibold text-gray-900">1. 基本概念</h4>
+                            <p>一致性哈希是一种分布式计算中的哈希技术，能够在动态环境中实现数据的均匀分布和最小化重新分布。</p>
+                        </div>
+                        
+                        <div>
+                            <h4 class="font-semibold text-gray-900">2. 虚拟节点</h4>
+                            <p>为了解决数据分布不均的问题，每个物理节点可以对应多个虚拟节点，提高负载均衡性。</p>
+                        </div>
+
+                        <div>
+                            <h4 class="font-semibold text-gray-900">3. 数据定位</h4>
+                            <p>数据通过哈希函数映射到环上，然后顺时针查找第一个服务器节点作为存储位置。</p>
+                        </div>
+
+                        <div>
+                            <h4 class="font-semibold text-gray-900">4. 节点增删</h4>
+                            <p>添加或删除节点时，只有相邻区域的数据需要迁移，大大减少了数据移动。</p>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="bg-white p-6 rounded-2xl shadow-lg border border-gray-200">
+                    <h3 class="text-lg font-semibold mb-4">对比传统哈希</h3>
+                    <div class="space-y-4">
+                        <div class="p-4 bg-red-50 rounded-lg border border-red-200">
+                            <h4 class="font-semibold text-red-900 mb-2">传统哈希 (hash % n)</h4>
+                            <ul class="text-sm text-red-700 space-y-1">
+                                <li>• 节点变化时需要重新分布所有数据</li>
+                                <li>• 数据迁移成本高</li>
+                                <li>• 扩展性差</li>
+                            </ul>
+                        </div>
+
+                        <div class="p-4 bg-green-50 rounded-lg border border-green-200">
+                            <h4 class="font-semibold text-green-900 mb-2">一致性哈希</h4>
+                            <ul class="text-sm text-green-700 space-y-1">
+                                <li>• 节点变化时只迁移相邻数据</li>
+                                <li>• 数据迁移成本低</li>
+                                <li>• 扩展性好</li>
+                                <li>• 支持虚拟节点提高均衡性</li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Log Column -->
+        <div class="mt-8 bg-white p-6 rounded-2xl shadow-lg border border-gray-200">
+            <div class="flex justify-between items-center mb-4">
+                <h2 class="text-xl font-semibold border-b pb-3">操作日志</h2>
+                <div class="space-x-2">
+                    <button id="clearLogBtn" class="bg-gray-500 text-white px-3 py-1 rounded text-sm hover:bg-gray-600 transition">清空日志</button>
+                    <button id="exportLogBtn" class="bg-blue-500 text-white px-3 py-1 rounded text-sm hover:bg-blue-600 transition">导出日志</button>
+                </div>
+            </div>
+            <div id="logContainer" class="space-y-2 text-sm font-mono max-h-64 overflow-y-auto">
+                <!-- Log entries will be added here -->
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Global variables
+        const canvas = document.getElementById('hashRingCanvas');
+        const ctx = canvas.getContext('2d');
+        
+        // Input elements
+        const serverNameInput = document.getElementById('serverName');
+        const virtualNodesInput = document.getElementById('virtualNodes');
+        const addServerBtn = document.getElementById('addServerBtn');
+        const keyNameInput = document.getElementById('keyName');
+        const addKeyBtn = document.getElementById('addKeyBtn');
+        const removeSelect = document.getElementById('removeSelect');
+        const removeBtn = document.getElementById('removeBtn');
+        const resetBtn = document.getElementById('resetBtn');
+        const demoScenarioBtn = document.getElementById('demoScenarioBtn');
+        const logContainer = document.getElementById('logContainer');
+        const clearLogBtn = document.getElementById('clearLogBtn');
+        const exportLogBtn = document.getElementById('exportLogBtn');
+
+        // Advanced controls
+        const batchServerCountInput = document.getElementById('batchServerCount');
+        const batchServerPrefixInput = document.getElementById('batchServerPrefix');
+        const batchAddServersBtn = document.getElementById('batchAddServersBtn');
+        const batchKeyCountInput = document.getElementById('batchKeyCount');
+        const batchKeyPrefixInput = document.getElementById('batchKeyPrefix');
+        const batchAddKeysBtn = document.getElementById('batchAddKeysBtn');
+        const hashFunctionSelect = document.getElementById('hashFunction');
+        const hashRingSizeSelect = document.getElementById('hashRingSize');
+        const showVirtualNodesCheckbox = document.getElementById('showVirtualNodes');
+        const animateMigrationCheckbox = document.getElementById('animateMigration');
+
+        // Tab elements
+        const tabButtons = document.querySelectorAll('.tab-button');
+        const tabContents = document.querySelectorAll('.tab-content');
+
+        // Data structures
+        let servers = [];
+        let virtualNodes = [];
+        let keys = [];
+        let migrationHistory = [];
+        let currentHashRingSize = 360;
+        
+        const colors = ['#3B82F6', '#10B981', '#F59E0B', '#EF4444', '#8B5CF6', '#EC4899', '#6366F1', '#F97316', '#06B6D4', '#84CC16'];
+        let colorIndex = 0;
+
+        // Chart instance
+        let loadChart = null;
+
+        // Hash functions
+        const hashFunctions = {
+            simple: function(str) {
+                let hash = 0;
+                if (str.length === 0) return hash;
+                for (let i = 0; i < str.length; i++) {
+                    const char = str.charCodeAt(i);
+                    hash = ((hash << 5) - hash) + char;
+                    hash = hash & hash;
+                }
+                return Math.abs(hash) % currentHashRingSize;
+            },
+
+            djb2: function(str) {
+                let hash = 5381;
+                for (let i = 0; i < str.length; i++) {
+                    hash = ((hash << 5) + hash) + str.charCodeAt(i);
+                }
+                return Math.abs(hash) % currentHashRingSize;
+            },
+
+            fnv: function(str) {
+                let hash = 0x811c9dc5;
+                for (let i = 0; i < str.length; i++) {
+                    hash ^= str.charCodeAt(i);
+                    hash += (hash << 1) + (hash << 4) + (hash << 7) + (hash << 8) + (hash << 24);
+                }
+                return Math.abs(hash) % currentHashRingSize;
+            }
+        };
+
+        function getCurrentHashFunction() {
+            return hashFunctions[hashFunctionSelect.value] || hashFunctions.simple;
+        }
+
+        function addLog(message, type = 'info') {
+            const entry = document.createElement('div');
+            entry.className = 'log-entry p-2 rounded-md';
+            
+            let bgColor, textColor, icon;
+            switch(type) {
+                case 'add':
+                    bgColor = 'bg-blue-100'; textColor = 'text-blue-800'; icon = '✚'; break;
+                case 'add_key':
+                    bgColor = 'bg-green-100'; textColor = 'text-green-800'; icon = '✚'; break;
+                case 'remove':
+                    bgColor = 'bg-red-100'; textColor = 'text-red-800'; icon = '✖'; break;
+                case 'remap':
+                    bgColor = 'bg-yellow-100'; textColor = 'text-yellow-800'; icon = '⇄'; break;
+                case 'batch':
+                    bgColor = 'bg-purple-100'; textColor = 'text-purple-800'; icon = '⚡'; break;
+                case 'error':
+                    bgColor = 'bg-red-100'; textColor = 'text-red-800'; icon = '⚠'; break;
+                default:
+                    bgColor = 'bg-gray-100'; textColor = 'text-gray-800'; icon = 'ⓘ';
+            }
+
+            entry.classList.add(bgColor, textColor);
+            entry.innerHTML = `<span class="font-bold mr-2">${icon}</span> <span class="text-xs text-gray-500">${new Date().toLocaleTimeString()}</span> ${message}`;
+            
+            entry.classList.add('new');
+            logContainer.prepend(entry);
+            setTimeout(() => {
+                entry.classList.remove('new');
+                requestAnimationFrame(() => {
+                    entry.style.transform = 'scaleY(1)';
+                    entry.style.opacity = '1';
+                });
+            }, 10);
+        }
+
+        function createVirtualNodes(server) {
+            const virtualNodeCount = parseInt(virtualNodesInput.value) || 3;
+            const serverVirtualNodes = [];
+            
+            for (let i = 0; i < virtualNodeCount; i++) {
+                const virtualNodeName = `${server.name}#${i}`;
+                const hash = getCurrentHashFunction()(virtualNodeName);
+                serverVirtualNodes.push({
+                    name: virtualNodeName,
+                    hash: hash,
+                    server: server,
+                    isVirtual: true
+                });
+            }
+            
+            return serverVirtualNodes;
+        }
+
+        function updateRemoveOptions() {
+            removeSelect.innerHTML = '<option value="">-- 选择要移除的元素 --</option>';
+            
+            servers.forEach(s => {
+                const option = document.createElement('option');
+                option.value = `server_${s.name}`;
+                option.textContent = `服务器: ${s.name} (${s.keyCount || 0} 个数据)`;
+                removeSelect.appendChild(option);
+            });
+            
+            keys.forEach(k => {
+                const option = document.createElement('option');
+                option.value = `key_${k.name}`;
+                option.textContent = `数据: ${k.name} → ${k.server ? k.server.name : '无服务器'}`;
+                removeSelect.appendChild(option);
+            });
+        }
+
+        function findTargetServer(keyHash) {
+            if (virtualNodes.length === 0) return null;
+            
+            const sortedVirtualNodes = [...virtualNodes].sort((a, b) => a.hash - b.hash);
+
+            for (let vnode of sortedVirtualNodes) {
+                if (vnode.hash >= keyHash) {
+                    return vnode.server;
+                }
+            }
+            
+            return sortedVirtualNodes[0].server;
+        }
+
+        function findTargetVirtualNode(keyHash) {
+            if (virtualNodes.length === 0) return null;
+            
+            const sortedVirtualNodes = [...virtualNodes].sort((a, b) => a.hash - b.hash);
+
+            for (let vnode of sortedVirtualNodes) {
+                if (vnode.hash >= keyHash) {
+                    return vnode;
+                }
+            }
+            
+            return sortedVirtualNodes[0];
+        }
+
+        function remapKeys() {
+            const migrations = [];
+            
+            keys.forEach(key => {
+                const oldServer = key.server;
+                const newServer = findTargetServer(key.hash);
+                
+                if (oldServer !== newServer) {
+                    migrations.push({
+                        key: key.name,
+                        from: oldServer ? oldServer.name : '无',
+                        to: newServer ? newServer.name : '无',
+                        timestamp: new Date()
+                    });
+                }
+                
+                key.server = newServer;
+            });
+
+            // Update server key counts
+            servers.forEach(server => server.keyCount = 0);
+            keys.forEach(key => {
+                if (key.server) {
+                    key.server.keyCount = (key.server.keyCount || 0) + 1;
+                }
+            });
+
+            // Log migrations
+            migrations.forEach(migration => {
+                addLog(`数据 '${migration.key}' 从 '${migration.from}' 迁移到 '${migration.to}'`, 'remap');
+                migrationHistory.unshift(migration);
+            });
+
+            // Keep migration history limited
+            if (migrationHistory.length > 100) {
+                migrationHistory = migrationHistory.slice(0, 100);
+            }
+
+            updateStatistics();
+            updateVirtualNodesInfo();
+            draw();
+        }
+
+        function updateVirtualNodesInfo() {
+            const virtualNodesInfoDiv = document.getElementById('virtualNodesInfo');
+            if (!virtualNodesInfoDiv) return;
+
+            if (virtualNodes.length === 0) {
+                virtualNodesInfoDiv.innerHTML = '<p class="text-gray-500">暂无虚拟节点</p>';
+                return;
+            }
+
+            const sortedVirtualNodes = [...virtualNodes].sort((a, b) => a.hash - b.hash);
+            
+            virtualNodesInfoDiv.innerHTML = `
+                <div class="mb-4">
+                    <p class="text-gray-600 mb-2">环上共有 ${virtualNodes.length} 个虚拟节点，按哈希值排序：</p>
+                    <div class="grid gap-2 max-h-64 overflow-y-auto">
+                        ${sortedVirtualNodes.map(vnode => `
+                            <div class="flex justify-between items-center p-2 bg-gray-50 rounded border-l-4" style="border-left-color: ${vnode.server.color}">
+                                <span class="font-medium">${vnode.name}</span>
+                                <div class="text-right">
+                                    <span class="text-gray-600">哈希: ${vnode.hash}</span>
+                                    <span class="ml-2 text-xs px-2 py-1 rounded" style="background-color: ${vnode.server.color}20; color: ${vnode.server.color}">→ ${vnode.server.name}</span>
+                                </div>
+                            </div>
+                        `).join('')}
+                    </div>
+                </div>
+                
+                <div class="mt-4 p-3 bg-blue-50 rounded-lg border border-blue-200">
+                    <h4 class="font-semibold text-blue-900 mb-2">💡 为什么映射结果可能出乎意料？</h4>
+                    <p class="text-blue-800 text-sm">
+                        一致性哈希算法使用虚拟节点来实现负载均衡。数据的映射是基于<strong>虚拟节点的哈希值</strong>，而不是物理服务器的哈希值。
+                        每个虚拟节点的名称为 "服务器名#序号"，因此其哈希值与物理服务器不同。
+                    </p>
+                </div>
+            `;
+        }
+
+        function updateStatistics() {
+            const loadStats = document.getElementById('loadStats');
+            const migrationHistoryDiv = document.getElementById('migrationHistory');
+            
+            if (loadStats) {
+                loadStats.innerHTML = '';
+                
+                if (servers.length === 0) {
+                    loadStats.innerHTML = '<p class="text-gray-500">暂无服务器数据</p>';
+                } else {
+                    // Calculate load balance metrics
+                    const avgLoad = keys.length / servers.length;
+                    const loadVariance = servers.reduce((sum, server) => {
+                        const diff = (server.keyCount || 0) - avgLoad;
+                        return sum + diff * diff;
+                    }, 0) / servers.length;
+                    const loadStdDev = Math.sqrt(loadVariance);
+                    const balanceScore = Math.max(0, 100 - (loadStdDev / avgLoad * 100));
+
+                    loadStats.innerHTML = `
+                        <div class="grid grid-cols-2 gap-4">
+                            <div class="text-center p-3 bg-blue-50 rounded-lg">
+                                <div class="text-2xl font-bold text-blue-600">${keys.length}</div>
+                                <div class="text-sm text-blue-600">总数据量</div>
+                            </div>
+                            <div class="text-center p-3 bg-green-50 rounded-lg">
+                                <div class="text-2xl font-bold text-green-600">${servers.length}</div>
+                                <div class="text-sm text-green-600">服务器数量</div>
+                            </div>
+                            <div class="text-center p-3 bg-yellow-50 rounded-lg">
+                                <div class="text-2xl font-bold text-yellow-600">${avgLoad.toFixed(1)}</div>
+                                <div class="text-sm text-yellow-600">平均负载</div>
+                            </div>
+                            <div class="text-center p-3 bg-purple-50 rounded-lg">
+                                <div class="text-2xl font-bold text-purple-600">${isNaN(balanceScore) ? 'N/A' : balanceScore.toFixed(1)}%</div>
+                                <div class="text-sm text-purple-600">均衡分数</div>
+                            </div>
+                        </div>
+                        
+                        <div class="mt-4">
+                            <h4 class="font-semibold mb-2">服务器负载详情</h4>
+                            ${servers.map(server => `
+                                <div class="flex justify-between items-center py-1 border-b border-gray-100">
+                                    <span class="font-medium" style="color: ${server.color}">${server.name}</span>
+                                    <span class="text-sm">${server.keyCount || 0} 个数据</span>
+                                </div>
+                            `).join('')}
+                        </div>
+                    `;
+                }
+            }
+
+            // Update migration history
+            if (migrationHistoryDiv) {
+                migrationHistoryDiv.innerHTML = migrationHistory.length === 0 
+                    ? '<p class="text-gray-500">暂无迁移记录</p>'
+                    : migrationHistory.slice(0, 10).map(migration => `
+                        <div class="p-2 bg-gray-50 rounded text-xs">
+                            <span class="font-medium">${migration.key}</span>: 
+                            ${migration.from} → ${migration.to}
+                            <span class="text-gray-400 float-right">${migration.timestamp.toLocaleTimeString()}</span>
+                        </div>
+                    `).join('');
+            }
+
+            updateLoadChart();
+        }
+
+        function updateLoadChart() {
+            const chartContainer = document.querySelector('.chart-container');
+            if (!chartContainer) return;
+
+            // Destroy existing chart
+            if (loadChart) {
+                loadChart.destroy();
+                loadChart = null;
+            }
+
+            if (servers.length === 0) {
+                // Show placeholder
+                chartContainer.innerHTML = `
+                    <div class="chart-container flex items-center justify-center text-gray-500">
+                        <div class="text-center">
+                            <div class="text-4xl mb-2">📊</div>
+                            <div>暂无数据</div>
+                            <div class="text-sm">请先添加服务器和数据</div>
+                        </div>
+                    </div>
+                `;
+                return;
+            }
+
+            // Ensure canvas exists
+            chartContainer.innerHTML = '<canvas id="loadChart"></canvas>';
+            const canvas = document.getElementById('loadChart');
+            const ctx = canvas.getContext('2d');
+
+            // Create new chart
+            loadChart = new Chart(ctx, {
+                type: 'doughnut',
+                data: {
+                    labels: servers.map(s => s.name),
+                    datasets: [{
+                        data: servers.map(s => s.keyCount || 0),
+                        backgroundColor: servers.map(s => s.color),
+                        borderWidth: 2,
+                        borderColor: '#ffffff'
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    resizeDelay: 0,
+                    layout: {
+                        padding: 10
+                    },
+                    plugins: {
+                        legend: {
+                            position: 'bottom',
+                            labels: {
+                                padding: 15,
+                                usePointStyle: true,
+                                font: {
+                                    size: 12
+                                }
+                            }
+                        },
+                        tooltip: {
+                            callbacks: {
+                                label: function(context) {
+                                    const total = context.dataset.data.reduce((a, b) => a + b, 0);
+                                    const percentage = total > 0 ? ((context.raw / total) * 100).toFixed(1) : 0;
+                                    return `${context.label}: ${context.raw} (${percentage}%)`;
+                                }
+                            }
+                        }
+                    }
+                }
+            });
+        }
+
+        function draw() {
+            const w = canvas.width;
+            const h = canvas.height;
+            const radius = Math.min(w, h) * 0.35;
+            const centerX = w / 2;
+            const centerY = h / 2;
+            
+            ctx.clearRect(0, 0, w, h);
+
+            // Draw the hash ring
+            ctx.beginPath();
+            ctx.arc(centerX, centerY, radius, 0, 2 * Math.PI);
+            ctx.strokeStyle = '#E5E7EB';
+            ctx.lineWidth = 3;
+            ctx.stroke();
+
+            // Draw hash value markers
+            const markerCount = currentHashRingSize === 360 ? 8 : 16;
+            const markerStep = currentHashRingSize / markerCount;
+            
+            for (let i = 0; i < markerCount; i++) {
+                const angle = (i * markerStep) * (currentHashRingSize === 360 ? Math.PI / 180 : 2 * Math.PI / currentHashRingSize);
+                const x1 = centerX + radius * Math.cos(angle);
+                const y1 = centerY + radius * Math.sin(angle);
+                const x2 = centerX + (radius - 8) * Math.cos(angle);
+                const y2 = centerY + (radius - 8) * Math.sin(angle);
+                
+                ctx.beginPath();
+                ctx.moveTo(x1, y1);
+                ctx.lineTo(x2, y2);
+                ctx.strokeStyle = '#9CA3AF';
+                ctx.lineWidth = 1;
+                ctx.stroke();
+                
+                // Draw marker labels
+                ctx.fillStyle = '#6B7280';
+                ctx.font = '10px Inter';
+                ctx.textAlign = 'center';
+                ctx.textBaseline = 'middle';
+                const textX = centerX + (radius + 15) * Math.cos(angle);
+                const textY = centerY + (radius + 15) * Math.sin(angle);
+                ctx.fillText((i * markerStep).toString(), textX, textY);
+            }
+
+            // Draw virtual nodes (if enabled)
+            if (showVirtualNodesCheckbox.checked) {
+                virtualNodes.forEach(vnode => {
+                    const angle = vnode.hash * (currentHashRingSize === 360 ? Math.PI / 180 : 2 * Math.PI / currentHashRingSize);
+                    const x = centerX + radius * Math.cos(angle);
+                    const y = centerY + radius * Math.sin(angle);
+
+                    ctx.beginPath();
+                    ctx.rect(x - 4, y - 4, 8, 8);
+                    ctx.fillStyle = vnode.server.color + '80'; // Semi-transparent
+                    ctx.fill();
+                    ctx.strokeStyle = vnode.server.color;
+                    ctx.lineWidth = 1;
+                    ctx.stroke();
+                });
+            }
+
+            // Draw physical servers
+            servers.forEach(server => {
+                const angle = server.hash * (currentHashRingSize === 360 ? Math.PI / 180 : 2 * Math.PI / currentHashRingSize);
+                const x = centerX + radius * Math.cos(angle);
+                const y = centerY + radius * Math.sin(angle);
+
+                // Server node
+                ctx.beginPath();
+                ctx.arc(x, y, 10, 0, 2 * Math.PI);
+                ctx.fillStyle = server.color;
+                ctx.fill();
+                ctx.strokeStyle = 'white';
+                ctx.lineWidth = 2;
+                ctx.stroke();
+
+                // Server label
+                ctx.fillStyle = '#1F2937';
+                ctx.font = 'bold 12px Inter';
+                ctx.textAlign = 'center';
+                ctx.textBaseline = 'middle';
+                const textX = centerX + (radius + 30) * Math.cos(angle);
+                const textY = centerY + (radius + 30) * Math.sin(angle);
+                ctx.fillText(`${server.name} (${server.keyCount || 0})`, textX, textY);
+            });
+
+            // Draw keys and connections
+            keys.forEach(key => {
+                const keyAngle = key.hash * (currentHashRingSize === 360 ? Math.PI / 180 : 2 * Math.PI / currentHashRingSize);
+                const keyX = centerX + radius * Math.cos(keyAngle);
+                const keyY = centerY + radius * Math.sin(keyAngle);
+
+                // Key node
+                ctx.beginPath();
+                ctx.arc(keyX, keyY, 4, 0, 2 * Math.PI);
+                ctx.fillStyle = key.server ? key.server.color : '#9CA3AF';
+                ctx.fill();
+                ctx.strokeStyle = 'white';
+                ctx.lineWidth = 1;
+                ctx.stroke();
+
+                // Connection to server
+                if (key.server) {
+                    const serverAngle = key.server.hash * (currentHashRingSize === 360 ? Math.PI / 180 : 2 * Math.PI / currentHashRingSize);
+                    const serverX = centerX + radius * Math.cos(serverAngle);
+                    const serverY = centerY + radius * Math.sin(serverAngle);
+                    
+                    ctx.beginPath();
+                    ctx.moveTo(keyX, keyY);
+                    ctx.lineTo(serverX, serverY);
+                    ctx.strokeStyle = key.server.color + '60';
+                    ctx.lineWidth = 1;
+                    ctx.setLineDash([2, 2]);
+                    ctx.stroke();
+                    ctx.setLineDash([]);
+                }
+
+                // Key label
+                ctx.fillStyle = '#4B5563';
+                ctx.font = '10px Inter';
+                const textAngle = keyAngle;
+                const textRadius = radius * 0.8;
+                const textX = centerX + textRadius * Math.cos(textAngle);
+                const textY = centerY + textRadius * Math.sin(textAngle);
+                ctx.save();
+                ctx.translate(textX, textY);
+                ctx.rotate(textAngle + Math.PI/2);
+                ctx.textAlign = "center";
+                ctx.fillText(key.name, 0, 0);
+                ctx.restore();
+            });
+        }
+
+        function handleResize() {
+            const container = canvas.parentElement;
+            const size = Math.min(container.clientWidth, 500);
+            canvas.width = size;
+            canvas.height = size;
+            draw();
+        }
+
+        // Tab switching
+        tabButtons.forEach(button => {
+            button.addEventListener('click', () => {
+                const targetTab = button.id.replace('Tab', 'Content');
+                
+                // Update active tab button
+                tabButtons.forEach(btn => btn.classList.remove('active'));
+                button.classList.add('active');
+                
+                // Show target content
+                tabContents.forEach(content => content.classList.remove('active'));
+                document.getElementById(targetTab).classList.add('active');
+            });
+        });
+
+        // Event Listeners
+        addServerBtn.addEventListener('click', () => {
+            const name = serverNameInput.value.trim();
+            if (name && !servers.find(s => s.name === name)) {
+                const hash = getCurrentHashFunction()(name);
+                const color = colors[colorIndex % colors.length];
+                colorIndex++;
+                
+                const server = { 
+                    name, 
+                    hash, 
+                    color,
+                    keyCount: 0
+                };
+                
+                servers.push(server);
+                
+                // Create virtual nodes
+                const serverVirtualNodes = createVirtualNodes(server);
+                virtualNodes.push(...serverVirtualNodes);
+                
+                addLog(`添加服务器 '${name}' (哈希: ${hash}, ${serverVirtualNodes.length} 个虚拟节点)`, 'add');
+                serverNameInput.value = '';
+                remapKeys();
+                updateRemoveOptions();
+                updateVirtualNodesInfo();
+            } else if (!name) {
+                addLog('请输入服务器名称', 'error');
+            } else {
+                addLog(`服务器 '${name}' 已存在`, 'error');
+            }
+        });
+
+        addKeyBtn.addEventListener('click', () => {
+            const name = keyNameInput.value.trim();
+            if (name && !keys.find(k => k.name === name)) {
+                const hash = getCurrentHashFunction()(name);
+                const server = findTargetServer(hash);
+                const key = { name, hash, server };
+                
+                keys.push(key);
+                
+                if (server) {
+                    server.keyCount = (server.keyCount || 0) + 1;
+                }
+                
+                keyNameInput.value = '';
+                // Find the specific virtual node that this key maps to
+                const targetVirtualNode = findTargetVirtualNode(hash);
+                
+                addLog(`添加数据 '${name}' (哈希: ${hash}) → ${server ? server.name : '无服务器'}${targetVirtualNode ? ` [通过虚拟节点 ${targetVirtualNode.name} (哈希: ${targetVirtualNode.hash})]` : ''}`, 'add_key');
+                draw();
+                updateRemoveOptions();
+                updateStatistics();
+                updateVirtualNodesInfo();
+            } else if (!name) {
+                addLog('请输入数据名称', 'error');
+            } else {
+                addLog(`数据 '${name}' 已存在`, 'error');
+            }
+        });
+
+        removeBtn.addEventListener('click', () => {
+            const selected = removeSelect.value;
+            if (!selected) return;
+
+            const [type, name] = selected.split('_');
+            
+            if (type === 'server') {
+                const serverIndex = servers.findIndex(s => s.name === name);
+                if (serverIndex > -1) {
+                    const removedServer = servers.splice(serverIndex, 1)[0];
+                    
+                    // Remove virtual nodes
+                    virtualNodes = virtualNodes.filter(vnode => vnode.server !== removedServer);
+                    
+                    addLog(`移除服务器 '${name}' (哈希: ${removedServer.hash})`, 'remove');
+                    remapKeys();
+                }
+            } else if (type === 'key') {
+                const keyIndex = keys.findIndex(k => k.name === name);
+                if (keyIndex > -1) {
+                    const removedKey = keys.splice(keyIndex, 1)[0];
+                    
+                    // Update server key count
+                    if (removedKey.server) {
+                        removedKey.server.keyCount = Math.max(0, (removedKey.server.keyCount || 1) - 1);
+                    }
+                    
+                    addLog(`移除数据 '${name}' (哈希: ${removedKey.hash})`, 'remove');
+                    draw();
+                    updateStatistics();
+                    updateVirtualNodesInfo();
+                }
+            }
+            updateRemoveOptions();
+        });
+
+        // Batch operations
+        batchAddServersBtn.addEventListener('click', () => {
+            const count = parseInt(batchServerCountInput.value);
+            const prefix = batchServerPrefixInput.value.trim() || 'server';
+            
+            if (count > 0 && count <= 20) {
+                let addedCount = 0;
+                for (let i = 1; i <= count; i++) {
+                    const name = `${prefix}-${i}`;
+                    if (!servers.find(s => s.name === name)) {
+                        const hash = getCurrentHashFunction()(name);
+                        const color = colors[colorIndex % colors.length];
+                        colorIndex++;
+                        
+                        const server = { 
+                            name, 
+                            hash, 
+                            color,
+                            keyCount: 0
+                        };
+                        
+                        servers.push(server);
+                        
+                        // Create virtual nodes
+                        const serverVirtualNodes = createVirtualNodes(server);
+                        virtualNodes.push(...serverVirtualNodes);
+                        
+                        addedCount++;
+                    }
+                }
+                
+                if (addedCount > 0) {
+                    addLog(`批量添加 ${addedCount} 个服务器 (前缀: ${prefix})`, 'batch');
+                    batchServerCountInput.value = '';
+                    batchServerPrefixInput.value = '';
+                    remapKeys();
+                    updateRemoveOptions();
+                }
+            } else {
+                addLog('请输入有效的服务器数量 (1-20)', 'error');
+            }
+        });
+
+        batchAddKeysBtn.addEventListener('click', () => {
+            const count = parseInt(batchKeyCountInput.value);
+            const prefix = batchKeyPrefixInput.value.trim() || 'key';
+            
+            if (count > 0 && count <= 100) {
+                let addedCount = 0;
+                for (let i = 1; i <= count; i++) {
+                    const name = `${prefix}-${i}`;
+                    if (!keys.find(k => k.name === name)) {
+                        const hash = getCurrentHashFunction()(name);
+                        const server = findTargetServer(hash);
+                        keys.push({ name, hash, server });
+                        
+                        if (server) {
+                            server.keyCount = (server.keyCount || 0) + 1;
+                        }
+                        
+                        addedCount++;
+                    }
+                }
+                
+                if (addedCount > 0) {
+                    addLog(`批量添加 ${addedCount} 个数据 (前缀: ${prefix})`, 'batch');
+                    batchKeyCountInput.value = '';
+                    batchKeyPrefixInput.value = '';
+                    draw();
+                    updateRemoveOptions();
+                    updateStatistics();
+                    updateVirtualNodesInfo();
+                }
+            } else {
+                addLog('请输入有效的数据数量 (1-100)', 'error');
+            }
+        });
+
+        // Demo scenario
+        demoScenarioBtn.addEventListener('click', () => {
+            // Reset first
+            servers = [];
+            virtualNodes = [];
+            keys = [];
+            migrationHistory = [];
+            colorIndex = 0;
+
+            // Add demo servers
+            const demoServers = ['web-server-1', 'web-server-2', 'web-server-3'];
+            demoServers.forEach(serverName => {
+                const hash = getCurrentHashFunction()(serverName);
+                const color = colors[colorIndex % colors.length];
+                colorIndex++;
+                
+                const server = { 
+                    name: serverName, 
+                    hash, 
+                    color,
+                    keyCount: 0
+                };
+                
+                servers.push(server);
+                
+                // Create virtual nodes
+                const serverVirtualNodes = createVirtualNodes(server);
+                virtualNodes.push(...serverVirtualNodes);
+            });
+
+            // Add demo keys
+            const demoKeys = ['user-123', 'user-456', 'user-789', 'photo-abc', 'photo-def', 'video-xyz', 'doc-001', 'doc-002'];
+            demoKeys.forEach(keyName => {
+                const hash = getCurrentHashFunction()(keyName);
+                const server = findTargetServer(hash);
+                keys.push({ name: keyName, hash, server });
+                
+                if (server) {
+                    server.keyCount = (server.keyCount || 0) + 1;
+                }
+            });
+
+            addLog('加载演示场景：3个服务器，8个数据项', 'batch');
+            draw();
+            updateRemoveOptions();
+            updateStatistics();
+            updateVirtualNodesInfo();
+        });
+
+        // Settings changes
+        hashFunctionSelect.addEventListener('change', () => {
+            // Recalculate all hashes
+            servers.forEach(server => {
+                server.hash = getCurrentHashFunction()(server.name);
+            });
+            
+            virtualNodes = [];
+            servers.forEach(server => {
+                const serverVirtualNodes = createVirtualNodes(server);
+                virtualNodes.push(...serverVirtualNodes);
+            });
+            
+            keys.forEach(key => {
+                key.hash = getCurrentHashFunction()(key.name);
+            });
+            
+            addLog(`切换哈希函数为: ${hashFunctionSelect.options[hashFunctionSelect.selectedIndex].text}`, 'info');
+            remapKeys();
+        });
+
+        hashRingSizeSelect.addEventListener('change', () => {
+            currentHashRingSize = parseInt(hashRingSizeSelect.value);
+            
+            // Recalculate all hashes
+            servers.forEach(server => {
+                server.hash = getCurrentHashFunction()(server.name);
+            });
+            
+            virtualNodes = [];
+            servers.forEach(server => {
+                const serverVirtualNodes = createVirtualNodes(server);
+                virtualNodes.push(...serverVirtualNodes);
+            });
+            
+            keys.forEach(key => {
+                key.hash = getCurrentHashFunction()(key.name);
+            });
+            
+            addLog(`哈希环大小调整为: ${currentHashRingSize}`, 'info');
+            remapKeys();
+        });
+
+        showVirtualNodesCheckbox.addEventListener('change', () => {
+            draw();
+        });
+
+        resetBtn.addEventListener('click', () => {
+            servers = [];
+            virtualNodes = [];
+            keys = [];
+            migrationHistory = [];
+            colorIndex = 0;
+            logContainer.innerHTML = '';
+            addLog('系统已重置');
+            draw();
+            updateRemoveOptions();
+            updateStatistics();
+            updateVirtualNodesInfo();
+        });
+
+        clearLogBtn.addEventListener('click', () => {
+            logContainer.innerHTML = '';
+            addLog('日志已清空');
+        });
+
+        exportLogBtn.addEventListener('click', () => {
+            const logs = Array.from(logContainer.children).map(entry => entry.textContent).reverse();
+            const dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify({
+                timestamp: new Date().toISOString(),
+                logs: logs,
+                servers: servers.map(s => ({ name: s.name, hash: s.hash, keyCount: s.keyCount })),
+                keys: keys.map(k => ({ name: k.name, hash: k.hash, server: k.server ? k.server.name : null })),
+                migrationHistory: migrationHistory
+            }, null, 2));
+            
+            const downloadAnchorNode = document.createElement('a');
+            downloadAnchorNode.setAttribute("href", dataStr);
+            downloadAnchorNode.setAttribute("download", `consistent-hash-log-${new Date().toISOString().slice(0,10)}.json`);
+            document.body.appendChild(downloadAnchorNode);
+            downloadAnchorNode.click();
+            downloadAnchorNode.remove();
+            
+            addLog('日志已导出');
+        });
+
+        // Keyboard shortcuts
+        document.addEventListener('keydown', (e) => {
+            if (e.ctrlKey || e.metaKey) {
+                switch(e.key) {
+                    case 's':
+                        e.preventDefault();
+                        if (serverNameInput.value.trim()) {
+                            addServerBtn.click();
+                        }
+                        break;
+                    case 'k':
+                        e.preventDefault();
+                        if (keyNameInput.value.trim()) {
+                            addKeyBtn.click();
+                        }
+                        break;
+                    case 'r':
+                        e.preventDefault();
+                        resetBtn.click();
+                        break;
+                }
+            }
+        });
+
+        // Enter key support
+        serverNameInput.addEventListener('keypress', (e) => {
+            if (e.key === 'Enter') {
+                addServerBtn.click();
+            }
+        });
+
+        keyNameInput.addEventListener('keypress', (e) => {
+            if (e.key === 'Enter') {
+                addKeyBtn.click();
+            }
+        });
+
+        // Initial setup
+        window.addEventListener('resize', handleResize);
+        handleResize();
+        addLog('欢迎使用一致性哈希高级演示系统！');
+        addLog('快捷键：Ctrl+S 添加服务器，Ctrl+K 添加数据，Ctrl+R 重置');
+        updateRemoveOptions();
+        updateStatistics();
+        updateVirtualNodesInfo();
+    </script>
+</body>
+</html>

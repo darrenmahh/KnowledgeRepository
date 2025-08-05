@@ -1,0 +1,46 @@
+/* 文件名: mermaid-styles.css */
+
+/* --- Mermaid 自适应缩放 --- */
+/* 让 Mermaid 图表容器的行为像一个块级元素 */
+div.mermaid {
+  display: block;
+  text-align: center; /* 让图表在容器内居中 */
+}
+
+/* 关键！让内部的 SVG 图像自适应容器宽度 */
+div.mermaid > svg {
+  max-width: 100%; /* 最大宽度为容器的100% */
+  height: auto;    /* 高度自动缩放以保持比例 */
+}
+/* --- Mermaid 美化样式 (可以和上面的代码放在同一个文件里) --- */
+
+/* 改变默认节点(矩形)的样式 */
+.mermaid .node rect,
+.mermaid .node polygon {
+  fill: #E3F2FD !important;    /* 填充颜色 (淡蓝色) */
+  stroke: #2196F3 !important;   /* 边框颜色 (蓝色) */
+  stroke-width: 2px !important;
+}
+
+/* 改变节点的文字样式 */
+.mermaid .node .label {
+  font-family: "霞鹜文楷", "LXGW WenKai", sans-serif !important; /* 使用更美观的字体 (需已安装) */
+  font-size: 16px !important;
+  color: #1E88E5 !important;    /* 字体颜色 */
+}
+
+/* 改变菱形节点的样式 */
+.mermaid .node.diamond rect,
+.mermaid .node.diamond polygon {
+  fill: #FFF3E0 !important;   /* 填充颜色 (淡橙色) */
+  stroke: #FB8C00 !important;  /* 边框颜色 (橙色) */
+}
+
+/* 改变箭头和线条的样式 */
+.mermaid .edgePath .path {
+  stroke: #42A5F5 !important; /* 线条颜色 */
+  stroke-width: 2px !important;
+}
+.mermaid .arrowheadPath {
+  fill: #42A5F5 !important; /* 箭头颜色 */
+}

@@ -1,0 +1,724 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>LeetCode 1002 - 查找共用字符</title>
+    <style>
+        body {
+            font-family: 'Arial', sans-serif;
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            color: #333;
+            scroll-behavior: smooth;
+        }
+        
+        .container {
+            background: white;
+            border-radius: 15px;
+            padding: 30px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+        }
+        
+        h1 {
+            text-align: center;
+            color: #2c3e50;
+            margin-bottom: 10px;
+        }
+        
+        .problem-description {
+            background: #f8f9fa;
+            padding: 20px;
+            border-radius: 10px;
+            margin: 20px 0;
+            border-left: 4px solid #3498db;
+        }
+        
+        .examples {
+            background: #e8f5e8;
+            padding: 15px;
+            border-radius: 8px;
+            margin: 15px 0;
+        }
+        
+        .input-section {
+            margin: 20px 0;
+            padding: 20px;
+            background: #f0f8ff;
+            border-radius: 10px;
+        }
+        
+        .input-group {
+            margin: 10px 0;
+        }
+        
+        label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: bold;
+            color: #2c3e50;
+        }
+        
+        input[type="text"] {
+            width: 100%;
+            padding: 10px;
+            border: 2px solid #ddd;
+            border-radius: 5px;
+            font-size: 16px;
+            box-sizing: border-box;
+        }
+        
+        input[type="text"]:focus {
+            border-color: #3498db;
+            outline: none;
+        }
+        
+        .buttons {
+            text-align: center;
+            margin: 20px 0;
+        }
+        
+        button {
+            background: linear-gradient(45deg, #3498db, #2980b9);
+            color: white;
+            border: none;
+            padding: 12px 24px;
+            margin: 5px;
+            border-radius: 25px;
+            cursor: pointer;
+            font-size: 16px;
+            transition: all 0.3s ease;
+        }
+        
+        button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(0,0,0,0.2);
+        }
+        
+        button:disabled {
+            background: #bdc3c7;
+            cursor: not-allowed;
+            transform: none;
+            opacity: 0.6;
+        }
+        
+        .button-group {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 10px;
+            flex-wrap: wrap;
+        }
+        
+        .step-nav {
+            background: #e8f4f8;
+            padding: 15px;
+            border-radius: 10px;
+            margin: 20px 0;
+            text-align: center;
+            border: 2px solid #3498db;
+            position: sticky;
+            top: 20px;
+            z-index: 100;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+        }
+        
+        .step-info {
+            color: #2c3e50;
+            font-weight: bold;
+            margin-bottom: 10px;
+        }
+        
+        .step-container {
+            margin: 20px 0;
+            padding: 20px;
+            background: #fff5f5;
+            border-radius: 10px;
+            border: 2px solid #e74c3c;
+            display: none;
+        }
+        
+        .step-container.active {
+            display: block;
+            animation: fadeIn 0.5s ease-in;
+        }
+        
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        
+        .step-title {
+            color: #e74c3c;
+            font-size: 18px;
+            font-weight: bold;
+            margin-bottom: 15px;
+        }
+        
+        .word-analysis {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 15px;
+            margin: 15px 0;
+        }
+        
+        .word-box {
+            background: white;
+            border: 2px solid #3498db;
+            border-radius: 8px;
+            padding: 15px;
+            min-width: 150px;
+            transition: all 0.3s ease;
+        }
+        
+        .word-box:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+        }
+        
+        .word-title {
+            font-weight: bold;
+            color: #2c3e50;
+            margin-bottom: 10px;
+            font-size: 16px;
+        }
+        
+        .char-count {
+            margin: 5px 0;
+            font-family: monospace;
+            background: #ecf0f1;
+            padding: 3px 6px;
+            border-radius: 3px;
+        }
+        
+        .result-section {
+            background: #d5f4e6;
+            padding: 20px;
+            border-radius: 10px;
+            margin: 20px 0;
+            border: 2px solid #27ae60;
+            display: none;
+        }
+        
+        .result-section.active {
+            display: block;
+            animation: fadeIn 0.5s ease-in;
+        }
+        
+        .result-chars {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+            margin: 15px 0;
+        }
+        
+        .result-char {
+            background: #27ae60;
+            color: white;
+            padding: 8px 12px;
+            border-radius: 20px;
+            font-weight: bold;
+            font-size: 18px;
+            animation: bounceIn 0.6s ease;
+        }
+        
+        @keyframes bounceIn {
+            0% { transform: scale(0); }
+            50% { transform: scale(1.2); }
+            100% { transform: scale(1); }
+        }
+        
+        .comparison-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 15px 0;
+        }
+        
+        .comparison-table th,
+        .comparison-table td {
+            border: 1px solid #ddd;
+            padding: 8px;
+            text-align: center;
+        }
+        
+        .comparison-table th {
+            background: #3498db;
+            color: white;
+        }
+        
+        .min-count {
+            background: #f39c12;
+            color: white;
+            font-weight: bold;
+        }
+        
+        .current-step {
+            background: #fff3cd;
+            border: 2px solid #ffc107;
+            padding: 15px;
+            border-radius: 8px;
+            margin: 10px 0;
+        }
+        
+        .algorithm-steps {
+            background: #e8f4f8;
+            padding: 15px;
+            border-radius: 8px;
+            margin: 15px 0;
+            border-left: 4px solid #3498db;
+        }
+        
+        .algorithm-steps ol {
+            margin: 0;
+            padding-left: 20px;
+        }
+        
+        .algorithm-steps li {
+            margin: 5px 0;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🔍 LeetCode 1002 - 查找共用字符</h1>
+        
+        <div class="problem-description">
+            <h3>题目描述：</h3>
+            <p>给你一个字符串数组 <code>words</code>，请你找出所有在 <code>words</code> 的每个字符串中都出现的共用字符（包括重复字符），并以数组形式返回。你可以按任意顺序返回答案。</p>
+            
+            <div class="examples">
+                <h4>示例：</h4>
+                <p><strong>示例 1：</strong></p>
+                <p>输入：words = ["bella","label","roller"]</p>
+                <p>输出：["e","l","l"]</p>
+                
+                <p><strong>示例 2：</strong></p>
+                <p>输入：words = ["cool","lock","cook"]</p>
+                <p>输出：["c","o"]</p>
+            </div>
+            
+            <div class="algorithm-steps">
+                <h4>算法思路：</h4>
+                <ol>
+                    <li>统计每个字符串中各字符的出现次数</li>
+                    <li>找出所有字符串中都存在的字符</li>
+                    <li>对于每个共同字符，取其在所有字符串中出现次数的最小值</li>
+                    <li>按最小值次数将字符加入结果数组</li>
+                </ol>
+            </div>
+        </div>
+        
+        <div class="input-section">
+            <h3>🎮 交互演示</h3>
+            <div class="input-group">
+                <label for="wordsInput">输入字符串数组（用逗号分隔）：</label>
+                <input type="text" id="wordsInput" placeholder="例如：bella,label,roller" value="bella,label,roller">
+            </div>
+            
+            <div class="buttons button-group">
+                <button onclick="startAnalysis()">开始分析</button>
+                <button onclick="loadExample()">加载示例2</button>
+                <button onclick="reset()">重置</button>
+            </div>
+        </div>
+        
+        <div class="step-nav" id="stepNav" style="display: none;">
+            <div class="step-info" id="stepInfo">步骤导航</div>
+            <div class="button-group">
+                <button onclick="prevStep()" id="prevBtn" disabled>⬅️ 上一步</button>
+                <button onclick="nextStep()" id="nextBtn" disabled>下一步 ➡️</button>
+            </div>
+        </div>
+        
+        <div id="step0" class="step-container">
+            <div class="step-title">步骤 1: 解析输入数据</div>
+            <div id="inputDisplay"></div>
+        </div>
+        
+        <div id="step1" class="step-container">
+            <div class="step-title">步骤 2: 统计每个字符串中各字符的出现次数</div>
+            <div id="charCountDisplay"></div>
+        </div>
+        
+        <div id="step2" class="step-container">
+            <div class="step-title">步骤 3: 找出所有字符串中都存在的字符</div>
+            <div id="commonCharsDisplay"></div>
+        </div>
+        
+        <div id="step3" class="step-container">
+            <div class="step-title">步骤 4: 计算每个共同字符的最小出现次数</div>
+            <div id="minCountDisplay"></div>
+        </div>
+        
+        <div id="result" class="result-section">
+            <h3>🎉 最终结果</h3>
+            <div id="finalResult"></div>
+            <div class="current-step">
+                <strong>算法核心思想：</strong>
+                <p>对于每个字符，我们需要找到它在所有字符串中出现次数的最小值，这样才能保证它在每个字符串中都存在。</p>
+                <p><strong>为什么取最小值？</strong> 因为如果某个字符在一个字符串中只出现1次，那么即使它在其他字符串中出现多次，我们也只能取1次，这样才能保证它在每个字符串中都存在。</p>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        let currentStep = -1;
+        let words = [];
+        let charCounts = [];
+        let commonChars = [];
+        let result = [];
+
+        function reset() {
+            currentStep = -1;
+            words = [];
+            charCounts = [];
+            commonChars = [];
+            result = [];
+            
+            // 隐藏所有步骤
+            for (let i = 0; i <= 3; i++) {
+                document.getElementById(`step${i}`).classList.remove('active');
+            }
+            document.getElementById('result').classList.remove('active');
+            updateButtonStates();
+        }
+
+        function loadExample() {
+            document.getElementById('wordsInput').value = 'cool,lock,cook';
+        }
+
+        function startAnalysis() {
+            reset();
+            const input = document.getElementById('wordsInput').value.trim();
+            
+            if (!input) {
+                alert('请输入字符串数组！');
+                return;
+            }
+            
+            words = input.split(',').map(word => word.trim()).filter(word => word);
+            
+            if (words.length === 0) {
+                alert('请输入有效的字符串！');
+                return;
+            }
+            
+            currentStep = 0;
+            showCurrentStep();
+        }
+
+        function updateButtonStates() {
+            const prevBtn = document.getElementById('prevBtn');
+            const nextBtn = document.getElementById('nextBtn');
+            const stepNav = document.getElementById('stepNav');
+            const stepInfo = document.getElementById('stepInfo');
+            
+            if (currentStep === -1) {
+                // 还没开始分析
+                stepNav.style.display = 'none';
+            } else {
+                // 显示步骤导航
+                stepNav.style.display = 'block';
+                
+                // 更新步骤信息
+                if (currentStep <= 3) {
+                    stepInfo.textContent = `当前步骤: ${currentStep + 1}/4`;
+                } else {
+                    stepInfo.textContent = '查看最终结果';
+                }
+                
+                // 上一步按钮状态
+                prevBtn.disabled = currentStep <= 0;
+                
+                // 下一步按钮状态
+                if (currentStep >= 4) {
+                    nextBtn.disabled = true;
+                    nextBtn.textContent = '已完成 ✅';
+                } else if (currentStep === 3) {
+                    nextBtn.disabled = false;
+                    nextBtn.textContent = '查看结果 🎉';
+                } else {
+                    nextBtn.disabled = false;
+                    nextBtn.textContent = '下一步 ➡️';
+                }
+            }
+        }
+
+        function prevStep() {
+            if (currentStep > 0) {
+                currentStep--;
+                if (currentStep <= 3) {
+                    showCurrentStep();
+                } else {
+                    showResult();
+                }
+            }
+        }
+
+        function nextStep() {
+            currentStep++;
+            if (currentStep <= 3) {
+                showCurrentStep();
+            } else {
+                showResult();
+            }
+        }
+
+        function showCurrentStep() {
+            // 隐藏所有步骤和结果
+            for (let i = 0; i <= 3; i++) {
+                document.getElementById(`step${i}`).classList.remove('active');
+            }
+            document.getElementById('result').classList.remove('active');
+            
+            // 显示当前步骤
+            const currentStepElement = document.getElementById(`step${currentStep}`);
+            currentStepElement.classList.add('active');
+            
+            switch(currentStep) {
+                case 0:
+                    showStep0();
+                    break;
+                case 1:
+                    showStep1();
+                    break;
+                case 2:
+                    showStep2();
+                    break;
+                case 3:
+                    showStep3();
+                    break;
+            }
+            
+            updateButtonStates();
+            
+            // 平滑滚动到当前步骤，考虑固定导航栏的高度
+            setTimeout(() => {
+                const navHeight = document.getElementById('stepNav').offsetHeight;
+                const elementTop = currentStepElement.offsetTop - navHeight - 20;
+                window.scrollTo({
+                    top: elementTop,
+                    behavior: 'smooth'
+                });
+            }, 100);
+        }
+
+        function showStep0() {
+            const display = document.getElementById('inputDisplay');
+            display.innerHTML = `
+                <div class="current-step">
+                    <p><strong>输入的字符串数组：</strong></p>
+                    <p style="font-family: monospace; font-size: 18px; background: #ecf0f1; padding: 10px; border-radius: 5px;">
+                        [${words.map(word => `"${word}"`).join(', ')}]
+                    </p>
+                    <p>接下来我们将分析这 ${words.length} 个字符串中的共同字符。</p>
+                    <p><strong>目标：</strong>找出在每个字符串中都出现的字符（包括重复字符）。</p>
+                </div>
+            `;
+        }
+
+        function showStep1() {
+            // 统计每个字符串中字符的出现次数
+            charCounts = words.map(word => {
+                const count = {};
+                for (let char of word) {
+                    count[char] = (count[char] || 0) + 1;
+                }
+                return count;
+            });
+
+            const display = document.getElementById('charCountDisplay');
+            let html = '<div class="word-analysis">';
+            
+            words.forEach((word, index) => {
+                html += `
+                    <div class="word-box">
+                        <div class="word-title">"${word}"</div>
+                `;
+                
+                // 按字母顺序显示字符计数
+                const sortedChars = Object.keys(charCounts[index]).sort();
+                sortedChars.forEach(char => {
+                    html += `<div class="char-count">'${char}': ${charCounts[index][char]}</div>`;
+                });
+                
+                html += '</div>';
+            });
+            
+            html += '</div>';
+            html += `
+                <div class="current-step">
+                    <p>我们统计了每个字符串中各字符的出现次数。这是找出共同字符的第一步。</p>
+                    <p><strong>注意：</strong>每个字符可能在同一个字符串中出现多次，我们需要记录准确的次数。</p>
+                </div>
+            `;
+            
+            display.innerHTML = html;
+        }
+
+        function showStep2() {
+            // 找出所有字符串中都存在的字符
+            if (charCounts.length === 0) return;
+            
+            // 获取所有可能的字符
+            const allChars = new Set();
+            charCounts.forEach(count => {
+                Object.keys(count).forEach(char => allChars.add(char));
+            });
+            
+            commonChars = Array.from(allChars).filter(char => {
+                return charCounts.every(count => count[char] > 0);
+            }).sort();
+
+            const display = document.getElementById('commonCharsDisplay');
+            let html = `
+                <div class="current-step">
+                    <p><strong>在所有字符串中都存在的字符：</strong></p>
+                    <div class="result-chars">
+            `;
+            
+            commonChars.forEach(char => {
+                html += `<span class="result-char">'${char}'</span>`;
+            });
+            
+            html += '</div></div>';
+            
+            // 显示详细分析
+            html += '<h4>详细分析：</h4>';
+            Array.from(allChars).sort().forEach(char => {
+                const existsInAll = charCounts.every(count => count[char] > 0);
+                const status = existsInAll ? '✅ 存在于所有字符串' : '❌ 不是共同字符';
+                const color = existsInAll ? '#27ae60' : '#e74c3c';
+                
+                html += `
+                    <div style="margin: 10px 0; padding: 10px; background: white; border-left: 4px solid ${color}; border-radius: 5px;">
+                        <strong>'${char}'</strong>: ${status}
+                        <br>
+                        <small>出现情况: ${words.map((word, i) => `"${word}": ${charCounts[i][char] || 0}`).join(', ')}</small>
+                    </div>
+                `;
+            });
+            
+            display.innerHTML = html;
+        }
+
+        function showStep3() {
+            // 计算每个共同字符的最小出现次数
+            const display = document.getElementById('minCountDisplay');
+            let html = '<table class="comparison-table"><tr><th>字符</th>';
+            
+            words.forEach(word => {
+                html += `<th>"${word}"</th>`;
+            });
+            html += '<th>最小次数</th><th>加入结果</th></tr>';
+            
+            result = [];
+            
+            commonChars.forEach(char => {
+                html += `<tr><td><strong>'${char}'</strong></td>`;
+                
+                const counts = [];
+                charCounts.forEach(count => {
+                    const charCount = count[char] || 0;
+                    counts.push(charCount);
+                    html += `<td>${charCount}</td>`;
+                });
+                
+                const minCount = Math.min(...counts);
+                html += `<td class="min-count">${minCount}</td>`;
+                
+                // 将字符按最小次数添加到结果中
+                const addedChars = [];
+                for (let i = 0; i < minCount; i++) {
+                    result.push(char);
+                    addedChars.push(`'${char}'`);
+                }
+                html += `<td>${addedChars.join(', ') || '无'}</td>`;
+                html += '</tr>';
+            });
+            
+            html += '</table>';
+            html += `
+                <div class="current-step">
+                    <p><strong>重要：</strong>对于每个共同字符，我们取它在所有字符串中出现次数的最小值，这样才能保证该字符在每个字符串中都至少出现这么多次。</p>
+                    <p><strong>例如：</strong>如果字符'l'在第一个字符串中出现2次，在第二个字符串中出现3次，在第三个字符串中出现2次，那么我们只能取min(2,3,2)=2次。</p>
+                </div>
+            `;
+            
+            display.innerHTML = html;
+        }
+
+        function showResult() {
+            // 设置为结果步骤
+            currentStep = 4;
+            
+            // 隐藏所有步骤
+            for (let i = 0; i <= 3; i++) {
+                document.getElementById(`step${i}`).classList.remove('active');
+            }
+            
+            const resultElement = document.getElementById('result');
+            resultElement.classList.add('active');
+            updateButtonStates();
+            
+            // 平滑滚动到结果区域
+            setTimeout(() => {
+                const navHeight = document.getElementById('stepNav').offsetHeight;
+                const elementTop = resultElement.offsetTop - navHeight - 20;
+                window.scrollTo({
+                    top: elementTop,
+                    behavior: 'smooth'
+                });
+            }, 100);
+            
+            const display = document.getElementById('finalResult');
+            let html = `
+                <p><strong>输入：</strong>[${words.map(word => `"${word}"`).join(', ')}]</p>
+                <p><strong>输出：</strong>[${result.map(char => `"${char}"`).join(', ')}]</p>
+                <div class="result-chars">
+            `;
+            
+            result.forEach((char, index) => {
+                setTimeout(() => {
+                    const span = document.createElement('span');
+                    span.className = 'result-char';
+                    span.textContent = char;
+                    document.querySelector('#finalResult .result-chars').appendChild(span);
+                }, index * 200);
+            });
+            
+            html += '</div>';
+            
+            // 添加验证
+            html += `
+                <div style="margin-top: 20px;">
+                    <h4>验证结果：</h4>
+                    <p>让我们验证每个结果字符是否确实在所有输入字符串中都存在：</p>
+            `;
+            
+            const resultCount = {};
+            result.forEach(char => {
+                resultCount[char] = (resultCount[char] || 0) + 1;
+            });
+            
+            Object.keys(resultCount).forEach(char => {
+                html += `<div style="margin: 5px 0; padding: 8px; background: #f0f9ff; border-radius: 5px;">`;
+                html += `<strong>'${char}' × ${resultCount[char]}</strong>: `;
+                html += words.map(word => {
+                    const count = (word.match(new RegExp(char, 'g')) || []).length;
+                    return `"${word}"中有${count}个`;
+                }).join(', ');
+                html += ` → 取最小值${resultCount[char]}`;
+                html += `</div>`;
+            });
+            
+            html += '</div>';
+            
+            display.innerHTML = html;
+        }
+    </script>
+</body>
+</html> 

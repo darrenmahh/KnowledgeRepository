@@ -1,0 +1,50 @@
+{
+  "aestheticStyle": "default",
+  "menuCommands": [
+    {
+      "id": "editor:insert-codeblock",
+      "name": "插入代码块",
+      "icon": "lucide-code"
+    },
+    {
+      "id": "editor:insert-mathblock",
+      "name": "插入数学块",
+      "icon": "lucide-sigma-square"
+    },
+    {
+      "id": "editor:insert-table",
+      "name": "插入表格",
+      "icon": "lucide-table"
+    },
+    {
+      "id": "editor:toggle-numbered-list",
+      "name": "有序列表",
+      "icon": "lucide-list-ordered"
+    },
+    {
+      "id": "editor:toggle-bullet-list",
+      "name": "无序列表",
+      "icon": "lucide-list"
+    },
+    {
+      "id": "editor:insert-callout",
+      "name": "插入标注",
+      "icon": "lucide-quote"
+    },
+    {
+      "id": "editor:toggle-highlight",
+      "name": "高亮/取消高亮",
+      "icon": "lucide-highlighter"
+    },
+    {
+      "id": "editor:set-heading-5",
+      "name": "设为小标题 5",
+      "icon": "heading-glyph"
+    }
+  ],
+  "appendMethod": "workspace",
+  "shouldShowMenuOnSelect": false,
+  "cMenuVisibility": true,
+  "cMenuBottomValue": 4.25,
+  "cMenuNumRows": 9
+}

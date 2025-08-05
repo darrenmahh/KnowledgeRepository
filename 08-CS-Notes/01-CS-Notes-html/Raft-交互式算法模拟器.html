@@ -1,0 +1,308 @@
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Raft 算法交互式模拟器</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Chosen Palette: Sky and Indigo (天空蓝与靛蓝色) -->
+    <!-- Application Structure Plan: 作为一个旨在简化复杂概念的教育工具，本应用采用分层递进的结构。1. 顶部是概念介绍和角色定义，为用户奠定理论基础。2. 中部是核心的交互式模拟器，用户可在此进行主动探索。3. 模拟器内部分为可视化节点区域和控制/日志面板。4. 底部是对核心机制的总结。这种从“理论”到“实践”再到“回顾”的流程，符合认知规律，旨在通过引导式探索，让用户在不同层次上与信息互动，从而构建对Raft算法的全面理解。 -->
+    <!-- Visualization & Content Choices: 1. **节点状态**: 使用不同颜色和标签清晰区分 Leader, Follower, Candidate (HTML/Tailwind + JS class toggling)。节点内动态展示其任期(Term)和日志(Log)，让内部状态一目了然。[Goal: Inform, Method: Structured HTML]。2. **RPC动画**: 使用JS动态创建和移动“信封”图标来代表RequestVote和AppendEntries RPC，并将RPC的内容（如Term）展示在动画上，这比静态图表更能体现算法的动态交互过程。[Goal: Change, Method: JS + CSS Animation]。3. **选举过程**: 将领导者选举的超时和投票过程转化为可由用户控制的分步动画。用户可以清晰地看到节点如何超时、如何发起选举、如何投票、以及如何处理选票瓜分的情况。[Goal: Compare, Method: JS State + Interactive HTML]。4. **日志复制**: 用户可以在Leader节点上“添加”新日志，并观察其如何通过AppendEntries RPC复制到Follower节点，以及Commit索引如何推进。[Goal: Change, Method: JS-driven updates]。 -->
+    <!-- CONFIRMATION: NO SVG graphics used. NO Mermaid JS used. -->
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Noto+Sans+SC:wght@400;500;700&display=swap');
+        body { font-family: 'Noto Sans SC', sans-serif; background-color: #f0f9ff; } /* sky-50 */
+        .node {
+            transition: all 0.4s ease-in-out;
+            box-shadow: 0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1);
+            border-width: 3px;
+        }
+        .node-follower { border-color: #38bdf8; /* sky-500 */ background-color: white;}
+        .node-candidate { border-color: #f59e0b; /* amber-500 */ background-color: #fef9c3; /* yellow-100 */}
+        .node-leader { border-color: #4f46e5; /* indigo-600 */ background-color: #e0e7ff; /* indigo-100 */}
+        .node-down { border-color: #9ca3af; /* gray-400 */ background-color: #f3f4f6; opacity: 0.6;}
+        .message {
+            position: absolute;
+            z-index: 10;
+            transition: all 0.7s ease-in-out;
+            opacity: 0;
+            font-size: 1.5rem;
+            padding: 0.2rem;
+        }
+        .log-entry { display: flex; justify-content: center; align-items: center; border: 1px solid #94a3b8; width: 30px; height: 30px; font-size: 0.8rem; font-weight: 500;}
+        .log-committed { background-color: #86efac; }
+        .log-container { min-height: 40px; }
+        .explanation-panel { backdrop-filter: blur(5px); background-color: rgba(255,255,255,0.7); }
+    </style>
+</head>
+<body class="text-slate-900">
+
+    <div id="app" class="container mx-auto p-4 md:p-8">
+
+        <header class="text-center mb-8">
+            <h1 class="text-4xl font-bold text-indigo-800">Raft 算法交互式模拟器</h1>
+            <p class="mt-2 text-lg text-slate-700">一个比 Paxos 更易理解的共识算法</p>
+        </header>
+        
+        <main class="bg-white/70 backdrop-blur-lg p-4 sm:p-8 rounded-2xl shadow-xl border border-slate-200">
+
+            <section id="introduction" class="mb-8">
+                <h2 class="text-2xl font-bold mb-3 border-b border-sky-300 pb-2 text-indigo-700">核心思想：分而治之</h2>
+                <p class="text-slate-700 leading-relaxed">Raft 将复杂的共识问题分解为三个更易于管理的子问题：<strong class="text-sky-600">领导者选举 (Leader Election)</strong>、<strong class="text-sky-600">日志复制 (Log Replication)</strong> 和 <strong class="text-sky-600">安全性 (Safety)</strong>。通过明确的领导者角色，Raft 简化了系统操作流程，使得整个算法流程更加清晰和确定。</p>
+            </section>
+
+            <section id="simulator-container" class="relative">
+                <div id="visual-pane" class="grid grid-cols-3 md:grid-cols-5 gap-4 md:gap-6 min-h-[400px]">
+                    <!-- 节点将由JS动态插入 -->
+                </div>
+
+                <div id="explanation-panel" class="absolute inset-0 flex items-center justify-center p-8 rounded-xl transition-opacity duration-500 opacity-0 pointer-events-none">
+                    <p id="explanation-text" class="text-2xl font-bold text-center text-indigo-800 bg-white/80 p-6 rounded-lg shadow-md"></p>
+                </div>
+            </section>
+
+            <section id="controls" class="mt-8 p-4 bg-sky-50 rounded-lg border border-sky-200">
+                <div class="flex flex-wrap items-center justify-between gap-4">
+                    <div class="flex items-center gap-3">
+                        <label for="scenario-select" class="font-medium">选择场景:</label>
+                        <select id="scenario-select" class="p-2 border border-slate-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500">
+                            <option value="election">1. 领导者选举</option>
+                            <option value="log_replication">2. 日志复制</option>
+                            <option value="leader_fail">3. 领导者失效与再选举</option>
+                        </select>
+                    </div>
+                    <div class="flex gap-3">
+                         <button id="reset-btn" class="bg-slate-500 text-white py-2 px-5 rounded-md hover:bg-slate-600 font-semibold transition-colors">重置</button>
+                         <button id="next-step-btn" class="bg-indigo-600 text-white py-2 px-5 rounded-md hover:bg-indigo-700 font-semibold transition-colors flex items-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed">
+                             <span>下一步</span>
+                             <span class="font-mono text-lg">&rarr;</span>
+                         </button>
+                    </div>
+                </div>
+            </section>
+
+        </main>
+    </div>
+
+<script>
+    const visualPane = document.getElementById('visual-pane');
+    const explanationPanel = document.getElementById('explanation-panel');
+    const explanationText = document.getElementById('explanation-text');
+    const scenarioSelect = document.getElementById('scenario-select');
+    const resetBtn = document.getElementById('reset-btn');
+    const nextStepBtn = document.getElementById('next-step-btn');
+
+    let state = {};
+
+    const scenarios = {
+        election: {
+            nodes: 5,
+            steps: [
+                { type: 'text', text: 'Raft 集群启动，所有节点都是 Follower 状态，拥有一个随机的选举超时。' },
+                { type: 'timeout', node: 2, text: '节点 S3 的选举计时器首先超时...' },
+                { type: 'state_change', node: 2, newState: 'Candidate', term: 1, text: 'S3 成为 Candidate，任期 Term 增加到 1，并为自己投票。' },
+                { type: 'rpc', from: 2, to: [0, 1, 3, 4], rpc_type: 'RequestVote', text: 'S3 向所有其他节点发送投票请求。' },
+                { type: 'vote', from: 0, to: 2, grant: true, text: 'S1 投票给 S3。' },
+                { type: 'vote', from: 1, to: 2, grant: true, text: 'S2 投票给 S3。' },
+                { type: 'vote', from: 3, to: 2, grant: true, text: 'S4 投票给 S3。S3 已获得多数选票(4/5)。' },
+                { type: 'state_change', node: 2, newState: 'Leader', text: 'S3 成为 Leader！' },
+                { type: 'rpc', from: 2, to: [0, 1, 3, 4], rpc_type: 'AppendEntries', text: '新的 Leader S3 开始发送心跳以维持地位。' },
+                { type: 'text', text: '领导者选举成功！' }
+            ]
+        },
+        log_replication: {
+            nodes: 5,
+            initialState: { leader: 2, term: 1, logs: [[],[],[{term: 1}],[],[]] },
+            steps: [
+                { type: 'text', text: '一个稳定的集群，S3 是 Leader。' },
+                { type: 'client_request', to: 2, log: {term: 1}, text: '客户端向 Leader S3 发送一个写请求。' },
+                { type: 'log_add', node: 2, log: {term: 1}, text: 'Leader S3 将新日志追加到自己的日志中（但尚未提交）。' },
+                { type: 'rpc', from: 2, to: [0, 1, 3, 4], rpc_type: 'AppendEntries', text: 'Leader S3 并行地将新日志条目复制给所有 Follower。' },
+                { type: 'log_replicated', node: 0, text: 'S1 成功复制日志。' },
+                { type: 'log_replicated', node: 1, text: 'S2 成功复制日志。' },
+                { type: 'log_replicated', node: 3, text: 'S4 成功复制日志。Leader 已收到多数节点的确认。' },
+                { type: 'commit', node: 2, index: 1, text: 'Leader S3 提交该日志条目。' },
+                { type: 'rpc', from: 2, to: [0, 1, 3, 4], rpc_type: 'AppendEntries', text: 'Leader 在下一次心跳中通知所有 Follower 提交该日志。' },
+                { type: 'commit', node: 0, index: 1, text: 'S1 提交日志。' },
+                { type: 'commit', node: 1, index: 1, text: 'S2 提交日志。' },
+                { type: 'commit', node: 3, index: 1, text: 'S4 提交日志。' },
+                { type: 'text', text: '日志复制并提交成功！集群状态达成一致。' }
+            ]
+        },
+        leader_fail: {
+            nodes: 5,
+            initialState: { leader: 2, term: 2, logs: Array(5).fill([]).map(()=>[{term:1},{term:2}]) },
+            steps: [
+                { type: 'text', text: '集群稳定运行，S3 是 Leader。' },
+                { type: 'fail', node: 2, text: '突然，Leader S3 宕机！' },
+                { type: 'text', text: 'Follower 们将因收不到心跳而触发选举超时...' },
+                { type: 'timeout', node: 4, text: '节点 S5 的选举计时器首先超时...' },
+                { type: 'state_change', node: 4, newState: 'Candidate', term: 3, text: 'S5 成为 Candidate，任期 Term 增加到 3，为自己投票。' },
+                { type: 'rpc', from: 4, to: [0, 1, 3], rpc_type: 'RequestVote', text: 'S5 向其他存活节点发送投票请求。' },
+                { type: 'vote', from: 0, to: 4, grant: true, text: 'S1 投票给 S5。' },
+                { type: 'vote', from: 1, to: 4, grant: true, text: 'S2 投票给 S5。' },
+                { type: 'vote', from: 3, to: 4, grant: true, text: 'S4 投票给 S5。S5 获得多数选票(4/4)。' },
+                { type: 'state_change', node: 4, newState: 'Leader', text: 'S5 成为新的 Leader！' },
+                { type: 'rpc', from: 4, to: [0, 1, 3], rpc_type: 'AppendEntries', text: '新 Leader S5 开始发送心跳，集群恢复服务。' },
+            ]
+        }
+    };
+    
+    function init() {
+        const scenario = scenarios[scenarioSelect.value];
+        state = {
+            nodes: Array.from({ length: scenario.nodes }, (_, i) => ({
+                id: i,
+                el: null,
+                state: 'Follower',
+                term: 0,
+                logs: [],
+                commitIndex: -1,
+            })),
+            currentStep: 0
+        };
+
+        if (scenario.initialState) {
+            state.nodes.forEach((node, i) => {
+                node.term = scenario.initialState.term || 0;
+                node.logs = JSON.parse(JSON.stringify(scenario.initialState.logs[i] || []));
+                node.commitIndex = (scenario.initialState.logs[i] || []).length - 1;
+            });
+            if(scenario.initialState.leader !== undefined) {
+                 state.nodes[scenario.initialState.leader].state = 'Leader';
+            }
+        }
+        
+        render();
+        hideExplanation();
+        nextStepBtn.disabled = false;
+    }
+
+    function render() {
+        visualPane.innerHTML = '';
+        state.nodes.forEach(node => {
+            const el = document.createElement('div');
+            el.id = `node-${node.id}`;
+            el.className = `node p-4 rounded-lg flex flex-col items-center`;
+            
+            const logsHTML = `<div class="log-container flex gap-1 mt-2 flex-wrap justify-center">${node.logs.map((log, index) => `<div class="log-entry ${index <= node.commitIndex ? 'log-committed' : ''}">${log.term}</div>`).join('')}</div>`;
+
+            el.innerHTML = `
+                <div class="font-bold text-lg">S${node.id + 1}</div>
+                <div class="text-sm font-medium" id="state-${node.id}"></div>
+                <div class="text-xs" id="term-${node.id}"></div>
+                ${logsHTML}
+            `;
+            visualPane.appendChild(el);
+            node.el = el;
+        });
+        updateNodeClasses();
+    }
+
+    function updateNodeClasses() {
+        state.nodes.forEach(node => {
+            node.el.classList.remove('node-follower', 'node-candidate', 'node-leader', 'node-down');
+            node.el.classList.add(`node-${node.state.toLowerCase()}`);
+            node.el.querySelector(`#state-${node.id}`).textContent = node.state;
+            node.el.querySelector(`#term-${node.id}`).textContent = `Term: ${node.term}`;
+            const logsHTML = `<div class="log-container flex gap-1 mt-2 flex-wrap justify-center">${node.logs.map((log, index) => `<div class="log-entry ${index <= node.commitIndex ? 'log-committed' : ''}">${log.term}</div>`).join('')}</div>`;
+            node.el.querySelector('.log-container').outerHTML = logsHTML;
+
+        });
+    }
+
+    function showExplanation(text) {
+        explanationText.textContent = text;
+        explanationPanel.style.opacity = '1';
+        explanationPanel.style.pointerEvents = 'auto';
+    }
+
+    function hideExplanation() {
+        explanationPanel.style.opacity = '0';
+        explanationPanel.style.pointerEvents = 'none';
+    }
+    
+    function animateRPC(fromNode, toNodes, rpc_type) {
+        const fromEl = fromNode.el;
+        toNodes.forEach(toNode => {
+            const toEl = toNode.el;
+            if(!toEl || toNode.state === 'Down') return;
+
+            const msg = document.createElement('div');
+            msg.className = 'message';
+            msg.innerHTML = rpc_type === 'RequestVote' ? '🗳️' : '❤️';
+            if (rpc_type === 'RequestVote') msg.style.color = '#f59e0b';
+            if (rpc_type === 'AppendEntries') msg.style.color = '#4f46e5';
+
+            const startRect = fromEl.getBoundingClientRect();
+            const endRect = toEl.getBoundingClientRect();
+            const containerRect = visualPane.getBoundingClientRect();
+
+            msg.style.left = `${startRect.left + startRect.width / 2 - containerRect.left}px`;
+            msg.style.top = `${startRect.top + startRect.height / 2 - containerRect.top}px`;
+            
+            visualPane.appendChild(msg);
+
+            requestAnimationFrame(() => {
+                msg.style.opacity = '1';
+                msg.style.left = `${endRect.left + endRect.width / 2 - containerRect.left}px`;
+                msg.style.top = `${endRect.top + endRect.height / 2 - containerRect.top}px`;
+            });
+
+            setTimeout(() => {
+                msg.style.opacity = '0';
+                setTimeout(() => msg.remove(), 700);
+            }, 700);
+        });
+    }
+
+    function next() {
+        hideExplanation();
+        const scenario = scenarios[scenarioSelect.value];
+        if (state.currentStep >= scenario.steps.length) {
+            return;
+        }
+
+        const step = scenario.steps[state.currentStep];
+        
+        setTimeout(() => showExplanation(step.text), 100);
+
+        switch (step.type) {
+            case 'state_change':
+                state.nodes[step.node].state = step.newState;
+                if (step.term) state.nodes[step.node].term = step.term;
+                break;
+            case 'rpc':
+                const fromNode = state.nodes[step.from];
+                const toNodes = step.to.map(i => state.nodes[i]);
+                animateRPC(fromNode, toNodes, step.rpc_type);
+                break;
+            case 'fail':
+                 state.nodes[step.node].state = 'Down';
+                break;
+            case 'log_add':
+                 state.nodes[step.node].logs.push(step.log);
+                 break;
+            case 'commit':
+                 state.nodes[step.node].commitIndex = step.index;
+                 break;
+        }
+        
+        updateNodeClasses();
+        state.currentStep++;
+        
+        if (state.currentStep >= scenario.steps.length) {
+             nextStepBtn.disabled = true;
+             setTimeout(() => showExplanation('模拟结束！点击“重置”以选择其他场景。'), 100);
+        }
+    }
+    
+    nextStepBtn.addEventListener('click', next);
+    resetBtn.addEventListener('click', init);
+    scenarioSelect.addEventListener('change', init);
+    
+    window.onload = init;
+</script>
+
+</body>
+</html>
+c

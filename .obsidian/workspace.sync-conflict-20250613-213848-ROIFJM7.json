@@ -1,0 +1,322 @@
+{
+  "main": {
+    "id": "af878cae545276cb",
+    "type": "split",
+    "children": [
+      {
+        "id": "caba24c7690af312",
+        "type": "tabs",
+        "children": [
+          {
+            "id": "72fabaff03b18717",
+            "type": "leaf",
+            "state": {
+              "type": "markdown",
+              "state": {
+                "file": "08-CS-Notes/00-notes/缓存.md",
+                "mode": "source",
+                "source": false
+              },
+              "icon": "lucide-file",
+              "title": "缓存"
+            }
+          },
+          {
+            "id": "cd6fdd700cfbe863",
+            "type": "leaf",
+            "state": {
+              "type": "markdown",
+              "state": {
+                "file": "08-CS-Notes/00-notes/集群.md",
+                "mode": "source",
+                "source": false
+              },
+              "icon": "lucide-file",
+              "title": "集群"
+            }
+          },
+          {
+            "id": "754946f115076527",
+            "type": "leaf",
+            "state": {
+              "type": "markdown",
+              "state": {
+                "file": "08-CS-Notes/00-notes/计算机操作系统.md",
+                "mode": "source",
+                "source": false
+              },
+              "icon": "lucide-file",
+              "title": "计算机操作系统"
+            }
+          }
+        ],
+        "currentTab": 1
+      }
+    ],
+    "direction": "vertical"
+  },
+  "left": {
+    "id": "c739be8c010755de",
+    "type": "split",
+    "children": [
+      {
+        "id": "f20dd02cc4000dcb",
+        "type": "tabs",
+        "children": [
+          {
+            "id": "e945d6d16a11f41b",
+            "type": "leaf",
+            "state": {
+              "type": "file-explorer",
+              "state": {
+                "sortOrder": "alphabetical",
+                "autoReveal": false
+              },
+              "icon": "lucide-folder-closed",
+              "title": "文件列表"
+            }
+          },
+          {
+            "id": "249b9cc0458730f2",
+            "type": "leaf",
+            "state": {
+              "type": "search",
+              "state": {
+                "query": "",
+                "matchingCase": false,
+                "explainSearch": false,
+                "collapseAll": false,
+                "extraContext": false,
+                "sortOrder": "alphabetical"
+              },
+              "icon": "lucide-search",
+              "title": "搜索"
+            }
+          },
+          {
+            "id": "a65e45fd94522bb4",
+            "type": "leaf",
+            "state": {
+              "type": "bookmarks",
+              "state": {},
+              "icon": "lucide-bookmark",
+              "title": "书签"
+            }
+          },
+          {
+            "id": "108b8224c0e85444",
+            "type": "leaf",
+            "state": {
+              "type": "recent-files",
+              "state": {},
+              "icon": "clock",
+              "title": "Recent Files"
+            }
+          }
+        ]
+      }
+    ],
+    "direction": "horizontal",
+    "width": 283.5
+  },
+  "right": {
+    "id": "2dcd0acacef7ce46",
+    "type": "split",
+    "children": [
+      {
+        "id": "69d59b2bd0190498",
+        "type": "tabs",
+        "children": [
+          {
+            "id": "9b4ce79679870764",
+            "type": "leaf",
+            "state": {
+              "type": "backlink",
+              "state": {
+                "file": "01-论文汇总/00-内容/目录.md",
+                "collapseAll": false,
+                "extraContext": false,
+                "sortOrder": "alphabetical",
+                "showSearch": false,
+                "searchQuery": "",
+                "backlinkCollapsed": false,
+                "unlinkedCollapsed": true
+              },
+              "icon": "links-coming-in",
+              "title": "目录 的反向链接列表"
+            }
+          },
+          {
+            "id": "bac7c5742cd27fc9",
+            "type": "leaf",
+            "state": {
+              "type": "outgoing-link",
+              "state": {
+                "file": "03-Leetcode/leetcode-master-master/README.md",
+                "linksCollapsed": false,
+                "unlinkedCollapsed": true
+              },
+              "icon": "links-going-out",
+              "title": "README 的出链列表"
+            }
+          },
+          {
+            "id": "bfc3eff9ae4c93d2",
+            "type": "leaf",
+            "state": {
+              "type": "tag",
+              "state": {
+                "sortOrder": "frequency",
+                "useHierarchy": true,
+                "showSearch": false,
+                "searchQuery": ""
+              },
+              "icon": "lucide-tags",
+              "title": "标签"
+            }
+          },
+          {
+            "id": "cf995728c8845860",
+            "type": "leaf",
+            "state": {
+              "type": "outline",
+              "state": {
+                "file": "08-CS-Notes/00-notes/集群.md",
+                "followCursor": false,
+                "showSearch": false,
+                "searchQuery": ""
+              },
+              "icon": "lucide-list",
+              "title": "集群 的大纲"
+            }
+          },
+          {
+            "id": "c76ca8a5a3aea4f0",
+            "type": "leaf",
+            "state": {
+              "type": "calendar",
+              "state": {},
+              "icon": "calendar-with-checkmark",
+              "title": "Calendar"
+            }
+          },
+          {
+            "id": "f9dac27f29a6e82b",
+            "type": "leaf",
+            "state": {
+              "type": "mermaid-toolbar-view",
+              "state": {},
+              "icon": "trident-custom",
+              "title": "Mermaid Toolbar"
+            }
+          },
+          {
+            "id": "17fc37b13c2dad58",
+            "type": "leaf",
+            "state": {
+              "type": "infio-chat-view",
+              "state": {},
+              "icon": "wand-sparkles",
+              "title": "Infio chat"
+            }
+          },
+          {
+            "id": "3466baba0b78301e",
+            "type": "leaf",
+            "state": {
+              "type": "planner-timeline",
+              "state": {},
+              "icon": "calendar-with-checkmark",
+              "title": "Timeline"
+            }
+          },
+          {
+            "id": "6ab187d31776c390",
+            "type": "leaf",
+            "state": {
+              "type": "advanced-tables-toolbar",
+              "state": {},
+              "icon": "spreadsheet",
+              "title": "Advanced Tables"
+            }
+          }
+        ],
+        "currentTab": 8
+      }
+    ],
+    "direction": "horizontal",
+    "width": 658.5,
+    "collapsed": true
+  },
+  "left-ribbon": {
+    "hiddenItems": {
+      "switcher:打开快速切换": false,
+      "graph:查看关系图谱": false,
+      "canvas:新建白板": false,
+      "daily-notes:打开/创建今天的日记": false,
+      "templates:插入模板": false,
+      "command-palette:打开命令面板": false,
+      "obsidian-importer:Open Importer": false,
+      "table-editor-obsidian:Advanced Tables Toolbar": false,
+      "float-search:Search obsidian in modal view": false,
+      "templater-obsidian:Templater": false,
+      "pdf-plus:PDF++: Toggle auto-copy": false,
+      "pdf-plus:PDF++: Toggle auto-focus": false,
+      "pdf-plus:PDF++: Toggle auto-paste": false,
+      "infio-copilot:打开 Infio Copilot": false,
+      "mermaid-tools:Open Mermaid Toolbar": false,
+      "obsidian-day-planner:Open Timeline": false,
+      "obsidian-day-planner:Open Multi-Day View": false,
+      "periodic-notes:Open today": false,
+      "translate:Open translation view": false
+    }
+  },
+  "active": "cd6fdd700cfbe863",
+  "lastOpenFiles": [
+    "08-CS-Notes/00-notes/缓存.md",
+    "08-CS-Notes/01-html/一致性哈希.html",
+    "08-CS-Notes/00-notes/计算机操作系统.md",
+    "08-CS-Notes/00-notes/集群.md",
+    "08-CS-Notes/00-notes/构建工具.md",
+    "05-GWY/01-行测/03-言语理解/郭照100题.md",
+    "03-Leetcode/leetcode-master-master/README.md",
+    "03-Leetcode/leetcode-master-master/problems/0142.环形链表II.md",
+    "03-Leetcode/leetcode-master-master/problems/面试题02.07.链表相交.md",
+    "03-Leetcode/leetcode-master-master/code/getIntersectionNode.java",
+    "03-Leetcode/leetcode-master-master/problems/周总结/20200927二叉树周末总结.md",
+    "03-Leetcode/leetcode-master-master/problems/前序/Java处理输入输出.md",
+    "03-Leetcode/leetcode-master-master/problems/前序/vim.md",
+    "03-Leetcode/leetcode-master-master/problems/前序/kvstore.md",
+    "03-Leetcode/leetcode-master-master/problems/前序/编程素养部分的吹毛求疵.md",
+    "03-Leetcode/leetcode-master-master/problems/前序/server.md",
+    "03-Leetcode/leetcode-master-master/problems/前序/gitserver.md",
+    "03-Leetcode/leetcode-master-master/problems/前序/代码风格.md",
+    "03-Leetcode/leetcode-master-master/problems/前序/程序员写文档工具.md",
+    "03-Leetcode/leetcode-master-master/problems/前序/程序员简历.md",
+    "03-Leetcode/leetcode-master-master/problems/前序/力扣上的代码在本地编译运行.md",
+    "05-GWY/01-行测/02-逻辑判断/0102-花生十三逻辑判断/花生十三逻辑600题.md",
+    "05-GWY/01-行测/02-逻辑判断/0102-花生十三逻辑判断/判断推理知识点梳理.md",
+    "05-GWY/01-行测/02-逻辑判断/0102-花生十三逻辑判断/判断推理错题归纳统计表.md",
+    "05-GWY/01-行测/04-html/01-logic-record.html",
+    "05-GWY/01-行测/04-html/01-logic-",
+    "05-GWY/01-行测/04-html",
+    "05-GWY/01-行测/新建文件夹",
+    "05-GWY/01-行测/00-题集汇总.md",
+    "03-Leetcode/leetcode-master-master/code/0613-链表相交.md",
+    "03-Leetcode/leetcode-master-master/code",
+    "08-CS-Notes/00-notes/攻击技术.md",
+    "_infio_prompts",
+    "08-CS-Notes/01-html/链表交换相邻节点.html",
+    "08-CS-Notes/01-html/RF_代码解释器.html",
+    "08-CS-Notes/assets/download-html.png",
+    "08-CS-Notes/assets/download-pdf.png",
+    "08-CS-Notes/assets/LogoMakr_0zpEzN.png",
+    "08-CS-Notes/assets/download-markdown.png",
+    "08-CS-Notes/assets/column.png",
+    "08-CS-Notes/assets/今日头条招聘海报.png",
+    "08-CS-Notes/assets/公众号海报7.png",
+    "08-CS-Notes/assets/公众号二维码-2.png",
+    "08-CS-Notes/00-notes/pics/公众号海报4.png",
+    "08-CS-Notes/00-notes/pics/_u91CD_u5EFA_u4E8C_u53C9_u6811-21548502782193.gif"
+  ]
+}

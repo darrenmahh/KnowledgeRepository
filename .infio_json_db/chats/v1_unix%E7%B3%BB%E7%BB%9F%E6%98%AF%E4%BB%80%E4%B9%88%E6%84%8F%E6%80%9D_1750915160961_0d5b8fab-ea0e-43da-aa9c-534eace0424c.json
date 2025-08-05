@@ -1,0 +1,116 @@
+{
+  "id": "0d5b8fab-ea0e-43da-aa9c-534eace0424c",
+  "title": "unix系统是什么意思",
+  "messages": [
+    {
+      "role": "user",
+      "applyStatus": 0,
+      "content": {
+        "root": {
+          "children": [
+            {
+              "children": [
+                {
+                  "detail": 0,
+                  "format": 0,
+                  "mode": "normal",
+                  "style": "",
+                  "text": "unix系统是什么意思",
+                  "type": "text",
+                  "version": 1
+                }
+              ],
+              "direction": "ltr",
+              "format": "",
+              "indent": 0,
+              "type": "paragraph",
+              "version": 1,
+              "textFormat": 0,
+              "textStyle": ""
+            }
+          ],
+          "direction": "ltr",
+          "format": "",
+          "indent": 0,
+          "type": "root",
+          "version": 1
+        }
+      },
+      "promptContent": [
+        {
+          "type": "text",
+          "text": "<task>\nunix系统是什么意思\n</task>\n\n<current_file_content path=\"11-牛客刷题/操作系统/操作系统错题记录.md\">\n 1 | - UNIX系统管理空闲空间的方法：成组链接法\n 2 | ---\n 3 | - 顺序文件可以存在任何一种设备上，包括顺序读取设备（磁带）和随机读取设备（磁盘）\n 4 | ---\n 5 | - [[Linux]]\n 6 | >   - 字符设备：按字符流的方式被访问的设备，如键盘、鼠标、声卡\n 7 | >   - 块设备：以块为单位进行数据传输，如磁盘\n 8 | ---\n 9 | - 段页式存储管理系统是 ==二维== 的\n10 | ---\n11 | - 不会产生内部碎片的存储方式：分段式存储管理  \n12 |   > 只要沾上分页就会有碎片\n13 | ---\n14 | - 对于分时系统最重要的是：交互性\n15 | ---\n16 | - 现代操作系统采用缓冲技术的目的是：\n17 |   > 协调速度差异、提高资源利用率、改善系统性能\n18 | ---\n19 | - CRAY-1是第一台商用向量超级计算机，采用并行处理与流水线技术相结合的架构设计。\n20 | - ---\n21 | - 操作系统管理的是计算机的：资源。\n22 | - ---\n23 | - 优先队列最适合使用哪种数据结构来实现：堆\n24 | 1. 堆是一个完全二叉树\n25 | 2. 可以保证最大值/最小值始终位于堆顶\n26 | 3. 插入删除都是O(logn)\n27 | 4. 获取最大最小值时间复杂度O(1)\n28 | ---\n29 | - 文件存储结构：\n30 | 1. 顺序文件（流式文件）\n31 | 2. 记录式文件：按照记录的形式组织存储\n32 | 3. 索引文件：在文件的基础上建立索引表\n33 | 4. 散列文件：根据关键字通过散列函数计算记录的存储位置\n34 | ---\n35 | - 分层式操作系统：要求各层之间采用单向调用的方式。\n36 |   原则：\n37 | 1. 按照抽象层次由低到高划分为不同层次。\n38 | 2. 每一层都建立在低层之上，为高层提供服务。\n39 | 3. 每层都只能使用比其低一层的功能。\n40 | ---\n41 | - 内核对象：管道、时间、线程\n42 | - 管道：由系统内核维护和管理，用于实现进程间数据传输的内核对象。\n43 | - 事件：用于线程同步的内核对象，可以通知一个或者多个线程某个事件的发生。\n44 | - 线程：程序执行的最小单位。\n45 | - 临界区：只是一种同步对象，不需要切换到内核模式，是用户模式下的同步对象。\n</current_file_content>\n\n<environment_details>\n# Obsidian Current File\n11-牛客刷题/操作系统/操作系统错题记录.md\n\n# Obsidian Open Tabs\n11-牛客刷题/操作系统/操作系统错题记录.md\n\n# Current Time\n2025/6/26 下午1:16:03 (Asia/Shanghai, UTC+8:00)\n\n# Current Mode\n<slug>ask</slug>\n<name>Ask</name>\n</environment_details>"
+        }
+      ],
+      "id": "8a4ae852-712e-4d8e-b5a3-a401feecb8ab",
+      "mentionables": [
+        {
+          "type": "current-file",
+          "file": "11-牛客刷题/操作系统/操作系统错题记录.md"
+        }
+      ]
+    },
+    {
+      "role": "assistant",
+      "applyStatus": 0,
+      "content": "",
+      "reasoningContent": "",
+      "id": "c88adab0-bb5a-4b1d-a41f-b4bdc057ad8f",
+      "metadata": {}
+    },
+    {
+      "role": "user",
+      "applyStatus": 0,
+      "content": {
+        "root": {
+          "children": [
+            {
+              "children": [
+                {
+                  "detail": 0,
+                  "format": 0,
+                  "mode": "normal",
+                  "style": "",
+                  "text": "unix系统是什么意思",
+                  "type": "text",
+                  "version": 1
+                }
+              ],
+              "direction": "ltr",
+              "format": "",
+              "indent": 0,
+              "type": "paragraph",
+              "version": 1,
+              "textFormat": 0,
+              "textStyle": ""
+            }
+          ],
+          "direction": "ltr",
+          "format": "",
+          "indent": 0,
+          "type": "root",
+          "version": 1
+        }
+      },
+      "promptContent": [
+        {
+          "type": "text",
+          "text": "<feedback>\nunix系统是什么意思\n</feedback>\n\n<environment_details>\n# Obsidian Current File\n11-牛客刷题/操作系统/操作系统错题记录.md\n\n# Obsidian Open Tabs\n11-牛客刷题/操作系统/操作系统错题记录.md\n\n# Current Time\n2025/6/26 下午1:19:20 (Asia/Shanghai, UTC+8:00)\n\n# Current Mode\n<slug>ask</slug>\n<name>Ask</name>\n</environment_details>"
+        }
+      ],
+      "id": "2e8e35db-de5a-4220-9343-85241047619f",
+      "mentionables": []
+    },
+    {
+      "role": "assistant",
+      "applyStatus": 0,
+      "content": "",
+      "reasoningContent": "",
+      "id": "8e8a3c97-51d8-4089-95a9-f23dc04b1ae9",
+      "metadata": {}
+    }
+  ],
+  "createdAt": 1750914964010,
+  "updatedAt": 1750915160961,
+  "schemaVersion": 1
+}

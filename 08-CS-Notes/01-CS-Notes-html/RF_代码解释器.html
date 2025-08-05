@@ -1,0 +1,377 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>交互式代码解释器：模型训练脚本 (优化版)</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap">
+    <style>
+        body {
+            font-family: 'Inter', 'Microsoft YaHei', sans-serif;
+            overflow: hidden; /* Prevent body scroll */
+        }
+
+        .code-block {
+            background-color: #1e293b;
+            color: #e2e8f0;
+            padding: 1rem;
+            border-radius: 0.5rem;
+            margin-bottom: 1rem;
+            cursor: pointer;
+            transition: all 0.3s ease-in-out;
+            border: 2px solid #334155;
+        }
+
+        .code-block:hover {
+            background-color: #334155;
+        }
+        
+        .code-block.active {
+            background-color: #334155;
+            border-color: #3b82f6;
+            box-shadow: 0 0 15px rgba(59, 130, 246, 0.5);
+            transform: scale(1.02);
+        }
+
+        .explanation-block {
+            background-color: #ffffff;
+            border-radius: 0.5rem;
+            padding: 1.5rem;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+            margin-bottom: 1.5rem;
+            transition: all 0.3s ease-in-out;
+            border: 2px solid transparent;
+        }
+        
+        .explanation-block.active {
+            border-color: #3b82f6;
+            box-shadow: 0 8px 25px -5px rgba(59, 130, 246, 0.2), 0 10px 10px -5px rgba(59, 130, 246, 0.1);
+            transform: scale(1.02);
+        }
+
+        pre {
+            white-space: pre-wrap;
+            word-wrap: break-word;
+        }
+        
+        .scroll-container {
+            height: calc(100vh - 120px); /* Adjust height based on header */
+            overflow-y: auto;
+            scroll-behavior: smooth;
+        }
+        
+        /* Custom scrollbar for better look */
+        .scroll-container::-webkit-scrollbar {
+            width: 8px;
+        }
+        .scroll-container::-webkit-scrollbar-track {
+            background: transparent;
+        }
+        .scroll-container::-webkit-scrollbar-thumb {
+            background: #cbd5e1; /* gray-300 */
+            border-radius: 4px;
+        }
+        .scroll-container::-webkit-scrollbar-thumb:hover {
+            background: #94a3b8; /* gray-400 */
+        }
+    </style>
+</head>
+
+<body class="bg-gray-100 text-gray-800">
+
+    <div class="container mx-auto px-4 sm:px-6 lg:px-8 py-4">
+        <header class="text-center mb-4">
+            <h1 class="text-3xl md:text-4xl font-bold text-gray-900">交互式代码解释器</h1>
+            <p class="text-md text-gray-600 mt-2">点击左侧代码块，右侧将滚动至对应解释并高亮。</p>
+        </header>
+
+        <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
+            <!-- Code Column -->
+            <div id="code-column" class="scroll-container pr-4">
+                <div id="code-1" class="code-block" onclick="showExplanation('explanation-1', this)">
+                    <pre><code class="language-python"># -*- coding: utf-8 -*-
+# 文件名: train_model_improved.py
+import pandas as pd
+import numpy as np
+from sklearn.model_selection import train_test_split, cross_val_score, GridSearchCV
+from sklearn.preprocessing import StandardScaler
+from sklearn.ensemble import RandomForestRegressor
+from sklearn.metrics import mean_squared_error, r2_score, mean_absolute_error
+import matplotlib.pyplot as plt
+import seaborn as sns
+import os
+import time
+import warnings
+
+warnings.filterwarnings('ignore')
+
+# 设置中文字体
+plt.rcParams['font.sans-serif'] = ['SimHei', 'Microsoft YaHei']
+plt.rcParams['axes.unicode_minus'] = False</code></pre>
+                </div>
+                <div id="code-2" class="code-block" onclick="showExplanation('explanation-2', this)">
+                     <pre><code class="language-python"># --- 用户配置 ---
+PROCESSED_DATA_FILENAME = 'C:\Thesis_data\qc_data\\final_data.csv'</code></pre>
+                </div>
+                 <div id="code-3" class="code-block" onclick="showExplanation('explanation-3', this)">
+                    <pre><code class="language-python"># --- 自定义评估函数 ---
+def SLOPE(true, pred):
+    """计算真实值与预测值之间回归线的斜率"""
+    true = np.asarray(true)
+    pred = np.asarray(pred)
+    x_mean = np.mean(pred)
+    y_mean = np.mean(true)
+    numerator = np.sum((pred - x_mean) * (true - y_mean))
+    denominator = np.sum((pred - x_mean) ** 2)
+    return numerator / denominator if denominator != 0 else np.nan
+
+def mybias(true, pred):
+    """计算模型的平均偏差"""
+    true = np.asarray(true)
+    pred = np.asarray(pred)
+    return np.mean(pred - true)</code></pre>
+                </div>
+                <div id="code-4" class="code-block" onclick="showExplanation('explanation-4', this)">
+                    <pre><code class="language-python">def print_evaluation_metrics(y_true, y_pred, dataset_name=""):
+    """打印详细的评估指标"""
+    mse = mean_squared_error(y_true, y_pred)
+    mae = mean_absolute_error(y_true, y_pred)
+    r2 = r2_score(y_true, y_pred)
+    slope = SLOPE(y_true, y_pred)
+    bias = mybias(y_true, y_pred)
+    rmse = np.sqrt(mse)
+
+    print(f"\n--- {dataset_name} 评估结果 ---")
+    print(f"R² (决定系数):        {r2:.4f}  (越接近1越好)")
+    print(f"RMSE (均方根误差):     {rmse:.4f}  (越小越好)")
+    # ... (rest of the print statements)
+    return {'R2': r2, 'RMSE': rmse, 'MAE': mae, 'MSE': mse, 'Slope': slope, 'Bias': bias}</code></pre>
+                </div>
+                <div id="code-5" class="code-block" onclick="showExplanation('explanation-5', this)">
+                    <pre><code class="language-python">def create_visualizations(y_train, y_train_pred, y_test, y_test_pred, feature_importance_df):
+    """创建可视化图表"""
+    fig, axes = plt.subplots(2, 2, figsize=(15, 12))
+    # ... (plotting logic for 4 charts)
+    plt.tight_layout()
+    plt.savefig('model_evaluation_plots.png', dpi=300, bbox_inches='tight')
+    plt.show()</code></pre>
+                </div>
+                <div id="code-6" class="code-block" onclick="showExplanation('explanation-6', this)">
+                     <pre><code class="language-python">def hyperparameter_tuning(X_train, y_train):
+    """超参数调优"""
+    param_grid = {
+        'n_estimators': [100, 300, 500],
+        'max_depth': [10, 20, None],
+        # ... (other parameters)
+    }
+    rf = RandomForestRegressor(random_state=42, n_jobs=1)
+    grid_search = GridSearchCV(rf, param_grid, cv=5, scoring='r2', n_jobs=1, verbose=1)
+    grid_search.fit(X_train, y_train)
+    return grid_search.best_estimator_</code></pre>
+                </div>
+                 <div id="code-7" class="code-block" onclick="showExplanation('explanation-7', this)">
+                    <pre><code class="language-python">def cross_validation_analysis(model, X_train, y_train):
+    """交叉验证分析"""
+    print("\n[交叉验证] 正在进行5折交叉验证...")
+    cv_scores = cross_val_score(model, X_train, y_train, cv=5, scoring='r2', n_jobs=-1)
+    # ... (error handling and printing)
+    return cv_scores</code></pre>
+                </div>
+                <div id="code-8" class="code-block" onclick="showExplanation('explanation-8', this)">
+                     <pre><code class="language-python">def check_data_leakage(df):
+    """检查数据泄露风险"""
+    # ... (checks for time sorting, duplicates, outliers)
+    print("...")</code></pre>
+                </div>
+                 <div id="code-9" class="code-block" onclick="showExplanation('explanation-9', this)">
+                    <pre><code class="language-python">def train_and_evaluate():
+    """主训练和评估函数"""
+    print("=== 增强版机器学习模型训练与评估 ===")
+    
+    # 步骤 1-3: 加载数据, 准备数据, 特征缩放
+    # ... (code for loading, splitting, scaling)
+    
+    # 步骤 4: 超参数调优
+    tune_hyperparams = input("是否进行超参数调优？(y/n, 默认n): ").lower().strip()
+    if tune_hyperparams == 'y':
+        best_model = hyperparameter_tuning(X_train_scaled, y_train)
+    else:
+        best_model = RandomForestRegressor(...)
+        best_model.fit(X_train_scaled, y_train)
+
+    # 步骤 5: 交叉验证
+    cv_scores = cross_validation_analysis(best_model, X_train_scaled, y_train)
+    
+    # 步骤 6: 模型评估
+    y_train_pred = best_model.predict(X_train_scaled)
+    train_metrics = print_evaluation_metrics(y_train, y_train_pred, "训练集")
+    # ... (test set prediction and evaluation)
+    
+    # 步骤 7: 特征重要性分析
+    feature_importances = pd.DataFrame(...)
+    
+    # 步骤 8: 可视化和保存
+    create_visualizations(...)
+    results_df.to_csv(...)
+    
+    print("\n=== 训练评估完成 ===")</code></pre>
+                </div>
+                 <div id="code-10" class="code-block" onclick="showExplanation('explanation-10', this)">
+                    <pre><code class="language-python">if __name__ == '__main__':
+    train_and_evaluate()</code></pre>
+                </div>
+            </div>
+
+            <!-- Explanation Column -->
+            <div id="explanation-column" class="scroll-container pr-2">
+                <div id="explanation-1" class="explanation-block">
+                    <h2 class="text-xl font-bold mb-2">1. 导入库与环境设置</h2>
+                    <p>这是脚本的准备阶段，负责加载所有必需的工具并配置运行环境。</p>
+                    <ul class="list-disc list-inside mt-2 space-y-1">
+                        <li><strong>pandas & numpy:</strong> 数据处理和数值计算的核心库。</li>
+                        <li><strong>scikit-learn (sklearn):</strong> 机器学习库，提供了模型、数据分割、评估工具等。</li>
+                        <li><strong>matplotlib & seaborn:</strong> 用于数据可视化的库，创建图表。</li>
+                        <li><strong>os, time, warnings:</strong> 分别用于与操作系统交互（如检查文件路径）、计时和控制警告信息的显示。</li>
+                         <li><strong>plt.rcParams:</strong> 这部分代码非常重要，它通过设置字体解决了<code>matplotlib</code>在显示中文时可能出现的乱码问题。</li>
+                    </ul>
+                </div>
+                <div id="explanation-2" class="explanation-block">
+                    <h2 class="text-xl font-bold mb-2">2. 用户配置</h2>
+                    <p>这个区域定义了一个关键变量，用于指定包含预处理后数据的CSV文件的路径。</p>
+                    <ul class="list-disc list-inside mt-2 space-y-1">
+                        <li><strong>PROCESSED_DATA_FILENAME:</strong> 将文件路径设置为一个常量，使得在需要更换数据源时，只需修改这一行代码，而无需在代码各处进行搜索和替换，提高了代码的可维护性。</li>
+                        <li><strong>注意:</strong> 路径中的反斜杠 `\` 可能需要转义（写成 `\\`）或者在字符串前加上 `r` (例如 `r'C:\...'`）来避免被解释为转义字符，这是Windows路径处理中常见的注意点。</li>
+                    </ul>
+                </div>
+                <div id="explanation-3" class="explanation-block">
+                    <h2 class="text-xl font-bold mb-2">3. 自定义评估函数</h2>
+                    <p>除了使用标准评估指标外，脚本还定义了两个自定义函数来更深入地评估模型性能。</p>
+                    <ul class="list-disc list-inside mt-2 space-y-1">
+                       <li><strong>SLOPE(斜率):</strong> 计算真实值与预测值散点图回归线的斜率。理想情况下，预测值应与真实值相等，所以这条线的斜率应接近 <strong>1</strong>。如果斜率大于1，说明模型倾向于高估高值、低估低值；如果小于1，则相反。</li>
+                       <li><strong>mybias(偏差):</strong> 计算预测值与真实值之差的平均值。这个指标反映了模型整体上是倾向于高估（正偏差）还是低估（负偏差）。理想模型的偏差应接近 <strong>0</strong>。</li>
+                    </ul>
+                </div>
+                <div id="explanation-4" class="explanation-block">
+                    <h2 class="text-xl font-bold mb-2">4. 打印评估指标函数</h2>
+                    <p>这个函数 <code>print_evaluation_metrics</code> 将所有关键的性能指标整齐地打印出来，并返回一个包含这些指标的字典，方便后续保存。</p>
+                    <ul class="list-disc list-inside mt-2 space-y-1">
+                        <li><strong>R² (决定系数):</strong> 表示模型对因变量变化的解释程度，越接近1越好。</li>
+                        <li><strong>RMSE (均方根误差):</strong> 衡量预测值与真实值之间差异的大小，对大误差更敏感。</li>
+                         <li><strong>MAE (平均绝对误差):</strong> 所有单个观测值与算术平均值的偏差的绝对值的平均。</li>
+                         <li><strong>返回值:</strong> 将所有计算出的指标打包成一个字典返回，这种做法非常规范，便于后续将结果写入文件或进行比较。</li>
+                    </ul>
+                </div>
+                <div id="explanation-5" class="explanation-block">
+                     <h2 class="text-xl font-bold mb-2">5. 创建可视化图表</h2>
+                    <p><code>create_visualizations</code> 函数通过“一图胜千言”的方式，直观地展示模型的性能和行为，共生成四个核心图表：</p>
+                    <ul class="list-disc list-inside mt-2 space-y-1">
+                       <li><strong>真实值 vs 预测值 (训练集/测试集):</strong> 散点图展示了模型预测的准确性。点越贴近红色的对角线（y=x线），说明预测越准。</li>
+                       <li><strong>残差分析:</strong> 残差图用于检查模型是否存在系统性偏差。如果残差（真实值-预测值）随机分布在0线上下，说明模型表现良好。如果出现特定模式（如喇叭形），则可能违反了某些回归假设。</li>
+                       <li><strong>特征重要性:</strong> 条形图显示了哪些特征对模型的预测贡献最大。这对于理解数据和模型决策过程至关重要。</li>
+                       <li><strong>保存图像:</strong> <code>plt.savefig</code> 会将生成的所有图表保存为一个PNG文件，方便在报告或演示中使用。</li>
+                    </ul>
+                </div>
+                 <div id="explanation-6" class="explanation-block">
+                    <h2 class="text-xl font-bold mb-2">6. 超参数调优</h2>
+                    <p><code>hyperparameter_tuning</code> 函数的目标是为随机森林模型找到最佳的“设置”（即超参数），以达到最优性能。</p>
+                    <ul class="list-disc list-inside mt-2 space-y-1">
+                       <li><strong>超参数:</strong> 这些是模型训练前设置的参数，如决策树的数量(<code>n_estimators</code>)和深度(<code>max_depth</code>)。它们控制着模型的复杂度和学习方式。</li>
+                       <li><strong>GridSearchCV (网格搜索交叉验证):</strong> 这是一种自动化调优技术。它会尝试<code>param_grid</code>中所有可能的参数组合，并通过交叉验证（cv=5表示5折）评估每种组合的性能，最终找出得分最高的组合。</li>
+                       <li><strong>返回值:</strong> 函数返回一个已经用找到的最佳参数配置好的新模型实例 (<code>best_estimator_</code>)，可以直接用于后续的训练和预测。</li>
+                    </ul>
+                </div>
+                <div id="explanation-7" class="explanation-block">
+                    <h2 class="text-xl font-bold mb-2">7. 交叉验证分析</h2>
+                    <p><code>cross_validation_analysis</code> 函数用于评估模型的**泛化能力**，即模型在未见过的数据上的表现如何。</p>
+                    <ul class="list-disc list-inside mt-2 space-y-1">
+                       <li><strong>工作原理:</strong> 它将训练数据分成K个部分（这里是5折）。轮流使用其中K-1份进行训练，剩下1份进行测试。这个过程重复K次，每次使用不同的部分作为测试集。</li>
+                       <li><strong>目的:</strong> 相比于单次划分训练集和测试集，交叉验证的结果更稳定、更可靠，可以有效避免因某次数据划分的偶然性带来的评估偏差。</li>
+                        <li><strong>结果解读:</strong> 函数会打印出每次验证的R²分数，以及它们的平均值和标准差。一个低的**标准差**表示模型的性能在不同数据子集上是稳定的。</li>
+                    </ul>
+                </div>
+                <div id="explanation-8" class="explanation-block">
+                    <h2 class="text-xl font-bold mb-2">8. 检查数据泄露风险</h2>
+                    <p><code>check_data_leakage</code> 是一个非常重要的健全性检查函数，旨在发现可能导致模型评估结果过于乐观的常见问题。</p>
+                    <ul class="list-disc list-inside mt-2 space-y-1">
+                       <li><strong>数据泄露:</strong> 指的是训练过程中包含了不应被获知的信息，特别是来自测试集或未来的信息。</li>
+                       <li><strong>检查项:</strong>
+                           <ul>
+                               <li>✓ **时间信息:** 检查数据中是否有时间列，并提示使用时间序列划分，这是防止使用未来数据预测过去的关键。</li>
+                               <li>✓ **重复记录:** 重复的数据可能同时出现在训练集和测试集中，导致模型看似性能很好，实则只是记住了重复样本。</li>
+                               <li>✓ **异常值:** 检查目标变量（gpp）中的极端值，这些值可能会对模型训练产生不成比例的影响。</li>
+                           </ul>
+                       </li>
+                    </ul>
+                </div>
+                <div id="explanation-9" class="explanation-block">
+                    <h2 class="text-xl font-bold mb-2">9. 主训练与评估流程</h2>
+                    <p><code>train_and_evaluate</code> 是整个脚本的核心，它按顺序编排了从数据加载到结果保存的所有步骤，构成了一个完整的机器学习工作流。</p>
+                    <ol class="list-decimal list-inside mt-2 space-y-2">
+                       <li><strong>加载与准备:</strong> 读取数据，定义特征(X)和目标(y)，并进行时间序列或随机划分。</li>
+                       <li><strong>特征缩放:</strong> 使用<code>StandardScaler</code>对特征进行标准化，确保不同尺度的特征得到同等对待，这通常能提升模型性能。</li>
+                       <li><strong>训练或调优:</strong> 根据用户输入，选择使用默认参数快速训练，还是进行耗时但更精确的超参数调优。</li>
+                       <li><strong>验证与评估:</strong> 对训练好的模型进行交叉验证和在测试集上的最终评估，并检查是否存在过拟合。</li>
+                       <li><strong>分析与输出:</strong> 计算特征重要性，生成可视化图表，并将所有评估结果和重要特征保存到CSV文件中，便于记录和分享。</li>
+                    </ol>
+                </div>
+                <div id="explanation-10" class="explanation-block">
+                    <h2 class="text-xl font-bold mb-2">10. 主程序入口</h2>
+                    <p><code>if __name__ == '__main__':</code> 是Python脚本的一个标准写法。</p>
+                    <ul class="list-disc list-inside mt-2 space-y-1">
+                       <li><strong>作用:</strong> 这行代码确保只有当这个文件被直接作为主程序运行时，<code>train_and_evaluate()</code> 函数才会被调用。</li>
+                       <li><strong>好处:</strong> 如果这个脚本被其他Python文件作为模块导入（例如，为了复用其中的某个函数），那么<code>train_and_evaluate()</code>不会自动执行。这使得代码既可以独立运行，也可以被安全地重用。</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        let activeCodeBlock = null;
+        let activeExplanation = null;
+
+        function showExplanation(explanationId, clickedCodeElement) {
+            // De-activate previous elements if they exist
+            if (activeCodeBlock) {
+                activeCodeBlock.classList.remove('active');
+            }
+            if (activeExplanation) {
+                activeExplanation.classList.remove('active');
+            }
+
+            // Activate new code block
+            clickedCodeElement.classList.add('active');
+            activeCodeBlock = clickedCodeElement;
+
+            // Find and activate corresponding explanation
+            const targetExplanation = document.getElementById(explanationId);
+            if (targetExplanation) {
+                // Scroll the explanation's parent container to the target
+                targetExplanation.scrollIntoView({
+                    behavior: 'smooth',
+                    block: 'center'
+                });
+                targetExplanation.classList.add('active');
+                activeExplanation = targetExplanation;
+            }
+        }
+
+        // Set initial state on page load
+        document.addEventListener('DOMContentLoaded', function() {
+            const firstCodeBlock = document.getElementById('code-1');
+            const firstExplanation = document.getElementById('explanation-1');
+
+            if (firstCodeBlock && firstExplanation) {
+                firstCodeBlock.classList.add('active');
+                firstExplanation.classList.add('active');
+                activeCodeBlock = firstCodeBlock;
+                activeExplanation = firstExplanation;
+            }
+        });
+    </script>
+
+</body>
+
+</html>

@@ -1,0 +1,895 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>时空图神经网络 - 交互式学习界面</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Microsoft YaHei', Arial, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            color: #333;
+        }
+
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+
+        .header {
+            background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);
+            color: white;
+            padding: 40px;
+            border-radius: 15px;
+            text-align: center;
+            margin-bottom: 30px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+        }
+
+        .header h1 {
+            font-size: 3em;
+            margin-bottom: 15px;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.3);
+        }
+
+        .header p {
+            font-size: 1.3em;
+            opacity: 0.9;
+        }
+
+        .nav-tabs {
+            display: flex;
+            background: white;
+            border-radius: 10px;
+            padding: 10px;
+            margin-bottom: 30px;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+            overflow-x: auto;
+        }
+
+        .nav-tab {
+            flex: 1;
+            min-width: 150px;
+            padding: 15px 25px;
+            text-align: center;
+            background: #f8f9fa;
+            border: none;
+            border-radius: 8px;
+            margin: 0 5px;
+            cursor: pointer;
+            font-size: 16px;
+            font-weight: bold;
+            transition: all 0.3s ease;
+            color: #666;
+        }
+
+        .nav-tab.active {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(0,0,0,0.2);
+        }
+
+        .nav-tab:hover:not(.active) {
+            background: #e9ecef;
+            transform: translateY(-1px);
+        }
+
+        .tab-content {
+            background: white;
+            border-radius: 15px;
+            padding: 30px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+            display: none;
+        }
+
+        .tab-content.active {
+            display: block;
+            animation: fadeIn 0.5s ease-in;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .concept-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
+            gap: 25px;
+            margin: 30px 0;
+        }
+
+        .concept-card {
+            background: linear-gradient(145deg, #f8f9fa, #e9ecef);
+            border-radius: 12px;
+            padding: 25px;
+            box-shadow: 0 8px 25px rgba(0,0,0,0.1);
+            transition: all 0.3s ease;
+            border-left: 5px solid #667eea;
+        }
+
+        .concept-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 15px 35px rgba(0,0,0,0.15);
+        }
+
+        .concept-card h3 {
+            color: #667eea;
+            margin-bottom: 15px;
+            font-size: 1.4em;
+        }
+
+        .visual-demo {
+            background: #f8f9fa;
+            border-radius: 12px;
+            padding: 30px;
+            margin: 25px 0;
+            text-align: center;
+        }
+
+        .graph-container {
+            display: flex;
+            justify-content: space-around;
+            align-items: center;
+            margin: 30px 0;
+            flex-wrap: wrap;
+            gap: 20px;
+        }
+
+        .graph-snapshot {
+            background: white;
+            border-radius: 10px;
+            padding: 20px;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+            min-width: 200px;
+            transition: all 0.3s ease;
+        }
+
+        .graph-snapshot:hover {
+            transform: scale(1.05);
+            box-shadow: 0 8px 25px rgba(0,0,0,0.15);
+        }
+
+        .graph-snapshot h4 {
+            color: #667eea;
+            margin-bottom: 15px;
+        }
+
+        .node {
+            width: 30px;
+            height: 30px;
+            border-radius: 50%;
+            background: linear-gradient(45deg, #4facfe, #00f2fe);
+            display: inline-block;
+            margin: 5px;
+            position: relative;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .node:hover {
+            transform: scale(1.2);
+            box-shadow: 0 4px 12px rgba(0,0,0,0.3);
+        }
+
+        .edge {
+            width: 2px;
+            height: 30px;
+            background: #bbb;
+            display: inline-block;
+            margin: 0 10px;
+            vertical-align: middle;
+        }
+
+        .control-panel {
+            background: #f0f8ff;
+            border-radius: 12px;
+            padding: 25px;
+            margin: 25px 0;
+        }
+
+        .control-group {
+            margin: 20px 0;
+        }
+
+        .control-group label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: bold;
+            color: #333;
+        }
+
+        .slider {
+            width: 100%;
+            height: 8px;
+            border-radius: 4px;
+            background: #ddd;
+            outline: none;
+            -webkit-appearance: none;
+        }
+
+        .slider::-webkit-slider-thumb {
+            -webkit-appearance: none;
+            appearance: none;
+            width: 20px;
+            height: 20px;
+            border-radius: 50%;
+            background: #667eea;
+            cursor: pointer;
+        }
+
+        .button-group {
+            display: flex;
+            gap: 15px;
+            justify-content: center;
+            flex-wrap: wrap;
+            margin: 25px 0;
+        }
+
+        .btn {
+            padding: 12px 25px;
+            border: none;
+            border-radius: 25px;
+            font-size: 16px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .btn-primary {
+            background: linear-gradient(45deg, #667eea, #764ba2);
+            color: white;
+        }
+
+        .btn-secondary {
+            background: linear-gradient(45deg, #4facfe, #00f2fe);
+            color: white;
+        }
+
+        .btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 20px rgba(0,0,0,0.2);
+        }
+
+        .metrics-display {
+            background: #e8f5e8;
+            border-radius: 12px;
+            padding: 25px;
+            margin: 25px 0;
+            border-left: 5px solid #4caf50;
+        }
+
+        .metric-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin: 10px 0;
+            padding: 10px;
+            background: white;
+            border-radius: 8px;
+        }
+
+        .metric-value {
+            font-weight: bold;
+            color: #2e7d32;
+            font-size: 1.2em;
+        }
+
+        .timeline {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin: 30px 0;
+            padding: 20px;
+            background: linear-gradient(90deg, #f8f9fa, #e9ecef, #f8f9fa);
+            border-radius: 10px;
+        }
+
+        .time-step {
+            background: white;
+            border-radius: 50%;
+            width: 50px;
+            height: 50px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+            color: #667eea;
+            border: 3px solid #667eea;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .time-step.active {
+            background: #667eea;
+            color: white;
+            transform: scale(1.1);
+        }
+
+        .time-step:hover {
+            transform: scale(1.05);
+            box-shadow: 0 4px 12px rgba(0,0,0,0.2);
+        }
+
+        .feature-matrix {
+            display: grid;
+            grid-template-columns: repeat(5, 1fr);
+            gap: 5px;
+            margin: 20px 0;
+            max-width: 300px;
+        }
+
+        .feature-cell {
+            width: 30px;
+            height: 30px;
+            background: #e3f2fd;
+            border-radius: 4px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 12px;
+            font-weight: bold;
+            color: #1976d2;
+            transition: all 0.3s ease;
+        }
+
+        .feature-cell:hover {
+            background: #1976d2;
+            color: white;
+            transform: scale(1.1);
+        }
+
+        @media (max-width: 768px) {
+            .nav-tabs {
+                flex-direction: column;
+            }
+            
+            .nav-tab {
+                margin: 5px 0;
+            }
+            
+            .concept-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .graph-container {
+                flex-direction: column;
+            }
+            
+            .button-group {
+                flex-direction: column;
+                align-items: center;
+            }
+        }
+
+        .section-title {
+            color: #667eea;
+            font-size: 1.8em;
+            margin: 30px 0 20px 0;
+            text-align: center;
+            position: relative;
+        }
+
+        .section-title::after {
+            content: '';
+            display: block;
+            width: 100px;
+            height: 3px;
+            background: linear-gradient(45deg, #667eea, #764ba2);
+            margin: 10px auto;
+            border-radius: 2px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>🧠 时空图神经网络</h1>
+            <p>探索时间和空间维度中的图神经网络架构</p>
+        </div>
+
+        <div class="nav-tabs">
+            <button class="nav-tab active" onclick="showTab('basics')">🔍 基础概念</button>
+            <button class="nav-tab" onclick="showTab('architecture')">🏗️ 网络架构</button>
+            <button class="nav-tab" onclick="showTab('demo')">🎮 交互演示</button>
+            <button class="nav-tab" onclick="showTab('applications')">🌟 应用场景</button>
+        </div>
+
+        <!-- 基础概念标签页 -->
+        <div id="basics" class="tab-content active">
+            <h2 class="section-title">基础概念</h2>
+            
+            <div class="concept-grid">
+                <div class="concept-card">
+                    <h3>🔗 图神经网络 (GNN)</h3>
+                    <p>图神经网络是一类能够处理图结构数据的深度学习模型。它们能够学习节点、边和图的表示，并在各种图相关任务中表现出色。</p>
+                    <ul style="margin-top: 15px; padding-left: 20px;">
+                        <li>节点表示学习</li>
+                        <li>图级别的表示学习</li>
+                        <li>链接预测</li>
+                        <li>图分类</li>
+                    </ul>
+                </div>
+
+                <div class="concept-card">
+                    <h3>⏰ 时间维度</h3>
+                    <p>在时空图神经网络中，时间维度捕获了图结构随时间的演化过程，包括节点特征的变化和边连接的动态性。</p>
+                    <ul style="margin-top: 15px; padding-left: 20px;">
+                        <li>时序依赖建模</li>
+                        <li>动态图演化</li>
+                        <li>趋势预测</li>
+                        <li>异常检测</li>
+                    </ul>
+                </div>
+
+                <div class="concept-card">
+                    <h3>🌍 空间维度</h3>
+                    <p>空间维度关注图中节点之间的几何关系和邻居结构，通过消息传递机制聚合邻居信息。</p>
+                    <ul style="margin-top: 15px; padding-left: 20px;">
+                        <li>邻居聚合</li>
+                        <li>消息传递</li>
+                        <li>注意力机制</li>
+                        <li>多跳连接</li>
+                    </ul>
+                </div>
+
+                <div class="concept-card">
+                    <h3>🔄 时空融合</h3>
+                    <p>时空图神经网络的核心在于如何有效地融合时间和空间信息，实现对复杂时空模式的建模。</p>
+                    <ul style="margin-top: 15px; padding-left: 20px;">
+                        <li>时空注意力</li>
+                        <li>多尺度建模</li>
+                        <li>因果卷积</li>
+                        <li>门控机制</li>
+                    </ul>
+                </div>
+            </div>
+
+            <div class="visual-demo">
+                <h3>📊 时空图的基本概念</h3>
+                <p>下图展示了一个简单的时空图，其中节点在不同时间步的状态和连接关系：</p>
+                
+                <div class="timeline">
+                    <div class="time-step active" onclick="highlightTimeStep(1)">t₁</div>
+                    <div class="time-step" onclick="highlightTimeStep(2)">t₂</div>
+                    <div class="time-step" onclick="highlightTimeStep(3)">t₃</div>
+                    <div class="time-step" onclick="highlightTimeStep(4)">t₄</div>
+                    <div class="time-step" onclick="highlightTimeStep(5)">t₅</div>
+                </div>
+
+                <div id="graph-evolution" class="graph-container">
+                    <!-- 动态生成的图演示 -->
+                </div>
+            </div>
+        </div>
+
+        <!-- 网络架构标签页 -->
+        <div id="architecture" class="tab-content">
+            <h2 class="section-title">网络架构</h2>
+            
+            <div class="concept-grid">
+                <div class="concept-card">
+                    <h3>🔧 ST-GCN (时空图卷积网络)</h3>
+                    <p>通过在空间和时间维度上应用卷积操作，捕获局部时空模式。</p>
+                    <div class="feature-matrix" id="stgcn-matrix"></div>
+                </div>
+
+                <div class="concept-card">
+                    <h3>🎯 ASTGCN (自适应时空图卷积网络)</h3>
+                    <p>引入自适应邻接矩阵和时空注意力机制，增强模型的表达能力。</p>
+                    <div class="feature-matrix" id="astgcn-matrix"></div>
+                </div>
+
+                <div class="concept-card">
+                    <h3>🌊 STGAT (时空图注意力网络)</h3>
+                    <p>利用注意力机制动态学习时空依赖关系，提高预测精度。</p>
+                    <div class="feature-matrix" id="stgat-matrix"></div>
+                </div>
+
+                <div class="concept-card">
+                    <h3>🔮 DCRNN (扩散卷积循环神经网络)</h3>
+                    <p>结合扩散卷积和循环神经网络，建模长期时空依赖。</p>
+                    <div class="feature-matrix" id="dcrnn-matrix"></div>
+                </div>
+            </div>
+
+            <div class="visual-demo">
+                <h3>🏗️ 架构选择器</h3>
+                <div class="button-group">
+                    <button class="btn btn-primary" onclick="showArchitecture('stgcn')">ST-GCN</button>
+                    <button class="btn btn-secondary" onclick="showArchitecture('astgcn')">ASTGCN</button>
+                    <button class="btn btn-primary" onclick="showArchitecture('stgat')">STGAT</button>
+                    <button class="btn btn-secondary" onclick="showArchitecture('dcrnn')">DCRNN</button>
+                </div>
+                <div id="architecture-display"></div>
+            </div>
+        </div>
+
+        <!-- 交互演示标签页 -->
+        <div id="demo" class="tab-content">
+            <h2 class="section-title">交互演示</h2>
+            
+            <div class="control-panel">
+                <h3>🎛️ 参数控制</h3>
+                
+                <div class="control-group">
+                    <label for="timeSteps">时间步数: <span id="timeStepsValue">5</span></label>
+                    <input type="range" id="timeSteps" class="slider" min="3" max="10" value="5" 
+                           onchange="updateParameter('timeSteps', this.value)">
+                </div>
+
+                <div class="control-group">
+                    <label for="nodeCount">节点数量: <span id="nodeCountValue">8</span></label>
+                    <input type="range" id="nodeCount" class="slider" min="4" max="12" value="8" 
+                           onchange="updateParameter('nodeCount', this.value)">
+                </div>
+
+                <div class="control-group">
+                    <label for="hiddenDim">隐藏维度: <span id="hiddenDimValue">64</span></label>
+                    <input type="range" id="hiddenDim" class="slider" min="16" max="128" value="64" step="16"
+                           onchange="updateParameter('hiddenDim', this.value)">
+                </div>
+
+                <div class="button-group">
+                    <button class="btn btn-primary" onclick="runSimulation()">▶️ 运行仿真</button>
+                    <button class="btn btn-secondary" onclick="resetSimulation()">🔄 重置</button>
+                    <button class="btn btn-primary" onclick="exportResults()">💾 导出结果</button>
+                </div>
+            </div>
+
+            <div class="metrics-display">
+                <h3>📈 性能指标</h3>
+                <div class="metric-item">
+                    <span>训练损失:</span>
+                    <span class="metric-value" id="trainLoss">0.0000</span>
+                </div>
+                <div class="metric-item">
+                    <span>验证精度:</span>
+                    <span class="metric-value" id="valAccuracy">0.0000</span>
+                </div>
+                <div class="metric-item">
+                    <span>计算时间:</span>
+                    <span class="metric-value" id="computeTime">0.00s</span>
+                </div>
+                <div class="metric-item">
+                    <span>内存使用:</span>
+                    <span class="metric-value" id="memoryUsage">0MB</span>
+                </div>
+            </div>
+
+            <div id="simulation-display" class="visual-demo">
+                <h3>🔄 仿真过程</h3>
+                <div id="simulation-content">
+                    <p>点击"运行仿真"开始体验时空图神经网络的训练过程</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- 应用场景标签页 -->
+        <div id="applications" class="tab-content">
+            <h2 class="section-title">应用场景</h2>
+            
+            <div class="concept-grid">
+                <div class="concept-card">
+                    <h3>🚗 交通流预测</h3>
+                    <p>预测道路网络中的交通流量，优化交通管理和路径规划。</p>
+                    <ul style="margin-top: 15px; padding-left: 20px;">
+                        <li>实时交通监控</li>
+                        <li>拥堵预警</li>
+                        <li>智能信号控制</li>
+                        <li>路径优化</li>
+                    </ul>
+                </div>
+
+                <div class="concept-card">
+                    <h3>🌡️ 环境监测</h3>
+                    <p>监测和预测环境参数的时空变化，如空气质量、温度等。</p>
+                    <ul style="margin-top: 15px; padding-left: 20px;">
+                        <li>空气质量预测</li>
+                        <li>气象预报</li>
+                        <li>污染源追踪</li>
+                        <li>生态系统监测</li>
+                    </ul>
+                </div>
+
+                <div class="concept-card">
+                    <h3>📱 社交网络分析</h3>
+                    <p>分析社交网络中信息传播和用户行为的时空模式。</p>
+                    <ul style="margin-top: 15px; padding-left: 20px;">
+                        <li>信息传播建模</li>
+                        <li>影响力分析</li>
+                        <li>社区发现</li>
+                        <li>行为预测</li>
+                    </ul>
+                </div>
+
+                <div class="concept-card">
+                    <h3>🏥 疫情传播建模</h3>
+                    <p>建模传染病在人群和地理空间中的传播过程。</p>
+                    <ul style="margin-top: 15px; padding-left: 20px;">
+                        <li>传播路径追踪</li>
+                        <li>风险评估</li>
+                        <li>干预策略评估</li>
+                        <li>资源配置优化</li>
+                    </ul>
+                </div>
+
+                <div class="concept-card">
+                    <h3>⚡ 智能电网</h3>
+                    <p>优化电力系统的运行，预测电力需求和故障。</p>
+                    <ul style="margin-top: 15px; padding-left: 20px;">
+                        <li>负荷预测</li>
+                        <li>故障检测</li>
+                        <li>电网优化</li>
+                        <li>可再生能源集成</li>
+                    </ul>
+                </div>
+
+                <div class="concept-card">
+                    <h3>🛒 推荐系统</h3>
+                    <p>基于用户行为和物品关系的时空模式进行个性化推荐。</p>
+                    <ul style="margin-top: 15px; padding-left: 20px;">
+                        <li>个性化推荐</li>
+                        <li>冷启动问题</li>
+                        <li>实时推荐</li>
+                        <li>多样性优化</li>
+                    </ul>
+                </div>
+            </div>
+
+            <div class="visual-demo">
+                <h3>🎯 应用案例选择器</h3>
+                <div class="button-group">
+                    <button class="btn btn-primary" onclick="showUseCase('traffic')">交通流预测</button>
+                    <button class="btn btn-secondary" onclick="showUseCase('environment')">环境监测</button>
+                    <button class="btn btn-primary" onclick="showUseCase('social')">社交网络</button>
+                    <button class="btn btn-secondary" onclick="showUseCase('epidemic')">疫情建模</button>
+                </div>
+                <div id="usecase-display"></div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        let currentTimeStep = 1;
+        let currentArchitecture = 'stgcn';
+        let simulationRunning = false;
+        let parameters = {
+            timeSteps: 5,
+            nodeCount: 8,
+            hiddenDim: 64
+        };
+
+        // 标签页切换
+        function showTab(tabName) {
+            // 隐藏所有标签页
+            const tabs = document.querySelectorAll('.tab-content');
+            tabs.forEach(tab => tab.classList.remove('active'));
+            
+            // 移除所有按钮的活跃状态
+            const buttons = document.querySelectorAll('.nav-tab');
+            buttons.forEach(btn => btn.classList.remove('active'));
+            
+            // 显示目标标签页
+            document.getElementById(tabName).classList.add('active');
+            event.target.classList.add('active');
+        }
+
+        // 时间步高亮
+        function highlightTimeStep(step) {
+            const timeSteps = document.querySelectorAll('.time-step');
+            timeSteps.forEach((ts, index) => {
+                ts.classList.toggle('active', index + 1 === step);
+            });
+            currentTimeStep = step;
+            updateGraphEvolution();
+        }
+
+        // 更新图演化显示
+        function updateGraphEvolution() {
+            const container = document.getElementById('graph-evolution');
+            let html = `<div class="graph-snapshot">
+                <h4>时间步 t${currentTimeStep}</h4>
+                <div>`;
+            
+            // 生成节点
+            for (let i = 0; i < 5; i++) {
+                const intensity = Math.random() * 0.5 + 0.5;
+                html += `<div class="node" style="opacity: ${intensity}" 
+                         title="节点 ${i+1} 在 t${currentTimeStep} 的状态"></div>`;
+                if (i < 4) html += '<div class="edge"></div>';
+            }
+            
+            html += '</div></div>';
+            container.innerHTML = html;
+        }
+
+        // 显示网络架构
+        function showArchitecture(arch) {
+            currentArchitecture = arch;
+            const display = document.getElementById('architecture-display');
+            
+            const architectures = {
+                'stgcn': {
+                    title: 'ST-GCN 架构',
+                    description: '时空图卷积网络通过在图的空间维度和时间维度上应用卷积操作来提取特征。',
+                    layers: ['输入层', '空间卷积', '时间卷积', '残差连接', '输出层']
+                },
+                'astgcn': {
+                    title: 'ASTGCN 架构', 
+                    description: '自适应时空图卷积网络引入了自适应邻接矩阵和时空注意力机制。',
+                    layers: ['输入层', '时空注意力', '自适应邻接矩阵', '图卷积', '输出层']
+                },
+                'stgat': {
+                    title: 'STGAT 架构',
+                    description: '时空图注意力网络利用多头注意力机制动态学习节点间的依赖关系。',
+                    layers: ['输入层', '多头注意力', '时间门控', '图聚合', '输出层']
+                },
+                'dcrnn': {
+                    title: 'DCRNN 架构',
+                    description: '扩散卷积循环神经网络结合了扩散过程和循环神经网络的优势。',
+                    layers: ['输入层', '扩散卷积', 'GRU单元', '编码器-解码器', '输出层']
+                }
+            };
+            
+            const info = architectures[arch];
+            display.innerHTML = `
+                <div class="concept-card">
+                    <h3>${info.title}</h3>
+                    <p>${info.description}</p>
+                    <div style="margin-top: 20px;">
+                        <h4>主要组件:</h4>
+                        <ul>
+                            ${info.layers.map(layer => `<li>${layer}</li>`).join('')}
+                        </ul>
+                    </div>
+                </div>
+            `;
+        }
+
+        // 更新参数
+        function updateParameter(param, value) {
+            parameters[param] = parseInt(value);
+            document.getElementById(param + 'Value').textContent = value;
+        }
+
+        // 运行仿真
+        function runSimulation() {
+            if (simulationRunning) return;
+            
+            simulationRunning = true;
+            const display = document.getElementById('simulation-content');
+            
+            display.innerHTML = `
+                <div style="text-align: center;">
+                    <h4>🔄 正在运行仿真...</h4>
+                    <p>参数设置: ${parameters.timeSteps}个时间步, ${parameters.nodeCount}个节点, ${parameters.hiddenDim}维隐藏层</p>
+                </div>
+            `;
+            
+            // 模拟训练过程
+            let epoch = 0;
+            const maxEpochs = 20;
+            const interval = setInterval(() => {
+                epoch++;
+                const loss = (1 / epoch * 10 + Math.random() * 0.1).toFixed(4);
+                const accuracy = Math.min(0.95, epoch / maxEpochs * 0.9 + Math.random() * 0.05).toFixed(4);
+                const time = (epoch * 0.1).toFixed(2);
+                const memory = (parameters.nodeCount * parameters.hiddenDim / 1000).toFixed(0);
+                
+                document.getElementById('trainLoss').textContent = loss;
+                document.getElementById('valAccuracy').textContent = accuracy;
+                document.getElementById('computeTime').textContent = time + 's';
+                document.getElementById('memoryUsage').textContent = memory + 'MB';
+                
+                if (epoch >= maxEpochs) {
+                    clearInterval(interval);
+                    simulationRunning = false;
+                    display.innerHTML += `
+                        <div style="margin-top: 20px; padding: 20px; background: #e8f5e8; border-radius: 8px;">
+                            <h4>✅ 仿真完成!</h4>
+                            <p>模型已成功训练完成，可以查看性能指标。</p>
+                        </div>
+                    `;
+                }
+            }, 500);
+        }
+
+        // 重置仿真
+        function resetSimulation() {
+            simulationRunning = false;
+            document.getElementById('trainLoss').textContent = '0.0000';
+            document.getElementById('valAccuracy').textContent = '0.0000';
+            document.getElementById('computeTime').textContent = '0.00s';
+            document.getElementById('memoryUsage').textContent = '0MB';
+            document.getElementById('simulation-content').innerHTML = 
+                '<p>点击"运行仿真"开始体验时空图神经网络的训练过程</p>';
+        }
+
+        // 导出结果
+        function exportResults() {
+            const results = {
+                parameters: parameters,
+                metrics: {
+                    trainLoss: document.getElementById('trainLoss').textContent,
+                    valAccuracy: document.getElementById('valAccuracy').textContent,
+                    computeTime: document.getElementById('computeTime').textContent,
+                    memoryUsage: document.getElementById('memoryUsage').textContent
+                },
+                timestamp: new Date().toISOString()
+            };
+            
+            const blob = new Blob([JSON.stringify(results, null, 2)], {type: 'application/json'});
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = 'stgnn_results.json';
+            a.click();
+        }
+
+        // 显示应用案例
+        function showUseCase(useCase) {
+            const display = document.getElementById('usecase-display');
+            
+            const cases = {
+                'traffic': {
+                    title: '🚗 交通流预测案例',
+                    description: '使用时空图神经网络预测城市道路网络的交通流量',
+                    example: '在北京市道路网络中，我们可以将每个路段作为图的节点，路段之间的连接作为边。通过收集历史交通流量数据，模型可以学习交通流的时空模式，预测未来的交通状况。'
+                },
+                'environment': {
+                    title: '🌡️ 环境监测案例',
+                    description: '监测和预测空气质量在城市中的时空分布',
+                    example: '以城市中的监测站点为节点，站点间的地理邻近关系为边构建图。模型可以学习污染物浓度的扩散模式，预测未监测区域的空气质量，为环境管理提供决策支持。'
+                },
+                'social': {
+                    title: '📱 社交网络案例',
+                    description: '分析社交媒体中信息传播的时空模式',
+                    example: '将用户作为节点，用户间的关注关系作为边。模型可以预测信息在网络中的传播路径和速度，识别关键影响者，为营销策略和舆情监控提供insights。'
+                },
+                'epidemic': {
+                    title: '🏥 疫情建模案例',
+                    description: '建模传染病在人群中的传播过程',
+                    example: '以地理区域为节点，人员流动为边。模型可以预测疫情的传播趋势，评估不同干预措施的效果，为公共卫生决策提供科学依据。'
+                }
+            };
+            
+            const info = cases[useCase];
+            display.innerHTML = `
+                <div class="concept-card">
+                    <h3>${info.title}</h3>
+                    <p><strong>场景描述:</strong> ${info.description}</p>
+                    <p><strong>实际应用:</strong> ${info.example}</p>
+                </div>
+            `;
+        }
+
+        // 初始化
+        window.onload = function() {
+            updateGraphEvolution();
+            showArchitecture('stgcn');
+            
+            // 初始化特征矩阵
+            const matrices = ['stgcn-matrix', 'astgcn-matrix', 'stgat-matrix', 'dcrnn-matrix'];
+            matrices.forEach(id => {
+                const container = document.getElementById(id);
+                for (let i = 0; i < 15; i++) {
+                    const cell = document.createElement('div');
+                    cell.className = 'feature-cell';
+                    cell.textContent = Math.floor(Math.random() * 100);
+                    container.appendChild(cell);
+                }
+            });
+        };
+    </script>
+</body>
+</html> 

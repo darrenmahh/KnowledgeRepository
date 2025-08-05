@@ -1,0 +1,219 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>交互式 XGBoost 演示</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Noto+Sans+SC:wght@400;500;700&display=swap');
+        body {
+            font-family: 'Noto Sans SC', sans-serif;
+        }
+        .step-card {
+            transition: all 0.3s ease-in-out;
+            border-left-width: 4px;
+        }
+        .step-card.active {
+            transform: translateY(-5px) scale(1.02);
+            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+        }
+        .progress-bar-fill {
+            transition: width 0.5s ease-in-out;
+        }
+    </style>
+</head>
+<body class="bg-gray-100 text-gray-800">
+
+    <div class="container mx-auto p-4 md:p-8">
+        <header class="text-center mb-8">
+            <h1 class="text-4xl font-bold text-gray-900">交互式 XGBoost 演示</h1>
+            <p class="text-xl text-gray-600 mt-2">体验 XGBoost 如何通过“迭代修正”来逐步逼近真实值。</p>
+        </header>
+
+        <main class="grid grid-cols-1 lg:grid-cols-3 gap-8">
+            <!-- 左侧：手动操作区 -->
+            <div class="lg:col-span-1 bg-white p-6 rounded-2xl shadow-lg">
+                <h2 class="text-2xl font-bold mb-4 border-b pb-2">步骤 1: 设定目标</h2>
+                <p class="mb-4 text-gray-600">假设我们要预测一个GPP（总初级生产力）值。请先设定一个**真实GPP值**作为我们的目标。</p>
+                
+                <div class="mb-6">
+                    <label for="gpp-slider" class="block font-medium mb-1">真实 GPP 值 (0 ~ 10)</label>
+                    <input id="gpp-slider" type="range" min="0" max="10" value="7.5" step="0.1" class="w-full h-2 bg-gradient-to-r from-yellow-300 to-green-500 rounded-lg appearance-none cursor-pointer">
+                    <div class="text-center font-bold text-3xl text-green-600 mt-2" id="gpp-value">7.5</div>
+                </div>
+
+                <div class="mt-8">
+                     <h2 class="text-2xl font-bold mb-4 border-b pb-2">步骤 2: 逐步预测</h2>
+                     <p class="mb-4 text-gray-600">点击下方的“下一步”按钮，观察 XGBoost 如何通过一系列简单的“弱学习器”（小树）来逐步修正预测。</p>
+                     <button id="next-step-btn" class="w-full bg-blue-600 text-white font-bold py-3 px-4 rounded-lg hover:bg-blue-700 transition duration-300">
+                         开始预测 (第 1 步)
+                     </button>
+                     <button id="reset-btn" class="w-full bg-gray-500 text-white font-bold py-2 px-4 rounded-lg hover:bg-gray-600 transition duration-300 mt-3">
+                         重置
+                     </button>
+                </div>
+            </div>
+
+            <!-- 右侧：XGBoost 预测流程 -->
+            <div class="lg:col-span-2 bg-white p-6 rounded-2xl shadow-lg">
+                <h2 class="text-2xl font-bold mb-4">XGBoost 预测流程</h2>
+                
+                <!-- 最终结果展示 -->
+                <div class="bg-indigo-50 p-6 rounded-xl mb-6">
+                    <div class="flex justify-between items-center mb-2">
+                        <span class="font-semibold text-indigo-800">当前预测值</span>
+                        <span class="font-bold text-xl text-indigo-900" id="current-prediction-display">3.00</span>
+                    </div>
+                    <div class="w-full bg-gray-200 rounded-full h-6">
+                        <div id="progress-bar" class="bg-indigo-500 h-6 rounded-full text-white text-center font-bold leading-6 progress-bar-fill" style="width: 30%;">
+                            3.00
+                        </div>
+                    </div>
+                    <div class="flex justify-between items-center mt-1 text-sm">
+                        <span>0</span>
+                        <span id="target-gpp-label" class="font-bold text-green-600">目标: 7.5</span>
+                        <span>10</span>
+                    </div>
+                </div>
+
+
+                <!-- 预测步骤 -->
+                <div id="steps-container" class="space-y-4">
+                    <div id="step-0" class="step-card bg-white p-4 rounded-lg border-gray-300 shadow active">
+                        <h4 class="font-bold">初始预测 (F₀)</h4>
+                        <p class="text-gray-600">模型从一个简单的基准开始，通常是所有数据的平均值。我们假设它是 <span class="font-bold">3.0</span>。</p>
+                        <p class="font-semibold mt-2">当前预测 = <span class="text-indigo-600">3.0</span></p>
+                        <p class="font-semibold">当前残差 (真实 - 预测) = <span class="text-red-600" id="residual-0">4.5</span></p>
+                    </div>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <script>
+    document.addEventListener('DOMContentLoaded', function () {
+        const gppSlider = document.getElementById('gpp-slider');
+        const gppValueDisplay = document.getElementById('gpp-value');
+        const nextStepBtn = document.getElementById('next-step-btn');
+        const resetBtn = document.getElementById('reset-btn');
+        const progressBar = document.getElementById('progress-bar');
+        const currentPredictionDisplay = document.getElementById('current-prediction-display');
+        const targetGppLabel = document.getElementById('target-gpp-label');
+        const stepsContainer = document.getElementById('steps-container');
+
+        let targetGpp = 7.5;
+        let currentPrediction = 3.0;
+        let currentStep = 0;
+        const learningRate = 0.5; // 学习率
+        const maxSteps = 5;
+
+        const weakLearners = [
+            (residual) => residual * 0.8,
+            (residual) => residual * 0.7,
+            (residual) => residual * 0.6,
+            (residual) => residual * 0.5,
+            (residual) => residual * 0.4
+        ];
+
+        function updateUI() {
+            // 更新滑块显示值
+            gppValueDisplay.textContent = parseFloat(targetGpp).toFixed(1);
+            targetGppLabel.textContent = `目标: ${parseFloat(targetGpp).toFixed(1)}`;
+            
+            // 更新进度条
+            const progressPercentage = (currentPrediction / 10) * 100;
+            progressBar.style.width = `${progressPercentage}%`;
+            progressBar.textContent = parseFloat(currentPrediction).toFixed(2);
+            currentPredictionDisplay.textContent = parseFloat(currentPrediction).toFixed(2);
+
+            // 更新所有步骤卡的残差显示
+            let tempPrediction = 3.0;
+            document.getElementById('residual-0').textContent = (targetGpp - tempPrediction).toFixed(2);
+            for (let i = 1; i <= currentStep; i++) {
+                 const stepCard = document.getElementById(`step-${i}`);
+                 if(stepCard){
+                     const residual = parseFloat(stepCard.dataset.residual);
+                     const correction = parseFloat(stepCard.dataset.correction);
+                     tempPrediction += correction;
+                     const newResidual = targetGpp - tempPrediction;
+                     stepCard.querySelector('.residual-value').textContent = newResidual.toFixed(2);
+                 }
+            }
+
+            // 更新按钮状态
+            if (currentStep >= maxSteps) {
+                nextStepBtn.disabled = true;
+                nextStepBtn.textContent = '预测完成';
+                nextStepBtn.classList.add('bg-gray-400', 'cursor-not-allowed');
+                nextStepBtn.classList.remove('bg-blue-600', 'hover:bg-blue-700');
+            } else {
+                nextStepBtn.disabled = false;
+                nextStepBtn.textContent = `进行第 ${currentStep + 1} 步预测`;
+                nextStepBtn.classList.remove('bg-gray-400', 'cursor-not-allowed');
+                nextStepBtn.classList.add('bg-blue-600', 'hover:bg-blue-700');
+            }
+        }
+
+        function reset() {
+            currentStep = 0;
+            currentPrediction = 3.0;
+            stepsContainer.innerHTML = `
+                <div id="step-0" class="step-card bg-white p-4 rounded-lg border-gray-300 shadow active">
+                    <h4 class="font-bold">初始预测 (F₀)</h4>
+                    <p class="text-gray-600">模型从一个简单的基准开始，假设为 <span class="font-bold">3.0</span>。</p>
+                    <p class="font-semibold mt-2">当前预测 = <span class="text-indigo-600">3.0</span></p>
+                    <p class="font-semibold">当前残差 (真实 - 预测) = <span class="text-red-600" id="residual-0">...</span></p>
+                </div>`;
+            updateUI();
+        }
+
+        gppSlider.addEventListener('input', (e) => {
+            targetGpp = parseFloat(e.target.value);
+            reset();
+        });
+
+        nextStepBtn.addEventListener('click', () => {
+            if (currentStep >= maxSteps) return;
+
+            // Deactivate previous card
+            const prevActiveCard = document.querySelector('.step-card.active');
+            if(prevActiveCard) prevActiveCard.classList.remove('active');
+
+            currentStep++;
+
+            const residual = targetGpp - currentPrediction;
+            const treePrediction = weakLearners[currentStep - 1](residual);
+            const correction = learningRate * treePrediction;
+            
+            currentPrediction += correction;
+
+            const newStepCard = document.createElement('div');
+            newStepCard.id = `step-${currentStep}`;
+            newStepCard.classList.add('step-card', 'bg-white', 'p-4', 'rounded-lg', 'border-blue-400', 'shadow', 'active');
+            newStepCard.dataset.residual = residual;
+            newStepCard.dataset.correction = correction;
+            newStepCard.innerHTML = `
+                <h4 class="font-bold">第 ${currentStep} 棵树 (h${currentStep})</h4>
+                <p class="text-gray-600">这棵树的任务是拟合上一轮的残差(<span class="font-bold text-red-500">${residual.toFixed(2)}</span>)。</p>
+                <p class="mt-2">树的预测 = <span class="font-semibold">${treePrediction.toFixed(2)}</span></p>
+                <p>本轮修正值 (学习率 * 树的预测) = <span class="font-bold text-green-600">${correction.toFixed(2)}</span></p>
+                <p class="font-semibold mt-2">新总预测 = 上一轮预测 + 修正值 = ${ (currentPrediction - correction).toFixed(2)} + ${correction.toFixed(2)} = <span class="text-indigo-600">${currentPrediction.toFixed(2)}</span></p>
+                <p class="font-semibold">新残差 = <span class="text-red-600 residual-value">${(targetGpp - currentPrediction).toFixed(2)}</span></p>
+            `;
+            stepsContainer.appendChild(newStepCard);
+            
+            // Scroll to the new card
+            newStepCard.scrollIntoView({ behavior: 'smooth', block: 'end' });
+            
+            updateUI();
+        });
+        
+        resetBtn.addEventListener('click', reset);
+
+        // Initial setup
+        reset();
+    });
+    </script>
+</body>
+</html>

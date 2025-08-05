@@ -1,0 +1,9 @@
+{
+  "citationExportFormat": "biblatex",
+  "literatureNoteTitleTemplate": "@{{citekey}}",
+  "literatureNoteFolder": "论文汇总",
+  "literatureNoteContentTemplate": "---\ntitle: {{title}}\nauthors: {{authorString}}\nyear: {{year}}\njournal: {{containerTitle}}\ncitekey: {{citekey}}\ntags: [论文笔记, {{year}}]\n---\n\n# {{title}}\n\n> 👨‍💼 作者：{{authorString}}  \n> 🗞 期刊：{{containerTitle}}  \n> 🕓 年份：{{year}}  \n> 🔗 CiteKey：`{{citekey}}`  \n\n---\n\n## 📌 一句话总结\n\n（一句话总结论文核心贡献）\n\n---\n\n## 🧪 方法与数据\n\n- 模型/方法：\n- 使用数据：\n- 实验设计：\n\n---\n\n## 📊 主要结果\n\n（可列出图表、指标对比）\n\n---\n\n## 🚧 不足与反思\n\n---\n\n## 💡 我的思考\n\n---\n\n",
+  "markdownCitationTemplate": "[@{{citekey}}]",
+  "alternativeMarkdownCitationTemplate": "@{{citekey}}",
+  "citationExportPath": "论文汇总/library.bib"
+}
