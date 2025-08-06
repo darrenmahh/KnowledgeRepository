@@ -1,6 +1,22 @@
 {
   "recentFiles": [
     {
+      "basename": "通用2.0",
+      "path": "13-java八股/Prompt/通用2.0.md"
+    },
+    {
+      "basename": "JUC",
+      "path": "000-八股/02-资料/JUC.pdf"
+    },
+    {
+      "basename": "JVM",
+      "path": "000-八股/02-资料/JVM.pdf"
+    },
+    {
+      "basename": "JavaSE",
+      "path": "000-八股/02-资料/JavaSE.pdf"
+    },
+    {
       "basename": "消息队列",
       "path": "000-八股/01-笔记/MQ/消息队列.md"
     },
@@ -37,10 +53,6 @@
       "path": "000-八股/02-资料/Redis.pdf"
     },
     {
-      "basename": "通用2.0",
-      "path": "13-java八股/Prompt/通用2.0.md"
-    },
-    {
       "basename": "通用",
       "path": "13-java八股/Prompt/通用.md"
     },
@@ -55,10 +67,6 @@
     {
       "basename": "Spring全家桶",
       "path": "000-八股/02-资料/Spring全家桶.pdf"
-    },
-    {
-      "basename": "JVM",
-      "path": "000-八股/02-资料/JVM.pdf"
     },
     {
       "basename": "电影",
@@ -139,14 +147,6 @@
     {
       "basename": "Java基础面试题",
       "path": "13-java八股/Java基础面试题.md"
-    },
-    {
-      "basename": "JavaSE",
-      "path": "000-八股/02-资料/JavaSE.pdf"
-    },
-    {
-      "basename": "JUC",
-      "path": "000-八股/02-资料/JUC.pdf"
     },
     {
       "basename": "实验思路",

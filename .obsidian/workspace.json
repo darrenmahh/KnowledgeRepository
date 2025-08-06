@@ -11,10 +11,30 @@
             "id": "d1cf0fef7b5db2c8",
             "type": "leaf",
             "state": {
-              "type": "empty",
-              "state": {},
+              "type": "markdown",
+              "state": {
+                "file": "13-java八股/Prompt/通用2.0.md",
+                "mode": "source",
+                "source": false
+              },
               "icon": "lucide-file",
-              "title": "新标签页"
+              "title": "通用2.0"
+            }
+          },
+          {
+            "id": "cfac6c1068083f73",
+            "type": "leaf",
+            "state": {
+              "type": "pdf",
+              "state": {
+                "file": "000-八股/02-资料/JUC.pdf",
+                "page": 1,
+                "left": -10,
+                "top": 845,
+                "zoom": 1.5026221260334898
+              },
+              "icon": "lucide-file-text",
+              "title": "JUC"
             }
           }
         ]
@@ -148,12 +168,13 @@
             "state": {
               "type": "outline",
               "state": {
+                "file": "13-java八股/Prompt/通用2.0.md",
                 "followCursor": false,
                 "showSearch": false,
                 "searchQuery": ""
               },
               "icon": "lucide-list",
-              "title": "大纲"
+              "title": "通用2.0 的大纲"
             }
           },
           {
@@ -211,22 +232,22 @@
       "periodic-notes:Open today": false
     }
   },
-  "active": "db5bc154f9365904",
+  "active": "d1cf0fef7b5db2c8",
   "lastOpenFiles": [
+    "000-八股/02-资料/JUC.pdf",
+    "13-java八股/Prompt/通用2.0.md",
+    "000-八股/02-资料/JVM.pdf",
+    "000-八股/02-资料/JavaSE.pdf",
     "000-八股/01-笔记/MQ/消息队列.md",
     "000-八股/02-资料/MQ.pdf",
     "01-论文汇总/08-论文pdf/通量GPP计算.pdf",
     "01-论文汇总/00-论文/论文大纲.md",
-    "000-八股/02-资料/JavaSE.pdf",
     "000-八股/02-资料/MySQL.pdf",
     "000-八股/02-资料/Redis.pdf",
-    "000-八股/02-资料/JVM.pdf",
     "000-八股/02-资料/Spring全家桶.pdf",
     "000-八股/02-资料/计算机基础.pdf",
-    "000-八股/02-资料/JUC.pdf",
     "confirm机制.md",
     "000-八股/01-笔记/Redis/Redis.md",
-    "13-java八股/Prompt/通用2.0.md",
     "000-八股/01-笔记/SQL",
     "000-八股/01-笔记/Redis/Redis阶段一.md",
     "13-java八股/Prompt/通用.md",
