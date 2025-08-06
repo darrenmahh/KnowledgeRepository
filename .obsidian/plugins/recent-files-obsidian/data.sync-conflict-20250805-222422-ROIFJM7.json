@@ -1,20 +1,48 @@
 {
   "recentFiles": [
     {
-      "basename": "步骤",
-      "path": "01-论文汇总/00-改进实验/步骤.md"
-    },
-    {
-      "basename": "通量GPP计算",
-      "path": "01-论文汇总/08-论文pdf/通量GPP计算.pdf"
-    },
-    {
       "basename": "消息队列",
       "path": "000-八股/01-笔记/MQ/消息队列.md"
     },
     {
-      "basename": "判断推理知识点梳理",
-      "path": "05-GWY/01-行测/02-逻辑判断/0102-花生十三逻辑判断/判断推理知识点梳理.md"
+      "basename": "MQ",
+      "path": "000-八股/02-资料/MQ.pdf"
+    },
+    {
+      "basename": "JavaSE",
+      "path": "000-八股/02-资料/JavaSE.pdf"
+    },
+    {
+      "basename": "MySQL",
+      "path": "000-八股/02-资料/MySQL.pdf"
+    },
+    {
+      "basename": "Redis",
+      "path": "000-八股/02-资料/Redis.pdf"
+    },
+    {
+      "basename": "JVM",
+      "path": "000-八股/02-资料/JVM.pdf"
+    },
+    {
+      "basename": "Spring全家桶",
+      "path": "000-八股/02-资料/Spring全家桶.pdf"
+    },
+    {
+      "basename": "计算机基础",
+      "path": "000-八股/02-资料/计算机基础.pdf"
+    },
+    {
+      "basename": "JUC",
+      "path": "000-八股/02-资料/JUC.pdf"
+    },
+    {
+      "basename": "confirm机制",
+      "path": "confirm机制.md"
+    },
+    {
+      "basename": "Redis",
+      "path": "000-八股/01-笔记/Redis/Redis.md"
     },
     {
       "basename": "Redis",
@@ -25,12 +53,12 @@
       "path": "000-八股/01-笔记/SQL笔记.md"
     },
     {
-      "basename": "命题否定整理",
-      "path": "05-GWY/01-行测/02-逻辑判断/0102-花生十三逻辑判断/命题否定整理.md"
+      "basename": "判断推理知识点梳理",
+      "path": "05-GWY/01-行测/02-逻辑判断/0102-花生十三逻辑判断/判断推理知识点梳理.md"
     },
     {
-      "basename": "Redis",
-      "path": "000-八股/02-资料/Redis.pdf"
+      "basename": "命题否定整理",
+      "path": "05-GWY/01-行测/02-逻辑判断/0102-花生十三逻辑判断/命题否定整理.md"
     },
     {
       "basename": "通用2.0",
@@ -45,22 +73,6 @@
       "path": "00_系统配置/待办.md"
     },
     {
-      "basename": "MySQL",
-      "path": "000-八股/02-资料/MySQL.pdf"
-    },
-    {
-      "basename": "Spring全家桶",
-      "path": "000-八股/02-资料/Spring全家桶.pdf"
-    },
-    {
-      "basename": "JVM",
-      "path": "000-八股/02-资料/JVM.pdf"
-    },
-    {
-      "basename": "MQ",
-      "path": "000-八股/02-资料/MQ.pdf"
-    },
-    {
       "basename": "电影",
       "path": "00_系统配置/电影.md"
     },
@@ -71,6 +83,10 @@
     {
       "basename": "SQL前29",
       "path": "000-八股/03-测试/SQL前29.md"
+    },
+    {
+      "basename": "步骤",
+      "path": "01-论文汇总/00-改进实验/步骤.md"
     },
     {
       "basename": "言语理解",
@@ -125,10 +141,6 @@
       "path": "15-开会记录/20250714.md"
     },
     {
-      "basename": "计算机基础",
-      "path": "000-八股/02-资料/计算机基础.pdf"
-    },
-    {
       "basename": "Redis",
       "path": "000-八股/Redis.pdf"
     },
@@ -139,14 +151,6 @@
     {
       "basename": "Java基础面试题",
       "path": "13-java八股/Java基础面试题.md"
-    },
-    {
-      "basename": "JavaSE",
-      "path": "000-八股/02-资料/JavaSE.pdf"
-    },
-    {
-      "basename": "JUC",
-      "path": "000-八股/02-资料/JUC.pdf"
     },
     {
       "basename": "实验思路",
@@ -195,10 +199,6 @@
     {
       "basename": "行测必背手册",
       "path": "05-GWY/04-晨读/行测必背手册.pdf"
-    },
-    {
-      "basename": "【言语】顾斐高频成语500词",
-      "path": "05-GWY/04-晨读/【言语】顾斐高频成语500词.pdf"
     }
   ],
   "omittedPaths": [],
