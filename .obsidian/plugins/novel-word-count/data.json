@@ -49445,33 +49445,6 @@
         "newlineCount": 0
       }
     },
-    "01-论文汇总/00-改进实验/步骤.md": {
-      "isCountable": true,
-      "targetNodeType": "file",
-      "noteCount": 1,
-      "wordCount": 1620,
-      "wordCountTowardGoal": 0,
-      "wordGoal": null,
-      "pageCount": 5.4,
-      "characterCount": 3085,
-      "nonWhitespaceCharacterCount": 2603,
-      "newlineCount": 137,
-      "readingTimeInMinutes": 3.495396226415094,
-      "linkCount": 0,
-      "embedCount": 0,
-      "aliases": null,
-      "createdDate": 1751961992689,
-      "modifiedDate": 1753344312066,
-      "sizeInBytes": 6312,
-      "sessionStart": {
-        "noteCount": 1,
-        "pageCount": 5.4,
-        "wordCount": 1620,
-        "characterCount": 3085,
-        "nonWhitespaceCharacterCount": 2603,
-        "newlineCount": 137
-      }
-    },
     "00_系统配置/电影.md": {
       "isCountable": true,
       "targetNodeType": "file",
@@ -50010,6 +49983,33 @@
         "characterCount": 13410,
         "nonWhitespaceCharacterCount": 11733,
         "newlineCount": 409
+      }
+    },
+    "01-论文汇总/00-论文/论文大纲.md": {
+      "isCountable": true,
+      "targetNodeType": "file",
+      "noteCount": 1,
+      "wordCount": 1540,
+      "wordCountTowardGoal": 0,
+      "wordGoal": null,
+      "pageCount": 5.133333333333334,
+      "characterCount": 2762,
+      "nonWhitespaceCharacterCount": 2327,
+      "newlineCount": 132,
+      "readingTimeInMinutes": 3.252037735849057,
+      "linkCount": 0,
+      "embedCount": 0,
+      "aliases": null,
+      "createdDate": 1751961992689,
+      "modifiedDate": 1754447941897,
+      "sizeInBytes": 5923,
+      "sessionStart": {
+        "noteCount": 0,
+        "pageCount": 0,
+        "wordCount": 0,
+        "characterCount": 0,
+        "nonWhitespaceCharacterCount": 0,
+        "newlineCount": 0
       }
     }
   }
