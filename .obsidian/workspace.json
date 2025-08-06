@@ -4,41 +4,20 @@
     "type": "split",
     "children": [
       {
-        "id": "607be2bd1c2023b3",
+        "id": "1b4f2343104855ab",
         "type": "tabs",
         "children": [
           {
-            "id": "d96f09bc6f4c4368",
+            "id": "d1cf0fef7b5db2c8",
             "type": "leaf",
             "state": {
-              "type": "pdf",
-              "state": {
-                "file": "01-论文汇总/08-论文pdf/通量GPP计算.pdf",
-                "page": 1,
-                "left": -10,
-                "top": 698,
-                "zoom": 1.568421052631579
-              },
-              "icon": "lucide-file-text",
-              "title": "通量GPP计算"
-            }
-          },
-          {
-            "id": "2e922194296915a7",
-            "type": "leaf",
-            "state": {
-              "type": "markdown",
-              "state": {
-                "file": "01-论文汇总/00-论文/论文大纲.md",
-                "mode": "source",
-                "source": false
-              },
+              "type": "empty",
+              "state": {},
               "icon": "lucide-file",
-              "title": "论文大纲"
+              "title": "新标签页"
             }
           }
-        ],
-        "currentTab": 1
+        ]
       }
     ],
     "direction": "vertical"
@@ -169,13 +148,12 @@
             "state": {
               "type": "outline",
               "state": {
-                "file": "01-论文汇总/00-论文/论文大纲.md",
                 "followCursor": false,
                 "showSearch": false,
                 "searchQuery": ""
               },
               "icon": "lucide-list",
-              "title": "论文大纲 的大纲"
+              "title": "大纲"
             }
           },
           {
@@ -233,12 +211,12 @@
       "periodic-notes:Open today": false
     }
   },
-  "active": "e945d6d16a11f41b",
+  "active": "db5bc154f9365904",
   "lastOpenFiles": [
-    "01-论文汇总/08-论文pdf/通量GPP计算.pdf",
-    "01-论文汇总/00-论文/论文大纲.md",
     "000-八股/01-笔记/MQ/消息队列.md",
     "000-八股/02-资料/MQ.pdf",
+    "01-论文汇总/08-论文pdf/通量GPP计算.pdf",
+    "01-论文汇总/00-论文/论文大纲.md",
     "000-八股/02-资料/JavaSE.pdf",
     "000-八股/02-资料/MySQL.pdf",
     "000-八股/02-资料/Redis.pdf",
@@ -250,7 +228,6 @@
     "000-八股/01-笔记/Redis/Redis.md",
     "13-java八股/Prompt/通用2.0.md",
     "000-八股/01-笔记/SQL",
-    "000-八股/01-笔记/Java",
     "000-八股/01-笔记/Redis/Redis阶段一.md",
     "13-java八股/Prompt/通用.md",
     "05-GWY/02-申论/白鹭申论进度.md",

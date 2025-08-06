@@ -1,16 +1,20 @@
 {
   "recentFiles": [
     {
-      "basename": "论文大纲",
-      "path": "01-论文汇总/00-论文/论文大纲.md"
+      "basename": "消息队列",
+      "path": "000-八股/01-笔记/MQ/消息队列.md"
+    },
+    {
+      "basename": "MQ",
+      "path": "000-八股/02-资料/MQ.pdf"
     },
     {
       "basename": "通量GPP计算",
       "path": "01-论文汇总/08-论文pdf/通量GPP计算.pdf"
     },
     {
-      "basename": "消息队列",
-      "path": "000-八股/01-笔记/MQ/消息队列.md"
+      "basename": "论文大纲",
+      "path": "01-论文汇总/00-论文/论文大纲.md"
     },
     {
       "basename": "判断推理知识点梳理",
@@ -55,10 +59,6 @@
     {
       "basename": "JVM",
       "path": "000-八股/02-资料/JVM.pdf"
-    },
-    {
-      "basename": "MQ",
-      "path": "000-八股/02-资料/MQ.pdf"
     },
     {
       "basename": "电影",
