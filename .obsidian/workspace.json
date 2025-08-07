@@ -22,22 +22,21 @@
             }
           },
           {
-            "id": "cfac6c1068083f73",
+            "id": "6e2e5eff15c3094a",
             "type": "leaf",
             "state": {
-              "type": "pdf",
+              "type": "markdown",
               "state": {
-                "file": "000-八股/02-资料/JUC.pdf",
-                "page": 1,
-                "left": -10,
-                "top": 845,
-                "zoom": 1.5026221260334898
+                "file": "17-论文/北京市GPP模型构建.md",
+                "mode": "source",
+                "source": false
               },
-              "icon": "lucide-file-text",
-              "title": "JUC"
+              "icon": "lucide-file",
+              "title": "北京市GPP模型构建"
             }
           }
-        ]
+        ],
+        "currentTab": 1
       }
     ],
     "direction": "vertical"
@@ -168,13 +167,12 @@
             "state": {
               "type": "outline",
               "state": {
-                "file": "13-java八股/Prompt/通用2.0.md",
                 "followCursor": false,
                 "showSearch": false,
                 "searchQuery": ""
               },
               "icon": "lucide-list",
-              "title": "通用2.0 的大纲"
+              "title": "大纲"
             }
           },
           {
@@ -203,8 +201,8 @@
             "state": {
               "type": "git-view",
               "state": {},
-              "icon": "git-pull-request",
-              "title": "Source Control"
+              "icon": "lucide-file",
+              "title": "插件不再活动"
             }
           }
         ],
@@ -228,47 +226,47 @@
       "pdf-plus:PDF++: Toggle auto-focus": false,
       "pdf-plus:PDF++: Toggle auto-paste": false,
       "mermaid-tools:Open Mermaid Toolbar": false,
-      "obsidian-git:Open Git source control": false,
       "periodic-notes:Open today": false
     }
   },
-  "active": "d1cf0fef7b5db2c8",
+  "active": "db5bc154f9365904",
   "lastOpenFiles": [
-    "000-八股/02-资料/JUC.pdf",
+    "17-论文/北京市GPP模型构建.md",
     "13-java八股/Prompt/通用2.0.md",
+    "01-论文汇总/00-论文/论文大纲.md",
+    "01-论文汇总/03_模型/01_结果/模型结果记录.md",
+    "17-论文",
+    "00_系统配置/待办.md",
+    "00_系统配置/HTML模板.md",
+    "00_系统配置/字体模板.md",
+    "00_系统配置/热力图.md",
+    "01-论文汇总/01-老师/结合通量观测站点数据和光能...用率模型模拟植被GPP研究_董浩.md",
+    "02-碳汇项目/碳汇系统.md",
+    "01-论文汇总/01-老师/基于涡度协方差与卫星遥感的...沼湿地总初级生产力估算研究_杨芷璇.md",
+    "01-论文汇总/01-老师/基于机器学习的青藏高原总初级生产力估算研究_戴婕.md",
+    "01-论文汇总/02-数据/03-参数数据信息.md",
+    "01-论文汇总/02-数据/02-参数处理步骤.md",
+    "01-论文汇总/02-数据/01-论文参数.md",
+    "01-论文汇总/02-数据/00-论文思路.md",
+    "01-论文汇总/02-数据/论文复现/基于机器学习的青藏高原总初级生产力估算研究 - 复现步骤详解.md",
+    "01-论文汇总/04-内容/实验思路.md",
+    "01-论文汇总/04-内容/目录.md",
+    "01-论文汇总/04-内容/数据处理步骤.md",
+    "01-论文汇总/04-内容/疑问.md",
+    "01-论文汇总/05-实验流程/01-LAI/LAI处理流程.md",
+    "01-论文汇总/08-论文pdf/通量GPP计算.pdf",
+    "000-八股/02-资料/JUC.pdf",
     "000-八股/02-资料/JVM.pdf",
     "000-八股/02-资料/JavaSE.pdf",
     "000-八股/01-笔记/MQ/消息队列.md",
     "000-八股/02-资料/MQ.pdf",
-    "01-论文汇总/08-论文pdf/通量GPP计算.pdf",
-    "01-论文汇总/00-论文/论文大纲.md",
     "000-八股/02-资料/MySQL.pdf",
     "000-八股/02-资料/Redis.pdf",
     "000-八股/02-资料/Spring全家桶.pdf",
     "000-八股/02-资料/计算机基础.pdf",
     "confirm机制.md",
     "000-八股/01-笔记/Redis/Redis.md",
-    "000-八股/01-笔记/SQL",
     "000-八股/01-笔记/Redis/Redis阶段一.md",
-    "13-java八股/Prompt/通用.md",
-    "05-GWY/02-申论/白鹭申论进度.md",
-    "00_系统配置/HTML模板.md",
-    "000-八股/01-笔记/SQL/SQL笔记.md",
-    "05-GWY/01-行测/02-逻辑判断/0102-花生十三逻辑判断/判断推理知识点梳理.md",
-    "05-GWY/01-行测/02-逻辑判断/0102-花生十三逻辑判断/命题否定整理.md",
-    "00_系统配置/待办.md",
-    "00_系统配置/电影.md",
-    "000-八股/03-测试/SQL前29答题.md",
-    "000-八股/03-测试/SQL前29.md",
-    "05-GWY/00-笔记/言语理解.md",
-    "01-论文汇总/05-实验流程/01-LAI/LAI处理流程.md",
-    "01-论文汇总/02-数据/论文复现/基于机器学习的青藏高原总初级生产力估算研究 - 复现步骤详解.md",
-    "01-论文汇总/02-数据/03-参数数据信息.md",
-    "01-论文汇总/02-数据/02-参数处理步骤.md",
-    "01-论文汇总/02-数据/00-论文思路.md",
-    "01-论文汇总/03_模型/01_结果/模型结果记录.md",
-    "000-八股/01-笔记/Java/Java基础笔记.md",
-    "05-GWY/01-行测/02-逻辑判断/0102-花生十三逻辑判断/花生十三逻辑600题.md",
     "05-GWY/Pasted image 20250623095226.png",
     "assets/img/7/2/0/720d7e4ab8b18d26c3e6c7ed8f7179be9764cfdc08282dbc0e0673816acca11f.png",
     "05-GWY/01-行测/02-逻辑判断/0102-花生十三逻辑判断/-1--images/Pasted image 20250630192724.png",
