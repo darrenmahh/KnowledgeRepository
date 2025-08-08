@@ -13,12 +13,12 @@
             "state": {
               "type": "markdown",
               "state": {
-                "file": "17-论文/北京市GPP模型构建.md",
+                "file": "01-论文汇总/03_模型/01_结果/模型结果记录.md",
                 "mode": "source",
                 "source": false
               },
               "icon": "lucide-file",
-              "title": "北京市GPP模型构建"
+              "title": "模型结果记录"
             }
           }
         ]
@@ -83,13 +83,28 @@
               "icon": "lucide-search",
               "title": "搜索"
             }
+          },
+          {
+            "id": "cf995728c8845860",
+            "type": "leaf",
+            "state": {
+              "type": "outline",
+              "state": {
+                "file": "01-论文汇总/03_模型/01_结果/模型结果记录.md",
+                "followCursor": false,
+                "showSearch": false,
+                "searchQuery": ""
+              },
+              "icon": "lucide-list",
+              "title": "模型结果记录 的大纲"
+            }
           }
-        ]
+        ],
+        "currentTab": 4
       }
     ],
     "direction": "horizontal",
-    "width": 265.5,
-    "collapsed": true
+    "width": 265.5
   },
   "right": {
     "id": "2dcd0acacef7ce46",
@@ -148,21 +163,6 @@
             }
           },
           {
-            "id": "cf995728c8845860",
-            "type": "leaf",
-            "state": {
-              "type": "outline",
-              "state": {
-                "file": "17-论文/北京市GPP模型构建.md",
-                "followCursor": false,
-                "showSearch": false,
-                "searchQuery": ""
-              },
-              "icon": "lucide-list",
-              "title": "北京市GPP模型构建 的大纲"
-            }
-          },
-          {
             "id": "b5c566cd9eb2ffa5",
             "type": "leaf",
             "state": {
@@ -183,12 +183,11 @@
             }
           }
         ],
-        "currentTab": 5
+        "currentTab": 2
       }
     ],
     "direction": "horizontal",
-    "width": 200,
-    "collapsed": true
+    "width": 200
   },
   "left-ribbon": {
     "hiddenItems": {
@@ -214,8 +213,8 @@
   },
   "active": "6e2e5eff15c3094a",
   "lastOpenFiles": [
-    "01-论文汇总/00-论文/论文大纲.md",
     "17-论文/北京市GPP模型构建.md",
+    "01-论文汇总/00-论文/论文大纲.md",
     "13-java八股/Prompt/通用2.0.md",
     "01-论文汇总/03_模型/01_结果/模型结果记录.md",
     "17-论文",
