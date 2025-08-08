@@ -4,21 +4,21 @@
     "type": "split",
     "children": [
       {
-        "id": "318f1deb8827a1db",
+        "id": "90c7786b289477fe",
         "type": "tabs",
         "children": [
           {
-            "id": "eb6e51053b391d1d",
+            "id": "c73cb68bb21ad705",
             "type": "leaf",
             "state": {
-              "type": "split-diff-view",
+              "type": "markdown",
               "state": {
-                "aFile": "01-论文汇总/03_模型/spatiotemporal_gnn.html",
-                "bFile": "01-论文汇总/03_模型/spatiotemporal_gnn.html",
-                "aRef": ""
+                "file": "01-论文汇总/03_模型/01_结果/模型结果记录.md",
+                "mode": "source",
+                "source": false
               },
-              "icon": "diff",
-              "title": "Diff: spatiotemporal_gnn.html"
+              "icon": "lucide-file",
+              "title": "模型结果记录"
             }
           }
         ]
@@ -90,12 +90,13 @@
             "state": {
               "type": "outline",
               "state": {
+                "file": "01-论文汇总/03_模型/01_结果/模型结果记录.md",
                 "followCursor": false,
                 "showSearch": false,
                 "searchQuery": ""
               },
               "icon": "lucide-list",
-              "title": "大纲"
+              "title": "模型结果记录 的大纲"
             }
           }
         ]
@@ -201,15 +202,11 @@
       "pdf-plus:PDF++: Toggle auto-focus": false,
       "pdf-plus:PDF++: Toggle auto-paste": false,
       "mermaid-tools:Open Mermaid Toolbar": false,
-      "periodic-notes:Open today": false,
       "obsidian-git:Open Git source control": false,
-      "obsidian-livesync:Show Log": false,
-      "obsidian-livesync:Replicate": false,
-      "obsidian-livesync:P2P Replicator": false,
-      "obsidian-livesync:Show Customization sync": false
+      "periodic-notes:Open today": false
     }
   },
-  "active": "eb6e51053b391d1d",
+  "active": "e945d6d16a11f41b",
   "lastOpenFiles": [
     "17-论文/北京市GPP模型构建.md",
     "000-八股/02-资料/计算机基础.pdf",
