@@ -52,7 +52,7 @@
 
 - <mark style="background: #FFB8EBA6;">特征构建</mark>：描述如何从43个初始变量出发，构建交互特征（如`ta_swc_interaction`）和周期性特征（`sin_DOY`, `cos_DOY`）。
 	
-- <mark style="background: #FFB8EBA6;">特征筛选</mark>：详细阐述多方法综合评估策略，即结合皮尔逊相关性、随机森林、XGBoost等方法对特征进行重要性排序，并最终筛选出24个核心特征的过程。
+- <mark style="background: #FFB8EBA6;">特征筛选</mark>：详细阐述多方法综合评估策略，即结合皮尔逊相关性、随机森林、XGBoost方法对特征进行重要性排序，并最终筛选出24个核心特征的过程。
 	
 - <mark style="background: #FFB8EBA6;">XGBoost模型构建</mark>： 介绍XGBoost模型的基本原理。重点突出采用<mark style="background: #FFB86CA6;">基于生态系统类型的分层采样</mark>策略来划分训练集和测试集，以保证模型的泛化能力。
 	
@@ -73,7 +73,7 @@
 
 ### 1.4.3 模型在不同生态系统上的泛化能力
 
-- 以表格形式对比模型在森林、绿地、湿地三个子集上的性能指标。
+- 以表格形式对比模型在森林、绿地、湿地三个子集上的<mark style="background: #BBFABBA6;"></mark>性能指标。
 - 突出模型在绿地上表现最好，在所有类型上均表现稳健的结论。
 - 验证在北京市不同区的差异。
 
