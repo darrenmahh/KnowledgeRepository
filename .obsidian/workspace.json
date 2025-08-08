@@ -186,7 +186,8 @@
       }
     ],
     "direction": "horizontal",
-    "width": 254.5
+    "width": 254.5,
+    "collapsed": true
   },
   "left-ribbon": {
     "hiddenItems": {
@@ -209,11 +210,11 @@
   "active": "c73cb68bb21ad705",
   "lastOpenFiles": [
     "01-论文汇总/03_模型/01_结果/模型结果记录.md",
+    "17-论文/北京市GPP模型构建.md",
     "login.html",
     "01-论文汇总/03_模型/01_结果/result.html",
     "01-论文汇总/03_模型/transformer.html",
     "01-论文汇总/03_模型/spatiotemporal_gnn.html",
-    "17-论文/北京市GPP模型构建.md",
     "000-八股/02-资料/计算机基础.pdf",
     "13-java八股/Prompt/通用2.0.md",
     "10-JavaGuide-main/docs/high-quality-technical-articles/advanced-programmer/20-bad-habits-of-bad-programmers.md",
