@@ -5,12 +5,12 @@
       "path": "17-论文/北京市GPP模型构建.md"
     },
     {
-      "basename": "通用2.0",
-      "path": "13-java八股/Prompt/通用2.0.md"
-    },
-    {
       "basename": "论文大纲",
       "path": "01-论文汇总/00-论文/论文大纲.md"
+    },
+    {
+      "basename": "通用2.0",
+      "path": "13-java八股/Prompt/通用2.0.md"
     },
     {
       "basename": "模型结果记录",

@@ -1,21 +1,24 @@
-
 # 1 **论文题目：
 
-## 1.1 **摘要 (Abstract)**
+## 1.1 **摘要
 
 - <mark style="background: #FFB8EBA6;">研究背景与目的</mark>： 阐述精准估算城市生态系统GPP的重要性，并明确本研究的目标——构建一个适用于北京市森林、绿地、湿地等多种生态系统的通用GPP模型。
+	
 - <mark style="background: #FFB8EBA6;">方法概述</mark>： 简要介绍研究方法，包括融合9个地面站点与多源遥感数据，采用<mark style="background: #FFB86CA6;">时间序列插值</mark>、<mark style="background: #FFB86CA6;">多方法特征筛选</mark>（从43个特征中筛选出24个核心特征）以及<mark style="background: #FFB86CA6;">基于生态系统分层采样</mark>的XGBoost建模策略，并展示不同模型之间差异。
+	
 - <mark style="background: #FFB8EBA6;">核心结果</mark>：展示模型的关键性能指标，包括总体R² (0.87)，以及在森林(0.86)、绿地(0.91)和湿地(0.81)上的出色表现。
+	
 - <mark style="background: #FFB8EBA6;">结论与意义</mark>： 总结本研究成功构建了一个具有强泛化能力的通用GPP模型，并指出其对北京市碳循环监测和生态管理的意义。
 
-**关键词 (Keywords):** 总初级生产力(GPP); XGBoost; 特征筛选; 数据融合; 北京
+**关键词 :** 总初级生产力(GPP); XGBoost; 特征筛选; 数据融合; 北京
 
-## 1.2 引言 (Introduction)
+## 1.2 引言
 
 ### 1.2.1 **研究背景**
 
 - 阐述全球碳循环背景下，城市生态系统GPP研究的重要性。
 - 介绍北京市作为特大城市的生态复杂性及其在区域碳收支中的关键作用。
+
 ### 1.2.2 **前人研究进展与不足**
 
 - 综述国内外GPP估算的主要方法（过程模型、光能利用率模型、机器学习模型）。
@@ -23,14 +26,15 @@
 
 ### 1.2.3 本研究的科学问题与目标
 
-- 提出核心科学问题：如何构建一个能适应北京市多种生态系统、并精准预测GPP的机器学习模型？
+- 提出核心问题：如何构建一个能适应北京市多种生态系统、并精准预测GPP的机器学习模型？
+	
 - 明确研究目标：
     1. 整合多源数据，构建高精度的日尺度GPP估算模型。
     2. 通过系统的特征筛选，识别驱动北京市GPP变化的核心因子。
     3. 严格验证模型的性能及其在不同生态系统间的泛化能力。
     4. 为后续实现北京市GPP空间制图提供可靠模型基础。
 
-## 1.3 **材料与方法 (Materials and Methods)**
+## 1.3 **数据与方法 
 
 ### 1.3.1 **研究区概况**
 
@@ -39,21 +43,25 @@
 ### 1.3.2 **数据来源与预处理**
 
 -  地面观测数据详细介绍9个通量观测站点的分布、覆盖的生态系统类型，以及提供的日尺度GPP和气象数据。
-- 遥感数据:详细列出使用的遥感数据源（<mark style="background: #FF5582A6;">MODIS MOD13A1</mark>的<mark style="background: #FFB86CA6;">NDVI</mark>, <mark style="background: #FF5582A6;">MODIS MCD15A3H</mark>的<mark style="background: #FFB86CA6;">LAI</mark>, <mark style="background: #FF5582A6;">Sentinel-2</mark>的<mark style="background: #FFB86CA6;">光谱波段</mark>）。
-- 时间序列数据重建:重点描述为解决遥感数据与地面数据时间尺度不匹配问题而采用的插值方法(季节性中位数-线性插值-前向后向填充)。
+	
+- 遥感数据:详细列出使用的遥感数据源（<mark style="background: #FF5582A6;">MODIS MOD13A1</mark>的<mark style="background: #FFB86CA6;">NDVI</mark>，<mark style="background: #FF5582A6;">MODIS MCD15A3H</mark>的<mark style="background: #FFB86CA6;">LAI</mark>，<mark style="background: #FF5582A6;">Sentinel-2</mark>的<mark style="background: #FFB86CA6;">光谱波段</mark>，使用光谱计算得来的<mark style="background: #FFB86CA6;">NIRv</mark>、<mark style="background: #FFB86CA6;">EVI</mark>）。
+	
+- 时间序列数据重建:重点描述为解决遥感数据与地面数据时间尺度不匹配问题而采用的插值方法(季节性中位数-线性插值)。
 
 ### 1.3.3 研究方法
 
-- <mark style="background: #FFB8EBA6;">特征工程</mark>：描述如何从43个初始变量出发，构建交互特征（如`ta_swc_interaction`）和周期性特征（`sin_DOY`, `cos_DOY`）。
+- <mark style="background: #FFB8EBA6;">特征构建</mark>：描述如何从43个初始变量出发，构建交互特征（如`ta_swc_interaction`）和周期性特征（`sin_DOY`, `cos_DOY`）。
+	
 - <mark style="background: #FFB8EBA6;">特征筛选</mark>：详细阐述多方法综合评估策略，即结合皮尔逊相关性、随机森林、XGBoost等方法对特征进行重要性排序，并最终筛选出24个核心特征的过程。
-- <mark style="background: #FFB8EBA6;">XGBoost模型构建</mark>： 介绍XGBoost模型的基本原理。重点突出采用<mark style="background: #FFB8EBA6;">基于生态系统类型的分层采样</mark>策略来划分训练集和测试集，以保证模型的泛化能力。
+	
+- <mark style="background: #FFB8EBA6;">XGBoost模型构建</mark>： 介绍XGBoost模型的基本原理。重点突出采用<mark style="background: #FFB86CA6;">基于生态系统类型的分层采样</mark>策略来划分训练集和测试集，以保证模型的泛化能力。
+	
 - <mark style="background: #FFB8EBA6;">模型评估</mark>：列出用于评估模型性能的指标（`R², RMSE, MAE, Slope, Bias`），并说明将从“总体”和“分生态系统类型”两个层面进行评估。
 
-## 1.4 **结果 (Results)**
+## 1.4 **结果
+### 1.4.1 特征重要性分析
 
-### 1.4.1 **特征重要性分析**
-
-- 展示综合排序后的特征重要性结果，可以图或表的形式列出排名前列的关键特征（例如前15名）。
+- 展示综合排序后的特征重要性结果
 
 ### 1.4.2 模型总体性能
 
@@ -68,7 +76,7 @@
 - 以表格形式对比模型在森林、绿地、湿地三个子集上的性能指标。
 - 突出模型在绿地上表现最好，在所有类型上均表现稳健的结论。
 
-## 1.5 讨论 (Discussion)
+## 1.5 讨论
 
 ### 1.5.1 模型性能分析
 
@@ -77,22 +85,22 @@
 
 ### 1.5.2 关键驱动因子解读
 
-- 结合特征重要性排名，从生态学角度解读排名前列的特征（如交互项、温度、植被指数等）为什么是影响GPP的关键因子。
+- 结合特征重要性排名，从生态学角度解读排名前列的特征（交互项、温度、植被指数等）为什么是影响GPP的关键因子。
 
 ### 1.5.3 研究的创新性与局限性
 
-- 总结本研究在方法上的创新点（如多方法特征筛选、针对城市多生态系统的分层建模等）。
-- 坦诚地指出研究的局限性（如站点数量有限、遥感数据插值可能引入的不确定性等）。
+- 总结本研究在方法上的创新点（交互特征构建、多方法特征筛选、针对城市多生态系统的分层建模等）。
+- 坦诚地指出研究的局限性（站点数量有限、遥感数据插值可能引入的不确定性等）。
 
 ### 1.5.4 未来展望
 
 - 明确指出本研究是后续工作的基础，下一步将利用此模型进行整个北京市的GPP空间制图与时空动态分析。
 
-## 1.6 结论 (Conclusion)
+## 1.6 结论
 
 - 总结本研究成功构建了一个高精度、强泛化能力的通用GPP模型，能够适用于北京市复杂的城市生态系统。
 - 再次强调模型的关键性能（总体R²=0.87），以及在森林、绿地、湿地上均表现出色的结论。
 
-## 1.7 **参考文献 (References)**
+## 1.7 **参考文献
 
-## 1.8 **致谢 (Acknowledgements)**
+## 1.8 **致谢
