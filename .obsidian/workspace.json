@@ -13,12 +13,12 @@
             "state": {
               "type": "markdown",
               "state": {
-                "file": "01-论文汇总/03_模型/01_结果/模型结果记录.md",
+                "file": "17-论文/北京市GPP模型构建.md",
                 "mode": "source",
                 "source": false
               },
               "icon": "lucide-file",
-              "title": "模型结果记录"
+              "title": "北京市GPP模型构建"
             }
           }
         ]
@@ -90,13 +90,13 @@
             "state": {
               "type": "outline",
               "state": {
-                "file": "01-论文汇总/03_模型/01_结果/模型结果记录.md",
+                "file": "17-论文/北京市GPP模型构建.md",
                 "followCursor": false,
                 "showSearch": false,
                 "searchQuery": ""
               },
               "icon": "lucide-list",
-              "title": "模型结果记录 的大纲"
+              "title": "北京市GPP模型构建 的大纲"
             }
           }
         ]
@@ -206,13 +206,17 @@
       "periodic-notes:Open today": false
     }
   },
-  "active": "e945d6d16a11f41b",
+  "active": "c73cb68bb21ad705",
   "lastOpenFiles": [
+    "01-论文汇总/03_模型/01_结果/模型结果记录.md",
+    "login.html",
+    "01-论文汇总/03_模型/01_结果/result.html",
+    "01-论文汇总/03_模型/transformer.html",
+    "01-论文汇总/03_模型/spatiotemporal_gnn.html",
     "17-论文/北京市GPP模型构建.md",
     "000-八股/02-资料/计算机基础.pdf",
     "13-java八股/Prompt/通用2.0.md",
     "10-JavaGuide-main/docs/high-quality-technical-articles/advanced-programmer/20-bad-habits-of-bad-programmers.md",
-    "01-论文汇总/03_模型/01_结果/模型结果记录.md",
     "01-论文汇总/00-论文/论文大纲.md",
     "17-论文",
     "00_系统配置/待办.md",
@@ -238,10 +242,6 @@
     "000-八股/02-资料/JVM.pdf",
     "000-八股/02-资料/JavaSE.pdf",
     "000-八股/01-笔记/MQ/消息队列.md",
-    "000-八股/02-资料/MQ.pdf",
-    "000-八股/02-资料/MySQL.pdf",
-    "000-八股/02-资料/Redis.pdf",
-    "000-八股/02-资料/Spring全家桶.pdf",
     "confirm机制.md",
     "05-GWY/Pasted image 20250623095226.png",
     "assets/img/7/2/0/720d7e4ab8b18d26c3e6c7ed8f7179be9764cfdc08282dbc0e0673816acca11f.png",

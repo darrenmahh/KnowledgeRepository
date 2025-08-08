@@ -1,12 +1,24 @@
 {
   "recentFiles": [
     {
+      "basename": "北京市GPP模型构建",
+      "path": "17-论文/北京市GPP模型构建.md"
+    },
+    {
       "basename": "模型结果记录",
       "path": "01-论文汇总/03_模型/01_结果/模型结果记录.md"
     },
     {
-      "basename": "北京市GPP模型构建",
-      "path": "17-论文/北京市GPP模型构建.md"
+      "basename": "result",
+      "path": "01-论文汇总/03_模型/01_结果/result.html"
+    },
+    {
+      "basename": "transformer",
+      "path": "01-论文汇总/03_模型/transformer.html"
+    },
+    {
+      "basename": "spatiotemporal_gnn",
+      "path": "01-论文汇总/03_模型/spatiotemporal_gnn.html"
     },
     {
       "basename": "计算机基础",
@@ -183,22 +195,6 @@
     {
       "basename": "Redis",
       "path": "000-八股/Redis.pdf"
-    },
-    {
-      "basename": "MySQL",
-      "path": "000-八股/MySQL.pdf"
-    },
-    {
-      "basename": "Java基础面试题",
-      "path": "13-java八股/Java基础面试题.md"
-    },
-    {
-      "basename": "白鹭申论进度",
-      "path": "05-GWY/02-申论/白鹭申论进度.md"
-    },
-    {
-      "basename": "home",
-      "path": "10-JavaGuide-main/docs/home.md"
     }
   ],
   "omittedPaths": [],

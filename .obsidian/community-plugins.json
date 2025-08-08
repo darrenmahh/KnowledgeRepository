@@ -18,5 +18,6 @@
   "contribution-graph",
   "dataview",
   "obsidian-emoji-toolbar",
-  "obsidian-git"
+  "obsidian-git",
+  "obsidian-html-plugin"
 ]
