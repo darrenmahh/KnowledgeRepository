@@ -1,12 +1,16 @@
 {
   "recentFiles": [
     {
-      "basename": "模型结果记录",
-      "path": "01-论文汇总/03_模型/01_结果/模型结果记录.md"
-    },
-    {
       "basename": "北京市GPP模型构建",
       "path": "17-论文/北京市GPP模型构建.md"
+    },
+    {
+      "basename": "20-bad-habits-of-bad-programmers",
+      "path": "10-JavaGuide-main/docs/high-quality-technical-articles/advanced-programmer/20-bad-habits-of-bad-programmers.md"
+    },
+    {
+      "basename": "模型结果记录",
+      "path": "01-论文汇总/03_模型/01_结果/模型结果记录.md"
     },
     {
       "basename": "论文大纲",
@@ -195,10 +199,6 @@
     {
       "basename": "home",
       "path": "10-JavaGuide-main/docs/home.md"
-    },
-    {
-      "basename": "java-basic-questions-01",
-      "path": "10-JavaGuide-main/docs/java/basis/java-basic-questions-01.md"
     }
   ],
   "omittedPaths": [],

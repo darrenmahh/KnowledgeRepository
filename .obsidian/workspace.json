@@ -4,21 +4,21 @@
     "type": "split",
     "children": [
       {
-        "id": "1b4f2343104855ab",
+        "id": "72f69a6b0ed9babe",
         "type": "tabs",
         "children": [
           {
-            "id": "6e2e5eff15c3094a",
+            "id": "f7326f170ac9d6c6",
             "type": "leaf",
             "state": {
               "type": "markdown",
               "state": {
-                "file": "01-论文汇总/03_模型/01_结果/模型结果记录.md",
+                "file": "17-论文/北京市GPP模型构建.md",
                 "mode": "source",
                 "source": false
               },
               "icon": "lucide-file",
-              "title": "模型结果记录"
+              "title": "北京市GPP模型构建"
             }
           }
         ]
@@ -73,7 +73,7 @@
             "state": {
               "type": "search",
               "state": {
-                "query": "",
+                "query": "tag:#练级攻略",
                 "matchingCase": false,
                 "explainSearch": false,
                 "collapseAll": false,
@@ -90,17 +90,16 @@
             "state": {
               "type": "outline",
               "state": {
-                "file": "01-论文汇总/03_模型/01_结果/模型结果记录.md",
+                "file": "17-论文/北京市GPP模型构建.md",
                 "followCursor": false,
                 "showSearch": false,
                 "searchQuery": ""
               },
               "icon": "lucide-list",
-              "title": "模型结果记录 的大纲"
+              "title": "北京市GPP模型构建 的大纲"
             }
           }
-        ],
-        "currentTab": 4
+        ]
       }
     ],
     "direction": "horizontal",
@@ -183,7 +182,7 @@
             }
           }
         ],
-        "currentTab": 2
+        "currentTab": 4
       }
     ],
     "direction": "horizontal",
@@ -211,12 +210,13 @@
       "obsidian-livesync:Show Customization sync": false
     }
   },
-  "active": "6e2e5eff15c3094a",
+  "active": "f7326f170ac9d6c6",
   "lastOpenFiles": [
+    "10-JavaGuide-main/docs/high-quality-technical-articles/advanced-programmer/20-bad-habits-of-bad-programmers.md",
     "17-论文/北京市GPP模型构建.md",
+    "01-论文汇总/03_模型/01_结果/模型结果记录.md",
     "01-论文汇总/00-论文/论文大纲.md",
     "13-java八股/Prompt/通用2.0.md",
-    "01-论文汇总/03_模型/01_结果/模型结果记录.md",
     "17-论文",
     "00_系统配置/待办.md",
     "00_系统配置/HTML模板.md",
@@ -248,7 +248,6 @@
     "000-八股/02-资料/计算机基础.pdf",
     "confirm机制.md",
     "000-八股/01-笔记/Redis/Redis.md",
-    "000-八股/01-笔记/Redis/Redis阶段一.md",
     "05-GWY/Pasted image 20250623095226.png",
     "assets/img/7/2/0/720d7e4ab8b18d26c3e6c7ed8f7179be9764cfdc08282dbc0e0673816acca11f.png",
     "05-GWY/01-行测/02-逻辑判断/0102-花生十三逻辑判断/-1--images/Pasted image 20250630192724.png",
