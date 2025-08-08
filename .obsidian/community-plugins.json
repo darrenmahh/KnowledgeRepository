@@ -17,5 +17,7 @@
   "code-styler",
   "contribution-graph",
   "dataview",
-  "obsidian-emoji-toolbar"
+  "obsidian-emoji-toolbar",
+  "obsidian-git",
+  "obsidian-livesync"
 ]

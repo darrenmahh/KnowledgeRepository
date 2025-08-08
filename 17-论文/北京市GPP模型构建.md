@@ -4,7 +4,7 @@
 ## 1.1 **摘要 (Abstract)**
 
 - <mark style="background: #FFB8EBA6;">研究背景与目的</mark>： 阐述精准估算城市生态系统GPP的重要性，并明确本研究的目标——构建一个适用于北京市森林、绿地、湿地等多种生态系统的通用GPP模型。
-- <mark style="background: #FFB8EBA6;">方法概述</mark>： 简要介绍研究方法，包括融合9个地面站点与多源遥感数据，采用时间序列插值、多方法特征筛选（从43个特征中筛选出24个核心特征）以及基于生态系统分层采样的XGBoost建模策略，并展示不同模型之间差异。
+- <mark style="background: #FFB8EBA6;">方法概述</mark>： 简要介绍研究方法，包括融合9个地面站点与多源遥感数据，采用<mark style="background: #FFB86CA6;">时间序列插值</mark>、<mark style="background: #FFB86CA6;">多方法特征筛选</mark>（从43个特征中筛选出24个核心特征）以及<mark style="background: #FFB86CA6;">基于生态系统分层采样</mark>的XGBoost建模策略，并展示不同模型之间差异。
 - <mark style="background: #FFB8EBA6;">核心结果</mark>：展示模型的关键性能指标，包括总体R² (0.87)，以及在森林(0.86)、绿地(0.91)和湿地(0.81)上的出色表现。
 - <mark style="background: #FFB8EBA6;">结论与意义</mark>： 总结本研究成功构建了一个具有强泛化能力的通用GPP模型，并指出其对北京市碳循环监测和生态管理的意义。
 
