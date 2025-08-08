@@ -4,11 +4,11 @@
     "type": "split",
     "children": [
       {
-        "id": "72f69a6b0ed9babe",
+        "id": "318f1deb8827a1db",
         "type": "tabs",
         "children": [
           {
-            "id": "f7326f170ac9d6c6",
+            "id": "eb6e51053b391d1d",
             "type": "leaf",
             "state": {
               "type": "markdown",
@@ -210,13 +210,14 @@
       "obsidian-livesync:Show Customization sync": false
     }
   },
-  "active": "f7326f170ac9d6c6",
+  "active": "eb6e51053b391d1d",
   "lastOpenFiles": [
-    "10-JavaGuide-main/docs/high-quality-technical-articles/advanced-programmer/20-bad-habits-of-bad-programmers.md",
+    "000-八股/02-资料/计算机基础.pdf",
+    "13-java八股/Prompt/通用2.0.md",
     "17-论文/北京市GPP模型构建.md",
+    "10-JavaGuide-main/docs/high-quality-technical-articles/advanced-programmer/20-bad-habits-of-bad-programmers.md",
     "01-论文汇总/03_模型/01_结果/模型结果记录.md",
     "01-论文汇总/00-论文/论文大纲.md",
-    "13-java八股/Prompt/通用2.0.md",
     "17-论文",
     "00_系统配置/待办.md",
     "00_系统配置/HTML模板.md",
@@ -245,9 +246,7 @@
     "000-八股/02-资料/MySQL.pdf",
     "000-八股/02-资料/Redis.pdf",
     "000-八股/02-资料/Spring全家桶.pdf",
-    "000-八股/02-资料/计算机基础.pdf",
     "confirm机制.md",
-    "000-八股/01-笔记/Redis/Redis.md",
     "05-GWY/Pasted image 20250623095226.png",
     "assets/img/7/2/0/720d7e4ab8b18d26c3e6c7ed8f7179be9764cfdc08282dbc0e0673816acca11f.png",
     "05-GWY/01-行测/02-逻辑判断/0102-花生十三逻辑判断/-1--images/Pasted image 20250630192724.png",

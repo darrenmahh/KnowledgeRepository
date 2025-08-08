@@ -5,6 +5,14 @@
       "path": "17-论文/北京市GPP模型构建.md"
     },
     {
+      "basename": "计算机基础",
+      "path": "000-八股/02-资料/计算机基础.pdf"
+    },
+    {
+      "basename": "通用2.0",
+      "path": "13-java八股/Prompt/通用2.0.md"
+    },
+    {
       "basename": "20-bad-habits-of-bad-programmers",
       "path": "10-JavaGuide-main/docs/high-quality-technical-articles/advanced-programmer/20-bad-habits-of-bad-programmers.md"
     },
@@ -15,10 +23,6 @@
     {
       "basename": "论文大纲",
       "path": "01-论文汇总/00-论文/论文大纲.md"
-    },
-    {
-      "basename": "通用2.0",
-      "path": "13-java八股/Prompt/通用2.0.md"
     },
     {
       "basename": "待办",
@@ -175,10 +179,6 @@
     {
       "basename": "20250714",
       "path": "15-开会记录/20250714.md"
-    },
-    {
-      "basename": "计算机基础",
-      "path": "000-八股/02-资料/计算机基础.pdf"
     },
     {
       "basename": "Redis",
