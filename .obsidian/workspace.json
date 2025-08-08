@@ -63,8 +63,8 @@
             "state": {
               "type": "recent-files",
               "state": {},
-              "icon": "clock",
-              "title": "Recent Files"
+              "icon": "lucide-file",
+              "title": "插件不再活动"
             }
           },
           {
@@ -167,8 +167,8 @@
             "state": {
               "type": "quiet-outline",
               "state": {},
-              "icon": "lines-of-text",
-              "title": "Quiet Outline"
+              "icon": "lucide-file",
+              "title": "插件不再活动"
             }
           },
           {
@@ -208,8 +208,8 @@
   },
   "active": "c73cb68bb21ad705",
   "lastOpenFiles": [
-    "01-论文汇总/03_模型/01_结果/模型结果记录.md",
     "17-论文/北京市GPP模型构建.md",
+    "01-论文汇总/03_模型/01_结果/模型结果记录.md",
     "login.html",
     "01-论文汇总/03_模型/01_结果/result.html",
     "01-论文汇总/03_模型/transformer.html",
