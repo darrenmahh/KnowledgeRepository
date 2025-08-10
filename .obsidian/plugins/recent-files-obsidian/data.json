@@ -1,6 +1,30 @@
 {
   "recentFiles": [
     {
+      "basename": "deprecated-java-technologies",
+      "path": "10-JavaGuide-main/docs/about-the-author/deprecated-java-technologies.md"
+    },
+    {
+      "basename": "index",
+      "path": "10-JavaGuide-main/index.html"
+    },
+    {
+      "basename": "SQL笔记",
+      "path": "000-八股/01-笔记/SQL/SQL笔记.md"
+    },
+    {
+      "basename": "Redis",
+      "path": "000-八股/01-笔记/Redis/Redis.md"
+    },
+    {
+      "basename": "Redis阶段一",
+      "path": "000-八股/01-笔记/Redis/Redis阶段一.md"
+    },
+    {
+      "basename": "消息队列",
+      "path": "000-八股/01-笔记/MQ/消息队列.md"
+    },
+    {
       "basename": "北京市GPP模型构建",
       "path": "17-论文/北京市GPP模型构建.md"
     },
@@ -125,10 +149,6 @@
       "path": "000-八股/02-资料/JavaSE.pdf"
     },
     {
-      "basename": "消息队列",
-      "path": "000-八股/01-笔记/MQ/消息队列.md"
-    },
-    {
       "basename": "MQ",
       "path": "000-八股/02-资料/MQ.pdf"
     },
@@ -179,22 +199,6 @@
     {
       "basename": "言语理解",
       "path": "05-GWY/00-笔记/言语理解.md"
-    },
-    {
-      "basename": "Java基础笔记",
-      "path": "000-八股/01-笔记/Java基础笔记.md"
-    },
-    {
-      "basename": "花生十三逻辑600题",
-      "path": "05-GWY/01-行测/02-逻辑判断/0102-花生十三逻辑判断/花生十三逻辑600题.md"
-    },
-    {
-      "basename": "20250714",
-      "path": "15-开会记录/20250714.md"
-    },
-    {
-      "basename": "Redis",
-      "path": "000-八股/Redis.pdf"
     }
   ],
   "omittedPaths": [],
