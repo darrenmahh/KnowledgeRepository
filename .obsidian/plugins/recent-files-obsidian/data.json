@@ -1,6 +1,34 @@
 {
   "recentFiles": [
     {
+      "basename": "README",
+      "path": "10-JavaGuide-main/docs/about-the-author/README.md"
+    },
+    {
+      "basename": "my-article-was-stolen-and-made-into-video-and-it-became-popular",
+      "path": "10-JavaGuide-main/docs/about-the-author/my-article-was-stolen-and-made-into-video-and-it-became-popular.md"
+    },
+    {
+      "basename": "javaguide-100k-star",
+      "path": "10-JavaGuide-main/docs/about-the-author/javaguide-100k-star.md"
+    },
+    {
+      "basename": "internet-addiction-teenager",
+      "path": "10-JavaGuide-main/docs/about-the-author/internet-addiction-teenager.md"
+    },
+    {
+      "basename": "feelings-of-half-a-year-from-graduation-to-entry",
+      "path": "10-JavaGuide-main/docs/about-the-author/feelings-of-half-a-year-from-graduation-to-entry.md"
+    },
+    {
+      "basename": "feelings-after-one-month-of-induction-training",
+      "path": "10-JavaGuide-main/docs/about-the-author/feelings-after-one-month-of-induction-training.md"
+    },
+    {
+      "basename": "dog-that-copies-other-people-essay",
+      "path": "10-JavaGuide-main/docs/about-the-author/dog-that-copies-other-people-essay.md"
+    },
+    {
       "basename": "deprecated-java-technologies",
       "path": "10-JavaGuide-main/docs/about-the-author/deprecated-java-technologies.md"
     },
@@ -171,34 +199,6 @@
     {
       "basename": "Redis",
       "path": "000-八股/02-资料/Redis.pdf"
-    },
-    {
-      "basename": "通用",
-      "path": "13-java八股/Prompt/通用.md"
-    },
-    {
-      "basename": "MySQL",
-      "path": "000-八股/02-资料/MySQL.pdf"
-    },
-    {
-      "basename": "Spring全家桶",
-      "path": "000-八股/02-资料/Spring全家桶.pdf"
-    },
-    {
-      "basename": "电影",
-      "path": "00_系统配置/电影.md"
-    },
-    {
-      "basename": "SQL前29答题",
-      "path": "000-八股/03-测试/SQL前29答题.md"
-    },
-    {
-      "basename": "SQL前29",
-      "path": "000-八股/03-测试/SQL前29.md"
-    },
-    {
-      "basename": "言语理解",
-      "path": "05-GWY/00-笔记/言语理解.md"
     }
   ],
   "omittedPaths": [],
